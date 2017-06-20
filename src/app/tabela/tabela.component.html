@@ -1,0 +1,52 @@
+<div class="tabela">
+  <div class ="header">
+  <app-footer-ostalo></app-footer-ostalo><br><br><br>
+  </div>
+  <div class="col-sm-12 col-md-12 razmak">
+    <div class="col-md-1 col-md-offset-1 col-sm-1 col-sm-offset-1">  
+      <div class="godina">
+          <p>Godina:</p>
+          <input [(ngModel)]="selectedGodinaTabelaKorisnik" style="width: 100px;" class="form-control" (click)="provera_godina_tabela_korisnik();" type="number" min="2017" max="2019" step="1" size="12" autocomplete='on'>
+          <!--{{ selectedGodina_tabela_korisnik }}-->
+      </div><br>
+    </div>
+    <div class="col-sm-7 col-md-7 col-lg-7 col-xl-7">
+      <div class="mesec">    
+            <p>Mesec:</p>
+          <select [(ngModel)]="selectedMesecTabela" class="form-control" (click)="odabraniMesecTabela();" name="mesec" id="mesec" list="mesec" style="width:150px; ">
+              <option *ngFor="let i of deviceObjects" [selected]="i === mesecP" >{{i?.name}}</option>
+          </select>				
+        </div>
+    </div>   
+  </div>
+  <div class="col-sm-12 col-md-12">
+    <div class="col-sm-7 col-sm-offset-1 col-md-7 col-md-offset-1 col-lg-7 col-lg-offset-1 col-xl-7 col-xl-offset-1"><br> 
+      <table class="table table-bordered">
+        <tr class="active">
+          <th style="width:340px;">Projekti</th>
+          <th *ngFor="let i of NizObjekiNedelje">{{i.Oznaka}}</th>
+        </tr>
+        <tr *ngFor="let i of projektiObjekiNedelje; let n = index;">
+          <th >{{i.Projekti}}</th>
+          <th *ngFor="let ned of NizObjekiNedelje" style="color:#A9A9A9">{{i[ned.Oznaka]}}</th>
+          <!--<td><button id="1{{ idNiz }}" style="width:75px;" class="btn btn-danger"  (click)="NizVidljivost(niz.Projekti,idNiz)">Prikazi</button></td>-->
+        </tr>
+        <tr>
+          <th>Ukupno</th>
+          <th *ngFor="let sum of this.sumNedelja">{{sum}}</th>
+        </tr>
+      </table><br><br><br>  
+    </div>
+  </div>
+  <div>
+      <p-dialog header="Obavestenje!!" [ngStyle]="{'width': valueSize +'px'}"  [(visible)]="display" modal="modal">
+          {{ textError  }}
+          <p-footer>
+            <div class="ui-dialog-buttonpane ui-widget-content ui-helper-clearfix" style="margin-top: 50px;">
+                <button type="button"   style="width:75px;" (click)="display=false; Izlaz();" >{{ textErrorIzlaz }}</button>
+            </div>
+        </p-footer>
+      </p-dialog>
+    </div>
+</div>
+<app-header></app-header>   

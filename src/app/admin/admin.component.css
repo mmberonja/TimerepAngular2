@@ -1,0 +1,152 @@
+.row {
+
+    width: 100%;
+}
+
+.razmak{
+
+    margin-top:75px; 
+}
+
+hr {
+    color: black;
+    background-color: black;
+    height: 1px;
+}
+
+#Naslovi{
+
+    width: 500px;
+    font-size: 25px;
+
+}
+
+/*Postavljanje klasa da budu jedna pored druge!!*/
+div.projekat-input, div.projekat-button,div.text-dodaj-novi-projekat{
+	display:inline-block;
+}
+
+div.korisnik-dodavanje, div.projekat-dodavanje,div.button-dodavanje{
+    display:inline-block;
+}
+
+#projekat-dodavanje-novog{
+    font-size: 17px;
+}
+
+
+
+/*#prazno {
+   padding:10px;
+   padding-bottom:60px;   
+}*/
+
+html, body {
+		height: 100%;
+		margin: 0;
+		padding: 0;
+}
+		
+#body1 {
+		padding:10px;
+		padding-bottom:60px;   /* Height of the footer */
+}
+
+#footer {
+	clear: both;
+    position: relative;
+    z-index: 10;
+    height: 4em;
+    margin-top: -3em;
+    background-color: black;
+}
+
+
+.micko table, th, td {
+    border: 1px solid #D3D3D3;
+    border-collapse: collapse;
+    
+    
+}
+
+
+.scroll-table {
+    height: 800px !important;
+    width: 1800px;
+    overflow-y:scroll;
+}
+
+   
+ .rotate1 {
+    width: 50px;
+    height: 20px;
+    background-color: yellow;
+    /* Rotate div */
+    
+    -webkit-transform: rotate(-90deg); /* Chrome, Safari, Opera */
+    transform: rotate(-90deg);
+
+ }
+
+
+table micko {
+	margin-bottom: 20px;
+}
+ tr#groups {
+	/*display:block;
+	margin-left:120px;
+	margin-top:120px;*/
+}
+ th.rotate {
+    white-space: nowrap;
+    -webkit-transform-origin: 65px 60px;
+    -moz-transform-origin: 65px 60px;
+    -o-transform-origin: 65px 60px;
+    -ms-transform-origin: 65px 60px;
+    transform-origin: 65px 60px;
+    
+	-webkit-transform: rotate(270deg);
+	-moz-transform: rotate(270deg);
+	-ms-transform: rotate(270deg);
+	-o-transform: rotate(270deg);
+	transform: rotate(270deg);
+	
+}
+span.intact {
+	display:inline-block;
+	width:30px;
+	height:150px;
+    margin-right:0px;
+    margin-left:-5px;
+    margin-bottom:-10px;
+}
+
+th.rotate span {
+	/* rotated text in IE renders very bad (unless you use clear type), so that even by making it normal, looks less bold but still bold */
+    font-weight: normal\9; /* \9 is an hack for IE8 and below */
+    letter-spacing: 3px\9; /* because is so bold, need to give letters some space to breath */
+
+    filter: progid:DXImageTransform.Microsoft.Matrix(M11=0, M12=1, M21=-1, M22=0, SizingMethod = "auto expand");
+    width: 150px\9;
+    height: 150px\9;
+    margin-right: -130px\9;
+}
+
+td.menuItems {
+	
+}
+td.no-indent {
+	font-weight: bold;
+	width: 500px;
+}
+td.indent {
+	padding-left:12px;
+}
+td.rights {
+	width:20px;
+    text-align: center;
+}
+div.wrapper {
+  width: 100%;
+  overflow-x: auto;
+}

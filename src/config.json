@@ -1,0 +1,9 @@
+{
+"konfiguracija":
+	{
+		"konekcija":
+			{
+				"web": "http://localhost:3090/"
+			}
+	}
+}

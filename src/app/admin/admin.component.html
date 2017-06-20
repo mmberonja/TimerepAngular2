@@ -1,0 +1,357 @@
+<div class="admin">
+  <div>
+  <app-footer-ostalo></app-footer-ostalo><br><br>
+  </div>
+    <div class="container-fluid ">
+      <div class="row">
+      </div>
+    </div>
+  <div class="container-fluid razmak">
+    <div class="row">
+      <div class="col-sm-5 col-md-5 col-lg-5">
+        <div class="projekat-input" style="vertical-align: top; padding: 0;">
+          <h4 class="first">Godina:</h4>
+          <input (click)="KlikGodinaKorisnik()"  class="form-control"  type="number" min="2017" max="2019" step="1" autocomplete='on'  [(ngModel)]="selectedGodinakorisniciAdmin">
+        </div>
+         &nbsp; &nbsp; &nbsp;
+        <div class="projekat-button">    
+          <h4 class="first">Mesec:</h4>
+            <select [(ngModel)]="KorisniciMesecAdmin" class="form-control" (click)="MesecAdminF()" name="mesec" id="mesec" list="mesec" style="width:150px; ">
+              <option *ngFor="let i of nizMesec"  >{{i.name}}</option>
+            </select>				
+        </div>&nbsp; &nbsp; &nbsp;<br>
+      </div>  
+      <div class="col-sm-7 col-md-7 col-lg-7">
+      </div>
+    </div>
+  </div>
+  <br>
+  <div class="container-fluid ">
+     <div class="wrapper">
+        <table class="micko">
+            <tr id="groups" >
+              <th class="rotate">&nbsp;</th>
+              <th class="rotate" *ngFor="let korisnici of this.nizObjKorisnik;" ><span class="intact">{{korisnici.ime}}</span></th>
+              <th class="rotate"  ><span class="intact">Ukupno</span></th>
+            </tr>
+           
+            <tr *ngFor="let obj of this.PakovanjeProjekata; let i = index;">
+              <th style="display:inline-block;width: 350px;">{{obj.Projekat}}</th>
+              <th *ngFor="let korisnici of this.nizObjKorisnik;" style="font-weight: lighter;font-style: normal; " >{{obj[korisnici.oznaka]}}</th><!--[ngStyle]="{'background-color':boja}"-->
+              <th >{{SumaPoProjektu[i]}}</th>
+            </tr>
+           
+            <tr>
+              <th>Ukupno</th>
+              <th *ngFor="let sumHor of this.SumaPoKorisniku;" >{{sumHor}}</th>
+            </tr>  
+        </table>
+     </div>
+    <!--<div class="wrapper">
+      <table class="micko">
+        <tr id="groups">
+          <th class="rotate">&nbsp;</th>
+          <th class="rotate" *ngFor="let korisnici of this.NizKorisnici;" ><span class="intact">{{korisnici}}</span></th>
+          <th class="rotate"  ><span class="intact">sum</span></th>
+        </tr>
+        <tr *ngFor="let obj of this.NizObjekataKorPr; let i = index;">
+          <th style="display:inline-block;width: 350px;">{{obj.Projekat}}</th>
+          <th *ngFor="let korisnici of this.NizKorisnici;" style="font-weight: lighter;font-style: normal;">{{obj[korisnici]}}</th>
+          <th  >{{SumaNizVertikalno[i]}}</th>
+        </tr>
+        <tr>
+          <th>sum</th>
+          <th *ngFor="let sumHor of this.SumaNizHorizontalno;" style="font-weight: lighter;font-style: normal;">{{sumHor}}</th>
+        </tr>  
+      </table>
+    </div>  --> 
+  </div>
+  <br>
+  <hr>
+  <div class="container-fluid ">
+    <div class="row">
+      <div class="col-sm-5 col-md-5 col-lg-5">
+        <div class="projekat-input" style="vertical-align: top; padding: 0;">
+          <h4 class="first">Godina:</h4>
+          <input (click)="KlikGodinaProjekti()" class="form-control"  type="number" min="2017" max="2019" step="1" autocomplete='on' style="width:100px;" [(ngModel)]="selectedGodinaProjektiAdmin">
+        </div> 
+        
+        &nbsp; &nbsp; &nbsp;
+        <div class="text-dodaj-novi-projekat">    
+          <h4 class="first">Mesec:</h4>
+            <select [(ngModel)]="ProjektiMesecAdmin" class="form-control" (click)="MesecAdminProjekti()" name="mesec" id="mesec" list="mesec" style="width:150px; ">
+              <option *ngFor="let i of nizMesec">{{i.name}}</option>
+            </select>				
+        </div>
+          &nbsp; &nbsp; &nbsp;
+        <div class="projekat-button">
+          <h4 class="first">Projekat:</h4>
+          <p-dropdown (click)="KlikProjektiAdmin()" [options]="projektiDropDown" [(ngModel)]="selectedProjektiAktivni" [style]="{'width':'250px', 'height':'34px'}"  filter="filter"></p-dropdown>
+        </div>
+      </div> 
+    </div>  
+  </div>
+  <br>
+  <div class="container-fluid "> 
+      <div class="wrapper">
+        <table class="micko">
+            <tr id="groups" >
+              <th class="rotate">&nbsp;</th>
+              <th class="rotate" *ngFor="let korisnici of this.detaljiNizObjKorisnik;" ><span class="intact">{{korisnici.ime}}</span></th>
+              <th class="rotate"  ><span class="intact">Ukupno</span></th>
+            </tr>
+           
+            <tr *ngFor="let obj of this.pakovanjeDetalji; let i = index;"> 
+              <th style="display:inline-block;width: 350px;">{{obj.Projekat}}</th>
+              <th *ngFor="let korisnici of this.detaljiNizObjKorisnik;" style="font-weight: lighter;font-style: normal; " >{{obj[korisnici.oznaka]}}</th> <!--[ngStyle]="{'background-color':boja}"-->
+              <th >{{SumaPoNedeljamaDetalji[i]}}</th>
+            </tr>
+            <tr>
+              <th>Ukupno</th>
+              <th *ngFor="let sum of this.SumaPoKorisnikuProjekat;">{{sum}}</th>
+            </tr>  
+        </table>
+     </div>
+  </div>
+  <br>
+  <!-- <div class="container-fluid ">
+    <div class="row">
+      <div class="col-sm-12 col-md-12 col-lg-12">
+         <p id="Naslovi">Dodavanje novog projekta</p> 
+      </div> 
+      <div class="col-sm-12 col-md-12 col-lg-12">
+        <div class="text-dodaj-novi-projekat">
+          <p id="projekat-dodavanje-novog">Projekat:</p>
+        </div>
+        <div class="projekat-input">
+          <input  class="form-control" [(ngModel)]="DodavanjeNovogKorisnika" type="text" id="ProjekatNovi" value="" >
+        </div>
+        &nbsp;  &nbsp;
+        <div class="projekat-button">
+          <button type="button" (click)="DodajNoviProjekat()" class="btn btn-danger">Dodaj</button>
+        </div>
+      </div>
+    </div>
+  </div> -->
+  <hr>
+  <div class="container-fluid ">
+    <div class="row">
+      <div class="col-sm-12 col-md-12 col-lg-12" >
+        <p id="Naslovi">Dodavanje novog projekta</p> 
+      </div>
+    </div> 
+    <form [formGroup]="myForm" novalidate (ngSubmit)="save(myForm.value, myForm.valid)">
+      <div class="text-dodaj-novi-projekat" style="vertical-align: top; padding: 0;">
+          <p id="projekat-dodavanje-novog">Projekat:</p>
+      </div>
+      <div class="projekat-input">
+        <div class="form-group">
+          <input type="text" class="form-control" [(ngModel)]="filter" formControlName="name" style="width: 200px;">
+        </div>
+      </div>
+       &nbsp; &nbsp;
+       <div class="projekat-button" style="vertical-align: top; padding: 0;">
+         <button type="submit" class="btn btn-danger">Dodaj</button>
+      </div>   
+     </form>
+     <div>
+       <small [hidden]="myForm.controls.name.valid || (myForm.controls.name.pristine && !submitted)" class="text-danger">
+          <!--Name is required (minimum 5 characters).-->
+          Potrebno je minimum 5 karaktera
+      </small>
+     </div>
+  </div>    
+  <br>    
+  <hr>
+  <div class="container-fluid ">
+    <div class="row">
+      <div class="col-sm-12 col-md-12 col-lg-12">
+        <p id="Naslovi">Dodavanje korisnika na projekat</p>
+      </div>
+      <div class="col-sm-12 col-md-12 col-lg-12">
+        <div class="korisnik-dodavanje">
+          <p>Korisnik:</p>
+          <p-dropdown [options]="imePrezimeAktivni" (click)="ProverDropDown()" [(ngModel)]="selectedDodavanjeKorisnikaNaProjekatKorisnik" [style]="{'width':'200px'}"  filter="filter"></p-dropdown>
+        </div>
+        &nbsp; &nbsp;
+        <div class="projekat-dodavanje">
+          <p>Projekat:</p>
+          <p-dropdown [options]="projektiDropDownDodajNaProjekat" (click)="ProverDropDownProjekti()" [(ngModel)]="selectedDodavanjeKorisnikaNaProjekatProjekat" [style]="{'width':'250px'}"  filter="filter"></p-dropdown>
+        </div>
+        &nbsp; &nbsp;
+        <div class="button-dodavanje">
+          <button type="" (click)="Dodaj()" class="btn btn-danger">Dodaj</button>
+          <!-- <button type="" class="btn btn-danger">Posalji zahtev</button> -->
+        </div>  
+      </div>
+      <br>
+      <div class="col-sm-12 col-md-12 col-lg-12">
+        <br>
+        <div *ngIf="!dodajProvera">
+        <small class="text-danger">
+           Potrebno je uneti parametre!!
+        </small>
+        </div>
+        <!--<small *ngIf="(selectedDodavanjeKorisnikaNaProjekatKorisnik == 'undefined' || selectedDodavanjeKorisnikaNaProjekatProjekat == 'undefined')" class="text-danger">
+           Potrebno je uneti parametre!!
+        </small>-->
+      </div>  
+    </div>
+  </div>
+  <br>    
+  <hr>
+   <div class="container-fluid ">
+    <div class="row">
+      <div class="col-sm-12 col-md-12 col-lg-12">
+        <p id="Naslovi">Uklanjanje korisnika sa projekata</p>
+      </div>
+      <div class="col-sm-12 col-md-12 col-lg-12">
+        <div class="korisnik-dodavanje">
+          <p>Korisnik:</p>
+          <p-dropdown [options]="imePrezimeAktivni" (click)="UklanjanjeDropDown()" [(ngModel)]="selectedUklanjanjeKorisnikaSaProjektaKorisnik" [style]="{'width':'200px'}"  filter="filter"></p-dropdown>
+        </div>
+        &nbsp; &nbsp;
+        <div class="projekat-dodavanje">
+          <p>Projekat:</p>
+          <p-dropdown [style]="{'width':'250px'}" [options]="projektiDropDownUklanjanjeSaProjekta" (click)="ProveraVrednostiProjekataUklanjanje()"  [(ngModel)]="selectedUklanjanjeKorisnikaSaProjektaProjekat" filter="filter"></p-dropdown>
+        </div>
+        &nbsp; &nbsp;
+        <div class="button-dodavanje">
+            <button type="" (click)="UklanjanjeKorisnikaSaProjekta()" class="btn btn-danger">Ukloni</button>
+        </div>
+      </div>
+      <div class="col-sm-12 col-md-12 col-lg-12">
+        <br>
+        <div *ngIf="!proveraUspesnosti">
+        <small class="text-danger">
+           Potrebno je uneti parametre!!
+        </small>
+        </div>
+        <!--<small *ngIf="(selectedDodavanjeKorisnikaNaProjekatKorisnik == 'undefined' || selectedDodavanjeKorisnikaNaProjekatProjekat == 'undefined')" class="text-danger">
+           Potrebno je uneti parametre!!
+        </small>-->
+      </div>
+     </div>
+    </div>
+    <br>    
+  <hr>
+  <div class="container-fluid ">
+    <div class="row">
+      <div class="col-sm-12 col-md-12 col-lg-12">
+        <p id="Naslovi">Deaktivacija korisnika</p>
+      </div>
+      <div class="col-sm-12 col-md-12 col-lg-12">
+        <div class="text-dodaj-novi-projekat">
+            <p id="projekat-dodavanje-novog">Korisnik:</p>
+        </div>
+        <div class="projekat-input">
+            <p-dropdown [style]="{'width':'200px'}" (click)="ProveraDeaktivacija()" [options]="imePrezimeAktivni"  [(ngModel)]="selectedDeaktivacija" filter="filter"></p-dropdown>
+        </div>
+        &nbsp; &nbsp;
+        <div class="button-dodavanje">
+            <button type="" (click)="Deaktivacija()" class="btn btn-danger">Deaktivacija</button>
+        </div>   
+      </div>
+      <div class="col-sm-12 col-md-12 col-lg-12">
+          <small *ngIf="!flgDeaktivacija" class="text-danger">
+            Potrebno je uneti korisnika!!
+          </small>
+      </div>     
+    </div>
+  </div>
+   <br>    
+  <hr>
+  <div class="container-fluid ">
+    <div class="row">
+      <div class="col-sm-12 col-md-12 col-lg-12">
+        <p id="Naslovi">Aktivacija korisnika</p>
+      </div>
+      <div class="col-sm-12 col-md-12 col-lg-12">
+        <div class="text-dodaj-novi-projekat">
+            <p id="projekat-dodavanje-novog">Korisnik:</p>
+        </div>
+        <div class="projekat-input">
+            <p-dropdown [style]="{'width':'200px'}" (click)="ProveraAktivacija()" [options]="imePrezimeNeAktivni"  [(ngModel)]="selectedAktivacija" filter="filter"></p-dropdown>
+        </div>
+        &nbsp; &nbsp;
+        <div class="button-dodavanje">
+            <button type="" (click)="Aktivacija()" class="btn btn-danger">Aktivacija</button>
+        </div>   
+      </div>
+      <div class="col-sm-12 col-md-12 col-lg-12">
+        <div *ngIf="!flgAktivacija">
+          <small class="text-danger">
+            Potrebno je uneti korisnika!!
+          </small>
+        </div>
+      </div>   
+    </div>
+    <div>
+      <p-dialog header="Upozorenje!!" [ngStyle]="{'width': valueSize +'px'}"  [(visible)]="display" modal="modal">
+          {{ text  }}
+          <p-footer>
+            <div class="ui-dialog-buttonpane ui-widget-content ui-helper-clearfix" style="margin-top: 50px;">
+                <button type="button"   style="width:75px;" (click)="display=false; Izlaz();" >{{ text_izlaz }}</button>
+            </div>
+        </p-footer>
+      </p-dialog>
+      <p-dialog header="{{textUpozorenje}}" [ngStyle]="{'width': valueSize +'px'}"  [(visible)]="displayUkloni" modal="modal">
+          {{ textUpozorenje  }}
+          <p-footer>
+            <div class="ui-dialog-buttonpane ui-widget-content ui-helper-clearfix" style="margin-top: 50px;">
+                <button type="button"   style="width:75px;" (click)="displayUkloni=false; IzlazNe();" >{{ textNe }}</button>
+                <button type="button"   style="width:75px;" (click)="displayUkloni=false; IzlazPotvrda();" >{{ textPotvrda }}</button>
+            </div>
+        </p-footer>
+      </p-dialog>
+      <p-dialog header="{{textUpozorenje}}" [ngStyle]="{'width': valueSize +'px'}"  [(visible)]="displayUredu" modal="modal">
+          {{ textUpozorenje  }}
+          <p-footer>
+            <div class="ui-dialog-buttonpane ui-widget-content ui-helper-clearfix" style="margin-top: 50px;">
+                <button type="button"   style="width:75px;" (click)="displayUredu=false;" >{{ textPotvrda }}</button>
+            </div>
+        </p-footer>
+      </p-dialog>
+      <p-dialog header="Greška!!" [ngStyle]="{'width': valueSize +'px'}"  [(visible)]="displayError" modal="modal">
+          {{ textError  }}
+          <p-footer>
+            <div class="ui-dialog-buttonpane ui-widget-content ui-helper-clearfix" style="margin-top: 50px;">
+                <button type="button"   style="width:75px;" (click)="displayError=false;" >{{ textPotvrdaError }}</button>
+            </div>
+        </p-footer>
+      </p-dialog>
+    </div>
+  </div>
+  <br>    
+  <hr>
+  <!--<div class="container-fluid ">
+    <div class="row">
+      <div class="col-sm-12 col-md-12 col-lg-12">
+        <p id="Naslovi">Slanje mejla</p>
+      </div>
+      <div>
+        <form>
+          <div class="form-group">
+            <label for="inputEmail" class="control-label">Email id</label>
+            <input type="text" class="form-control" id="inputEmail" name="inputEmail" placeholder="Email Id" [(ngModel)]="newUser.username">
+          </div>
+          <div class="form-group">
+            <label for="inputPassword" class="control-label">Password</label>
+            <input type="password" class="form-control" id="inputPassword" name="inputPassword" placeholder="password"  [(ngModel)]="newUser.password">
+          </div>       
+          <div class="form-group">
+            <button type="button" class="btn btn-danger" (click)="addUser()">Sign up</button>
+          </div>
+        </form>
+
+      </div>  
+   </div>
+  </div>     
+  <br>    
+  <hr>-->
+ <!--<div class="body" id="body1">
+		<p></p>
+	</div>
+  <div id="footer"></div> -->
+  <app-header></app-header>      
+</div>  

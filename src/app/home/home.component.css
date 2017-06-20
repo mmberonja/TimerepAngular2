@@ -1,0 +1,42 @@
+/*html, body {
+    width: 100%;
+}*/
+
+.Home{
+
+    width: 99%;
+    padding:0;
+    
+}
+
+h1 {
+    /*text-align: center;*/
+    color:black;
+}
+
+
+
+p {
+    text-align: center;
+    color:black;
+}
+
+.button-home {
+    width: 100px !important;
+}
+
+.table-row-1{
+
+    width: 180px !important;
+
+}
+
+.table-row{
+
+    width: 140px !important;
+
+}
+
+div.form-group-prijava, div.form-group-registracija{
+	display:inline-block;
+}

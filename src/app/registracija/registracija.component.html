@@ -1,0 +1,93 @@
+<div class="container">
+  <div class="row">
+    <div class="col-sm-4 col-sm-offset-4 col-md-4 col-md-offset-4 col-lg-4 col-lg-offset-4">
+      <h1>Registracija korisnika:</h1>
+      <form [formGroup]="RegForm" novalidate (ngSubmit)="save(RegForm.value, RegForm.valid)">
+          <div class="form-group" >
+              <label for="ime">Ime:</label>
+              <input type="text" class="form-control" name="ime" formControlName="name" [(ngModel)]="model.name"  style="width: 350px;" placeholder="Ime" required />
+              <small [hidden]="RegForm.controls.name.valid || (RegForm.controls.name.pristine && !submitted)" class="text-danger">
+                <!--Name is required (minimum 5 characters).-->
+                Potrebno je minimum 2 karaktera
+            </small>
+          </div>
+          <div class="form-group" >
+              <label for="korisnickoime">Korisničko ime:</label>
+              <input type="text" class="form-control" name="korisnickoime" formControlName="korisnk" [(ngModel)]="model.korisnk"  style="width: 350px;" placeholder="Korisničko ime" required />
+              <small [hidden]="RegForm.controls.korisnk.valid || (RegForm.controls.korisnk.pristine && !submitted)" class="text-danger">
+                <!--Name is required (minimum 5 characters).-->
+                Potrebno je minimum 5 karaktera
+            </small>
+          </div>
+          <div class="form-group" >
+              <label for="prezime">Prezime:</label>
+              <input type="text" class="form-control" name="prezime" formControlName="prezime" [(ngModel)]="model.prezime"  style="width: 350px;" placeholder="Prezime" required />
+              <small [hidden]="RegForm.controls.prezime.valid || (RegForm.controls.prezime.pristine && !submitted)" class="text-danger">
+                <!--Name is required (minimum 5 characters).-->
+                Potrebno je minimum 2 karaktera
+            </small>
+            <div>
+              
+            </div>
+          </div>
+          <div class="form-group" [ngClass]="">
+            <label for="emaill">Mejl:</label>
+            <input type="email" class="form-control" name="emaill" (window:keydown)="doSomething($event,model.emaill)" formControlName="emaill" style="width: 350px;" [(ngModel)]="model.emaill" aria-describedby="emailHelp" placeholder="Email" ngControl="email">
+             <small [hidden]="RegForm.controls.emaill.valid || (RegForm.controls.emaill.pristine && !submitted)" class="text-danger">
+                <!--Name is required (minimum 5 characters).-->
+                Potrebno je minimum 5 karaktera
+            </small>
+            <small *ngIf="!ispravnostMejla" class="text-danger">
+                  <!--Name is required (minimum 5 characters).-->
+                  Mejl je neispravan!!
+              </small>
+          </div>
+          <div class="form-group" [ngClass]="">
+            <label for="sifra">Šifra:</label>
+            <input type="password" class="form-control" name="sifra" formControlName="sifra" style="width: 350px;" [(ngModel)]="model.sifra" placeholder="Šifra">
+             <small [hidden]="RegForm.controls.sifra.valid || (RegForm.controls.sifra.pristine && !submitted)" class="text-danger">
+                <!--Name is required (minimum 5 characters).-->
+                Potrebno je minimum 5 karaktera
+            </small>
+          </div>
+          <div class="form-group" [ngClass]="">
+            <label for="sifra">Potvrda šifre:</label>
+            <input type="password" class="form-control" name="sifraPotvrda" formControlName="sifraPotvrda" style="width: 350px;" [(ngModel)]="model.sifraPotvrda" placeholder="Potvrda šifre">
+             <small [hidden]="RegForm.controls.sifraPotvrda.valid || (RegForm.controls.sifraPotvrda.pristine && !submitted)" class="text-danger">
+                <!--Name is required (minimum 5 characters).-->
+                Potrebno je minimum 5 karaktera
+            </small>
+            <div>
+              <small *ngIf="jednakostSifre == 'nije'" class="text-danger">
+                  <!--Name is required (minimum 5 characters).-->
+                  Ne podudaraju se šifre!!
+              </small>
+            </div>
+          </div>
+          <div class="form-group">
+              <button class="btn btn-danger" style="width: 100px;">Registracija</button>
+              
+              <a  [routerLink]="['/login']" class="btn btn-danger" style="width: 100px;">Nazad</a>
+          </div>
+      </form>
+      <p-dialog header="Obaveštenje" width="300" height="190" [(visible)]="display" modal="modal">
+          {{ text }}
+          <p-footer>
+            <div class="ui-dialog-buttonpane ui-widget-content ui-helper-clearfix" style="margin-top: 50px;">
+                <button type="button"   style="width:75px;" (click)="display=false; loginPage();" >Izlaz</button>
+            </div>
+        </p-footer>
+      </p-dialog>
+       <p-dialog header="Obaveštenje" width="300" height="190" [(visible)]="displayError" modal="modal">
+          {{ textError }}
+          <p-footer>
+            <div class="ui-dialog-buttonpane ui-widget-content ui-helper-clearfix" style="margin-top: 50px;">
+                <button type="button"   style="width:75px;" (click)="displayError=false; Izlaz();" >{{ textErrorIzlaz }}</button>
+            </div>
+        </p-footer>
+      </p-dialog>
+      <!--<button type="text" (click)="showDialog()" pButton icon="fa-external-link-square" label="Show"></button>-->
+     </div>  
+  </div>
+</div>
+       

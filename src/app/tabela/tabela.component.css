@@ -1,0 +1,51 @@
+/*.tabela{width: 99%;}*/
+.header{
+
+   
+    
+}
+
+.razmak{
+
+    margin-top:100px; 
+}
+
+.row {
+
+    width: 60%;
+}
+
+#tabela-korisnik td 
+{
+	text-align:center;
+    
+
+}
+#tabela-korisnik th 
+{
+	text-align:center;
+    
+    /*table-layout: fixed;*/
+    /*width:80px;*/
+	/*vertical-align:middle;*/
+}
+
+#cssTable td 
+{
+    text-align:center; 
+    vertical-align:middle;
+    height: 5px;
+}
+
+.ui-panel-title{
+        vertical-align: middle !important;
+        text-align:center !important;
+}
+
+div.godina, div.mesec{
+	display:inline-block;
+}
+
+
+
+

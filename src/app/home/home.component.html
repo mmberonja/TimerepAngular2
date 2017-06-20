@@ -1,0 +1,48 @@
+<div class="Home">
+  <div class="container">  
+    <div class="row">
+        <div class="col-sm-5 col-sm-offset-5 col-md-5 col-md-offset-5 col-lg-5 col-lg-offset-5 col-xl-5 col-xl-offset-5" style="background-color:white;">
+                <h1>{{h1}}</h1><br>
+                <div class="row">
+                    <form [formGroup]="RegForm" novalidate (ngSubmit)="login(RegForm.value, RegForm.valid)">
+                        <div class="form-group" >
+                            <label for="ime">Korisničko ime:</label>
+                            <input type="text" class="form-control" name="ime" formControlName="username" [(ngModel)]="model.username" style="width:205px;"  placeholder="Korisničko ime" required />
+                            <small [hidden]="RegForm.controls.username.valid || (RegForm.controls.username.pristine && !submitted)" class="text-danger">
+                                Popuni polje!! {{ textUsr }}
+                            </small>
+                        </div>
+                        <div class="form-group" >
+                            <label for="sifra">Šifra:</label>
+                            <input type="password" class="form-control" name="sifra" formControlName="password" [(ngModel)]="model.password" style="width:205px;"  (keyup.enter)="login();" placeholder="Šifra" required />
+                            <small [hidden]="RegForm.controls.password.valid || (RegForm.controls.password.pristine && !submitted)" class="text-danger">
+                                <!--Name is required (minimum 5 characters).-->
+                                Popuni polje!! {{ textPsw }}
+                            </small>
+                        </div>
+                        <div class="form-group" >
+                            <button class=" btn btn-danger" style="width:100px;" >Prijava</button>
+                            <a class="btn btn-danger" (click)="Registracija();" style="width:100px;">Registracija</a>
+                        </div>      
+                    </form>   
+                </div>
+        </div>
+        <!--<div class="col-sm-5 col-md-5" style="background-color:lavender;">
+            
+        </div>-->
+    </div>
+   </div> 
+ <div>
+     
+      <p-dialog header="Obavestenje!!" [ngStyle]="{'width': valueSize +'px'}"  [(visible)]="displayError" modal="modal">
+          {{ textError  }}
+          <p-footer>
+            <div class="ui-dialog-buttonpane ui-widget-content ui-helper-clearfix" style="margin-top: 50px;">
+                <button type="button"   style="width:75px;" (click)="displayError=false; Izlaz();" >{{ textErrorIzlaz }}</button>
+            </div>
+        </p-footer>
+      </p-dialog>
+    </div>
+</div>
+<!-- class="col-sm-12 col-md-12 col-lg-12" -->   
+

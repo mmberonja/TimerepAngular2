@@ -1,0 +1,64 @@
+<div class="lozinka">
+  <div class ="header">
+    <app-footer-ostalo></app-footer-ostalo><br><br>
+  </div>
+  <div class="container razmak">
+    <div class="row">
+       <form [formGroup]="RegForm" novalidate (ngSubmit)="save(RegForm.value, RegForm.valid)">
+         <div class="form-group" >
+              <label for="staraSifra">Stara šifra:</label>
+              <input type="password" class="form-control" name="staraSifra" formControlName="starasifra" [(ngModel)]="model.starasifra"  style="width: 300px;" placeholder="Stara šifra" required />
+              <small [hidden]="RegForm.controls.starasifra.valid || (RegForm.controls.starasifra.pristine && !submitted)" class="text-danger">
+                <!--Name is required (minimum 5 characters).-->
+                Potrebno je uneti šifru!! 
+            </small>
+          </div>
+          <div class="form-group" >
+              <label for="novaSifra">Nova šifra:</label>
+              <input type="password" class="form-control" name="novaSifra" formControlName="novasifra" [(ngModel)]="model.novasifra"  style="width: 300px;" placeholder="Nova šifra" required />
+              <small [hidden]="RegForm.controls.novasifra.valid || (RegForm.controls.novasifra.pristine && !submitted)" class="text-danger">
+                <!--Name is required (minimum 5 characters).-->
+                Potrebno je uneti šifru!! 
+            </small>
+          </div>
+          <div class="form-group" >
+              <label for="potvrdaSifra">Potvrda šifre:</label>
+              <input type="password" class="form-control" name="potvrdaSifra" formControlName="potvrdasifra" [(ngModel)]="model.potvrdasifra"  style="width: 300px;" placeholder="Potvrda šifre" required />
+              <small [hidden]="RegForm.controls.potvrdasifra.valid || (RegForm.controls.potvrdasifra.pristine && !submitted)" class="text-danger">
+                <!--Name is required (minimum 5 characters).-->
+                Potrebno je uneti šifru!!
+            </small>
+          </div>
+          <div class="form-group">
+              <button class="btn btn-danger" style="width: 100px;">Sačuvaj</button>
+              
+              <!--<a  [routerLink]="['/login']" class="btn btn-danger" style="width: 100px;">Nazad</a>-->
+          </div>   
+       </form>  
+      <!--<p>Stara šifra:</p>
+      <p>Nova šifra:</p>
+      <p>Potvrda šifre:</p>-->
+    </div>
+    <div>
+      <p-dialog header="Obavestenje!!" [ngStyle]="{'width': valueSize + 'px'}"  [(visible)]="display" modal="modal">
+          {{ text  }}
+          <p-footer>
+            <div class="ui-dialog-buttonpane ui-widget-content ui-helper-clearfix" style="margin-top: 50px;">
+                <button type="button"   style="width:75px;" (click)="display=false; FirstPage();" >{{ text_izlaz_lozinka }}</button>
+            </div>
+        </p-footer>
+      </p-dialog>
+    </div>
+    <div>
+      <p-dialog header="Obavestenje!!" [ngStyle]="{'width': valueSize +'px'}"  [(visible)]="displayError" modal="modal">
+          {{ textError  }}
+          <p-footer>
+            <div class="ui-dialog-buttonpane ui-widget-content ui-helper-clearfix" style="margin-top: 50px;">
+                <button type="button"   style="width:75px;" (click)="displayError=false; Izlaz();" >{{ textErrorIzlaz }}</button>
+            </div>
+        </p-footer>
+      </p-dialog>
+    </div>   
+  </div>
+<app-header></app-header>    
+</div>

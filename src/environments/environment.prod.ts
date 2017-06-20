@@ -1,3 +1,4 @@
 export const environment = {
-  production: true
+  production: true,
+  web: 'http://nedizvapi.to-net.rs/',
 };
