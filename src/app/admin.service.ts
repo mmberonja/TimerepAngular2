@@ -23,11 +23,11 @@ export class AdminService {
   constructor(private router:Router,private http: Http,@Inject('ApiEndpoint') private apiEndpoint: any) { 
 
 
-       this.getJSON().subscribe(data => {
-                  this.obj=data.konfiguracija.konekcija.web;
-                  console.log("obj" + this.obj);
-              }, 
-              error => console.log(error));
+      /* this.getJSON().subscribe(data => {
+        this.obj=data.konfiguracija.konekcija.web;
+                  //console.log("obj" + this.obj);
+        }, 
+        error => console.log(error));*/
 
   }
   
@@ -456,7 +456,19 @@ export class AdminService {
 
      RefresujToken(ime:any,admin:any):Observable<any>{
 
-        return this.http.get(''+this.apiEndpoint+'refresh/token?ime='+ime+'&admin='+admin+'')
+        let token = JSON.parse(localStorage.getItem('Token'));
+        //console.log(JSON.parse(localStorage.getItem('Token')));
+        if(token == null){
+                this.router.navigate(['/login']);
+        }
+        let authHeader = new Headers(
+            {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + token
+            }
+        );
+        let options = new RequestOptions({ headers: authHeader })
+        return this.http.get(''+this.apiEndpoint+'refresh/token?ime='+ime+'&admin='+admin+'',options)
             .map(data => { 
                let user =  data.json();
                //localStorage.removeItem('Token')
@@ -465,7 +477,7 @@ export class AdminService {
             .catch(this.handleError) 
      }
 
-    trenutni_godina():Promise<any>{
+     trenutni_godina():Promise<any>{
 
         let token = JSON.parse(localStorage.getItem('Token'));
             //console.log("token" + token)
@@ -487,7 +499,7 @@ export class AdminService {
             .then(data => data.json())//data.json() as User[]) 
             .catch( data => console.log("error")) 
             
-    }
+     }
 
    /*AddUserService(usercreds){
 

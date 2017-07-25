@@ -3,7 +3,7 @@
     <app-footer-ostalo></app-footer-ostalo><br><br>
   </div>
   <div class="container razmak">
-    <div class="row">
+    <div *ngIf="flgLoadingLozinka" class="row">
        <form [formGroup]="RegForm" novalidate (ngSubmit)="save(RegForm.value, RegForm.valid)">
          <div class="form-group" >
               <label for="staraSifra">Stara šifra:</label>
@@ -38,6 +38,11 @@
       <!--<p>Stara šifra:</p>
       <p>Nova šifra:</p>
       <p>Potvrda šifre:</p>-->
+    </div>
+    <div *ngIf="flgLoadingLozinka == false">
+       <div class="col-sm-5 col-sm-offset-5 col-md-5 col-md-offset-5 col-lg-5 col-lg-offset-5 col-xl-5 col-xl-offset-5" style="background-color:white;">
+        <button style="background-color:white" class="btn btn-lg"><span class="glyphicon glyphicon-refresh glyphicon-refresh-animate"></span> Loading...</button>
+      </div>
     </div>
     <div>
       <p-dialog header="Obavestenje!!" [ngStyle]="{'width': valueSize + 'px'}"  [(visible)]="display" modal="modal">

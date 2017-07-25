@@ -17,13 +17,19 @@ export class FooterComponent implements OnInit {
   base64:any;
   ispisToken:any;
   tokenAdmin:string;
+  fullImagePath: string;
 
   constructor(private router: Router,
               private sservice :SService            
-  ) { }
+  ) { 
+
+   
+
+  }
 
   ngOnInit() {
 
+    
     //Provera iz Tokena da li je admin ili nije!!
     if(JSON.parse(localStorage.getItem('Token')) == null){
 
@@ -32,7 +38,7 @@ export class FooterComponent implements OnInit {
 
     }
     this.tokenAdmin = this.ParsirajJWT(JSON.parse(localStorage.getItem('Token')));
-    console.log("tokenAdmin" + this.tokenAdmin);
+    //console.log("tokenAdmin" + this.tokenAdmin);
 
     this.disableValue = 0;
 

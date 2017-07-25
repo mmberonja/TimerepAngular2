@@ -182,6 +182,9 @@ export class AdminComponent implements OnInit,OnDestroy {
    KorisniciNedeljaAdmin:any; 
    error:any;
    interval:any;
+   Naslov:string = "Obavestenje"
+   flgLoadingAdmin:boolean = false;
+   flgLoadingAdminTabela2:boolean = false;
 
    //Style html
    boja:string;  
@@ -338,6 +341,7 @@ export class AdminComponent implements OnInit,OnDestroy {
         .then(
           gorinaTre => { this.selectedGodinakorisniciAdmin = gorinaTre
 
+            //this.flgLoadingAdmin = false;
             //Provera za gresku!!
             //this.selectedGodinakorisniciAdmin = 201
 
@@ -473,6 +477,8 @@ export class AdminComponent implements OnInit,OnDestroy {
 
                               }
                             }
+
+                            this.flgLoadingAdmin = true;
 
                             //SumaPoKorisniku
                           },
@@ -612,8 +618,8 @@ export class AdminComponent implements OnInit,OnDestroy {
                                   this.projekatKorDetalji = Number(duzNed) + 1;
                                   this.SumaPoNedeljamaDetalji[pd] = this.pakovanjeDetalji[pd]['Nedelja' + this.projekatKorDetalji] + this.SumaPoNedeljamaDetalji[pd];  
                                 }
-                            }
-
+                              }
+                              this.flgLoadingAdminTabela2 = true;
                           },
                           error => {
                             this.Erorr('Nije moguce očitati korisnike');           
@@ -689,7 +695,10 @@ export class AdminComponent implements OnInit,OnDestroy {
                       this.text = 'Došlo je do greške na serveru!!'
                       this.text_izlaz = 'Gotovo';
                       this.showDialog();
-        });
+                  },
+                  () => {console.log('done')}   
+                  
+        )
 
         if(JSON.parse(localStorage.getItem('Token')) == null){
 
@@ -717,6 +726,7 @@ export class AdminComponent implements OnInit,OnDestroy {
   //Prvi tabela,svi projekti i svi korisnici
   MesecAdminF(){
 
+    this.flgLoadingAdmin = false;
     this.brisanjeVrednostiSelecta();
     this.brojNedeljaZaDatimesecAdmin();
 
@@ -891,6 +901,7 @@ export class AdminComponent implements OnInit,OnDestroy {
                             }
                           }
 
+                          this.flgLoadingAdmin = true;
                           //SumaPoKorisniku
                         },
                         error => { this.error = error
@@ -1027,7 +1038,7 @@ export class AdminComponent implements OnInit,OnDestroy {
 
   KlikGodinaKorisnik(){//input godine -korisnici
     //console.log("selectedGodinakorisniciAdmin" + this.selectedGodinakorisniciAdmin)
-
+    this.flgLoadingAdmin = false;
     console.log("Token"+JSON.parse(localStorage.getItem('Token')));
 
     if(JSON.parse(localStorage.getItem('Token')) == null){
@@ -1233,6 +1244,7 @@ export class AdminComponent implements OnInit,OnDestroy {
                               }
                             }
 
+                            this.flgLoadingAdmin = true;
                             //SumaPoKorisniku
                           },
                           error => { this.error = error
@@ -1257,6 +1269,7 @@ export class AdminComponent implements OnInit,OnDestroy {
   //
   //Druga tabela,goduna,mesec projekat!
   KlikGodinaProjekti(){//input godine -projekti
+    this.flgLoadingAdminTabela2 = false;
     if(JSON.parse(localStorage.getItem('Token')) == null){
 
             console.log("Izlogovani ste!!");
@@ -1432,6 +1445,7 @@ export class AdminComponent implements OnInit,OnDestroy {
                                 this.SumaPoNedeljamaDetalji[pd] = this.pakovanjeDetalji[pd]['Nedelja' + this.projekatKorDetalji] + this.SumaPoNedeljamaDetalji[pd];  
                               }
                           }
+                          this.flgLoadingAdminTabela2 = true;
 
                         },
                         error => {
@@ -1445,7 +1459,7 @@ export class AdminComponent implements OnInit,OnDestroy {
   }
 
   MesecAdminProjekti(){
-
+    this.flgLoadingAdminTabela2 = false;
         this.brisanjeVrednostiSelecta();
         this.projektiBrojNedeljaMesecAdmin();
         if(JSON.parse(localStorage.getItem('Token')) == null){
@@ -1592,7 +1606,7 @@ export class AdminComponent implements OnInit,OnDestroy {
                                 this.SumaPoNedeljamaDetalji[pd] = this.pakovanjeDetalji[pd]['Nedelja' + this.projekatKorDetalji] + this.SumaPoNedeljamaDetalji[pd];  
                               }
                           }
-
+                          this.flgLoadingAdminTabela2 = true;
                         },
                         error => {
                           this.Erorr('Nije moguce očitati korisnike');           
@@ -1605,7 +1619,7 @@ export class AdminComponent implements OnInit,OnDestroy {
   }
 
   KlikProjektiAdmin(){
-
+    this.flgLoadingAdminTabela2 = false;
     if(JSON.parse(localStorage.getItem('Token')) == null){
 
             console.log("Izlogovani ste!!");
@@ -1750,7 +1764,7 @@ export class AdminComponent implements OnInit,OnDestroy {
                                 this.SumaPoNedeljamaDetalji[pd] = this.pakovanjeDetalji[pd]['Nedelja' + this.projekatKorDetalji] + this.SumaPoNedeljamaDetalji[pd];  
                               }
                           }
-
+                          this.flgLoadingAdminTabela2 = true;
                         },
                         error => {
                           this.Erorr('Nije moguce očitati korisnike');           
@@ -1957,6 +1971,7 @@ export class AdminComponent implements OnInit,OnDestroy {
                           projektiAktivni => { this.projektiAktivni = projektiAktivni
                             //ovde se popunjava dopwdpwn sa korisniciAktivni
                             this.popuniProjektiAdmin(this.projektiAktivni);
+                            this.Erorr('Uspešno ste dodali novi projekat.');
 
                           },
                           error => {
@@ -2106,13 +2121,14 @@ export class AdminComponent implements OnInit,OnDestroy {
           this.dodajProvera = true;
          //Dodato da posle pritiska na button dodaj se izprazni dropdown
          
+         //this.Erorr("Uspešno ste dodali novi projekat.");
          
           this.adminservice.DodavanjeKorisnikaNaProjekat(this.selectedDodavanjeKorisnikaNaProjekatKorisnik, this.selectedDodavanjeKorisnikaNaProjekatProjekat,this.trenutnaGodinaDodavanje)
                 .subscribe(
                     insert => { this.insert = insert
 
                         console.log("Bravoo" + this.insert)
-
+                        //this.Erorr("Uspešno ste dodali novi projekat.");
                         //Poziva se funkcija koja refresuje tabelu Korisnik kada se doda projekat za odradjenog korisnika!!
                         //this.KlikKorisnikAdmin();
                         //Poziva se funkcija koja refresuje tabelu Projekti kada se doda projekat za odradjenog korisnika!!
@@ -2127,6 +2143,7 @@ export class AdminComponent implements OnInit,OnDestroy {
                         this.ProbaDropDownFunkcija();
                         //Da bi se dropdown sa projektima na kojima korisnik radi dopunio sa dodatim projektom!!
                         this.UklanjanjeDropDownFunkcija();
+                        //this.Erorr(this.error._body);
                         this.displayUredu = true;
                         this.textPotvrda = 'Uredu';
                         this.textUpozorenje = 'Uspešno ste dodali projekat';
@@ -2135,10 +2152,10 @@ export class AdminComponent implements OnInit,OnDestroy {
                     error => {
                         console.log("error");
                         this.Erorr(this.error._body);
-                        /*localStorage.clear();
-                        this.text = 'Došlo je do greške na serveru!!'
-                        this.text_izlaz = 'Gotovo';
-                        this.showDialog();*/
+                        //localStorage.clear();
+                        //this.text = 'Došlo je do greške na serveru!!'
+                        //this.text_izlaz = 'Gotovo';
+                        //this.showDialog();
           }); 
       }
     }
@@ -2664,11 +2681,17 @@ export class AdminComponent implements OnInit,OnDestroy {
 
   Erorr(error:any){
 
-    this.textError = error;
+    this.textError = String(error);
     this.textPotvrdaError = 'Uredu';
-    this.displayError = true;
+    //this.displayError = true;
+    this.showDialogError();
     
 
+  }
+
+  showDialogError() {
+          console.log("Usaooo")
+          this.displayError = true;
   }
 
   IzlazNe(){

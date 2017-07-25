@@ -6,7 +6,7 @@
     <div class="col-md-1 col-md-offset-1 col-sm-1 col-sm-offset-1">  
       <div class="godina">
           <p>Godina:</p>
-          <input [(ngModel)]="selectedGodinaTabelaKorisnik" style="width: 100px;" class="form-control" (click)="provera_godina_tabela_korisnik();" type="number" min="2017" max="2019" step="1" size="12" autocomplete='on'>
+          <input [(ngModel)]="selectedGodinaTabelaKorisnik" style="width: 100px;" class="form-control" (click)="proveraGodinaTabelaKorisnik();" type="number" min="2017" max="2019" step="1" size="12" autocomplete='on'>
           <!--{{ selectedGodina_tabela_korisnik }}-->
       </div><br>
     </div>
@@ -20,10 +20,10 @@
     </div>   
   </div>
   <div class="col-sm-12 col-md-12">
-    <div class="col-sm-7 col-sm-offset-1 col-md-7 col-md-offset-1 col-lg-7 col-lg-offset-1 col-xl-7 col-xl-offset-1"><br> 
+    <div class="col-sm-8 col-sm-offset-1 col-md-8 col-md-offset-1 col-lg-8 col-lg-offset-1 col-xl-8 col-xl-offset-1"><br> 
       <table class="table table-bordered">
         <tr class="active">
-          <th style="width:340px;">Projekti</th>
+          <th style="width:370px;">Projekti</th>
           <th *ngFor="let i of NizObjekiNedelje">{{i.Oznaka}}</th>
         </tr>
         <tr *ngFor="let i of projektiObjekiNedelje; let n = index;">

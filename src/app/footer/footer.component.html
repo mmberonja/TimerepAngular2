@@ -1,23 +1,23 @@
 <div class="footer-all">
   <div class="row">
     <div class="col-sm-12 col-md-12 border_pocetna" style="background-color:white;" >
-          <div class="col-sm-2 col-md-2 border_pocetna-slika" style="background-color:white; height: 100%;">
-            <!--<img src="/images/TO-NET.jpg"  width="300" height="78" class="as-banner" />-->
+      <div class="col-sm-2 col-md-2 border_pocetna-slika" style="background-color:white; height: 100%;margin-top: 20px;left: 30px;">
+        <a href="http://www.to-net.rs/"><img (click)="Sajt" src="assets/tonet_logo.png"  width="220" height="40" class="as-banner" /></a> 
+      </div>
+      <div class="col-sm-2 col-sm-offset-8 col-md-2 col-md-offset-8 col-lg-2 col-lg-offset-8 col-xl-2 col-xl-offset-8" style="background-color:white; height: 100%;">
+        <div class="border_pocetna-button">
+          <div class="dropdown">
+              <button class="btn btn-danger dropbtn">Moj nalog</button>
+                <div class="dropdown-content" >
+                  <p>{{ fullname_baza }}</p>
+                  <p [hidden]="tokenAdmin == 'nije'"><a (click)="Admin()">Admin</a></p>
+                  <p><a (click)="Lozinka()">Promeni lozinku</a></p>
+                  <p><a (click)="Tabela()">Tabela</a></p>
+                  <p><a (click)="Odjava()" >Odjava</a></p>
+                </div>  
           </div>
-          <div class="col-sm-2 col-sm-offset-8 col-md-2 col-md-offset-8 col-lg-2 col-lg-offset-8 col-xl-2 col-xl-offset-8" style="background-color:white; height: 100%;">
-            <div class="border_pocetna-button">
-            <div class="dropdown">
-                <button class="btn btn-danger dropbtn">Moj nalog</button>
-                  <div class="dropdown-content" >
-                    <p>{{ fullname_baza }}</p>
-                    <p [hidden]="tokenAdmin == 'nije'"><a (click)="Admin()">Admin</a></p>
-                    <p><a (click)="Lozinka()">Promeni lozinku</a></p>
-                    <p><a (click)="Tabela()">Tabela</a></p>
-                    <p><a (click)="Odjava()" >Odjava</a></p>
-                  </div>  
-            </div>
-            </div>
-          </div> 
+        </div>
+      </div> 
       </div>
   </div>
 </div>

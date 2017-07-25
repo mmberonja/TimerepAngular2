@@ -11,12 +11,12 @@
       <div class="col-sm-5 col-md-5 col-lg-5">
         <div class="projekat-input" style="vertical-align: top; padding: 0;">
           <h4 class="first">Godina:</h4>
-          <input (click)="KlikGodinaKorisnik()"  class="form-control"  type="number" min="2017" max="2019" step="1" autocomplete='on'  [(ngModel)]="selectedGodinakorisniciAdmin">
+          <input (ngModelChange)="KlikGodinaKorisnik()"  class="form-control"  type="number" min="2017" max="2019" step="1" autocomplete='on'  [(ngModel)]="selectedGodinakorisniciAdmin">
         </div>
          &nbsp; &nbsp; &nbsp;
         <div class="projekat-button">    
           <h4 class="first">Mesec:</h4>
-            <select [(ngModel)]="KorisniciMesecAdmin" class="form-control" (click)="MesecAdminF()" name="mesec" id="mesec" list="mesec" style="width:150px; ">
+            <select [(ngModel)]="KorisniciMesecAdmin" class="form-control" (ngModelChange)="MesecAdminF()" name="mesec" id="mesec" list="mesec" style="width:150px; ">
               <option *ngFor="let i of nizMesec"  >{{i.name}}</option>
             </select>				
         </div>&nbsp; &nbsp; &nbsp;<br>
@@ -26,8 +26,8 @@
     </div>
   </div>
   <br>
-  <div class="container-fluid ">
-     <div class="wrapper">
+  <div class="container-fluid">
+     <div *ngIf="flgLoadingAdmin" class="wrapper">
         <table class="micko">
             <tr id="groups" >
               <th class="rotate">&nbsp;</th>
@@ -46,6 +46,11 @@
               <th *ngFor="let sumHor of this.SumaPoKorisniku;" >{{sumHor}}</th>
             </tr>  
         </table>
+     </div>
+     <div *ngIf="flgLoadingAdmin == false">
+      <div class="col-sm-5 col-sm-offset-0 col-md-5 col-md-offset-0 col-lg-5 col-lg-offset-0 col-xl-5 col-xl-offset-0" style="background-color:white;">
+        <button style="background-color:white" class="btn btn-lg"><span class="glyphicon glyphicon-refresh glyphicon-refresh-animate"></span> Loading...</button>
+      </div>
      </div>
     <!--<div class="wrapper">
       <table class="micko">
@@ -79,21 +84,21 @@
         &nbsp; &nbsp; &nbsp;
         <div class="text-dodaj-novi-projekat">    
           <h4 class="first">Mesec:</h4>
-            <select [(ngModel)]="ProjektiMesecAdmin" class="form-control" (click)="MesecAdminProjekti()" name="mesec" id="mesec" list="mesec" style="width:150px; ">
+            <select [(ngModel)]="ProjektiMesecAdmin" class="form-control" (ngModelChange)="MesecAdminProjekti()" name="mesec" id="mesec" list="mesec" style="width:150px; ">
               <option *ngFor="let i of nizMesec">{{i.name}}</option>
             </select>				
         </div>
           &nbsp; &nbsp; &nbsp;
         <div class="projekat-button">
           <h4 class="first">Projekat:</h4>
-          <p-dropdown (click)="KlikProjektiAdmin()" [options]="projektiDropDown" [(ngModel)]="selectedProjektiAktivni" [style]="{'width':'250px', 'height':'34px'}"  filter="filter"></p-dropdown>
+          <p-dropdown (ngModelChange)="KlikProjektiAdmin()" [options]="projektiDropDown" [(ngModel)]="selectedProjektiAktivni" [style]="{'width':'250px', 'height':'34px'}"  filter="filter"></p-dropdown>
         </div>
       </div> 
     </div>  
   </div>
   <br>
   <div class="container-fluid "> 
-      <div class="wrapper">
+      <div *ngIf="flgLoadingAdminTabela2" class="wrapper">
         <table class="micko">
             <tr id="groups" >
               <th class="rotate">&nbsp;</th>
@@ -111,6 +116,11 @@
               <th *ngFor="let sum of this.SumaPoKorisnikuProjekat;">{{sum}}</th>
             </tr>  
         </table>
+     </div>
+     <div *ngIf="flgLoadingAdminTabela2 == false">
+      <div class="col-sm-5 col-sm-offset-0 col-md-5 col-md-offset-0 col-lg-5 col-lg-offset-0 col-xl-5 col-xl-offset-0" style="background-color:white;">
+        <button style="background-color:white" class="btn btn-lg"><span class="glyphicon glyphicon-refresh glyphicon-refresh-animate"></span> Loading...</button>
+      </div>
      </div>
   </div>
   <br>
@@ -312,7 +322,7 @@
             </div>
         </p-footer>
       </p-dialog>
-      <p-dialog header="Greška!!" [ngStyle]="{'width': valueSize +'px'}"  [(visible)]="displayError" modal="modal">
+      <p-dialog header="{{Naslov}}!!" [ngStyle]="{'width': valueSize +'px'}"  [(visible)]="displayError" modal="modal">
           {{ textError  }}
           <p-footer>
             <div class="ui-dialog-buttonpane ui-widget-content ui-helper-clearfix" style="margin-top: 50px;">

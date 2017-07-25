@@ -1,8 +1,15 @@
-div.godina, div.mesec,div.probaM,div.Zahtev {
+div.godina, div.mesec,div.probaM,div.prikazi-sakri-sve,div.Zahtev,div.snimi-sve {
 	display:inline-block;
 }
 
+.pored-prvi, .pored-drugi{
+    display:inline-block;
+}
 
+.obavestenje-text, .obavestenje-text-dani{
+    display:inline-block;
+    display: table-cell;
+}
 
 .ui-dialog {
     overflow: visible;
@@ -70,8 +77,6 @@ div.tabela-detalji-text, div.tabela-detalji-input, div.tabela-detalji-button{
 .micko table, th, td {
     border: 1px solid #D3D3D3;
     border-collapse: collapse;
-    
-    
 }
 
 
@@ -90,7 +95,10 @@ div.tabela-detalji-text, div.tabela-detalji-input, div.tabela-detalji-button{
     
     -webkit-transform: rotate(-90deg); /* Chrome, Safari, Opera */
     transform: rotate(-90deg);
+ }
 
+ .sort-satnica , .up-down{
+    display:inline-block;    
  }
 
 
@@ -157,7 +165,37 @@ div.wrapper {
 }
 
 .izlaz{
-
-    float:right
-
+    float:right;
+    left: 10px;
 }
+
+.glyphicon-refresh-animate {
+    -animation: spin .7s infinite linear;
+    -webkit-animation: spin2 .7s infinite linear;
+}
+
+@-webkit-keyframes spin2 {
+    from { -webkit-transform: rotate(0deg);}
+    to { -webkit-transform: rotate(360deg);}
+}
+
+@keyframes spin {
+    from { transform: scale(1) rotate(0deg);}
+    to { transform: scale(1) rotate(360deg);}
+}
+
+/*.btn-danger
+{
+  background-color: #9F418F;
+  border-color: #9F418F;
+}*/
+
+/*
+#loading-image-preuzmi {
+	background-repeat: no-repeat;
+	position: absolute;
+	margin-left: 140px;
+	background: url('src/app/images/loading.gif');
+	width: 30%;
+	height: 30%;
+}*/

@@ -109,8 +109,19 @@ export class ServiceTabela {
     }
 
     RefresujToken(ime:any,admin:any):Observable<any>{
-
-        return this.http.get(''+this.apiEndpoint+'refresh/token?ime='+ime+'&admin='+admin+'')
+        let token = JSON.parse(localStorage.getItem('Token'));
+        //console.log(JSON.parse(localStorage.getItem('Token')));
+        if(token == null){
+                this.router.navigate(['/login']);
+        }
+        let authHeader = new Headers(
+            {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + token
+            }
+        );
+        let options = new RequestOptions({ headers: authHeader })
+        return this.http.get(''+this.apiEndpoint+'refresh/token?ime='+ime+'&admin='+admin+'',options)
             .map(data => { 
                let user =  data.json();
                //console.log("user" + user);

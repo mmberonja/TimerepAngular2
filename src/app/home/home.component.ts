@@ -61,6 +61,8 @@ export class HomeComponent implements OnInit {
     textErrorIzlaz:string;
     displayError:boolean = false;
 
+    flgLoadingHome:boolean = true;
+
     constructor(
         private router: Router,
         private route: ActivatedRoute,
@@ -74,20 +76,13 @@ export class HomeComponent implements OnInit {
 
     ngOnInit(){
 
-        //this.ParsirajJWTVreme(JSON.parse(localStorage.getItem('Token')));
-        
-
-
-        //console.log("Home!!")
-        //console.log("Home!!"+JSON.parse(localStorage.getItem('Token')));
-
         if(JSON.parse(localStorage.getItem('Token')) != null)
         {   
-            console.log("firstpage")
+            //console.log("firstpage")
             this.router.navigate(['/firstpage']);
         }
         else{
-            console.log("login")
+            //console.log("login")
             this.router.navigate(['/login']);
         }
 
@@ -110,7 +105,7 @@ export class HomeComponent implements OnInit {
         this.base64Url = token.split('.')[1];
         this.base64 = this.base64Url.replace('-', '+').replace('_', '/');
         this.ispisToken = JSON.parse(window.atob(this.base64));
-        console.log(this.ispisToken);
+        //console.log(this.ispisToken);
 
     }
 
@@ -137,19 +132,11 @@ export class HomeComponent implements OnInit {
     }
 
     Registracija(){
-
-        /*localStorage.clear();
-        console.log("localStorage"+JSON.parse(localStorage.getItem('currentUser')))*/
         this.router.navigate(['/registracija']);
-
     }
 
     login(model: any, isValid: boolean){   
        
-      /*console.log("this.model.username" + this.model.username)
-      console.log("this.model.username" + this.model.password)*/
-      console.log("LoginHome!!");
-
       this.submitted = true;  
 
       if(isValid){
@@ -164,44 +151,60 @@ export class HomeComponent implements OnInit {
 
         }
         else if(JSON.parse(localStorage.getItem('Token')) == null){
+            this.flgLoadingHome = false;
 
             if(this.model.username && this.model.password){
                 this.authenticationService.loginService(this.model.username,this.model.password)
                     .then(
                         users => { this.users = users
-                            
+
                             this.prolaz_sifre = this.users;
-                            console.log("this.prolaz_sifre" + this.prolaz_sifre);
+                            //console.log("this.prolaz_sifre" + this.prolaz_sifre);
                             if(this.prolaz_sifre == "Nije dobra Sifra"){
-                            this.model.password=''
-                            console.log("Nije dobra sifra")
-                            this.textPsw = "Nije dobra šifra!!"
+                                //this.flgLoadingHome = true;
+                                this.model.password='';
+                                console.log("Nije dobra sifra");
+                                this.textPsw = "Nije dobra šifra!!";
+                                this.flgLoadingHome = true;
+
                             }
                             else if(this.prolaz_sifre == "Nije dobro Ime"){
-                            this.model.username=''
-                            console.log("Nije dobrokorisnicko ime")
-                            this.textUsr = "Nije dobro korisničko ime!!"
+                                this.model.username='';
+                                console.log("Nije dobrokorisnicko ime");
+                                this.textUsr = "Nije dobro korisničko ime!!";
+                                this.flgLoadingHome = true;
                             }
                             else if(this.prolaz_sifre == "Neaktivni ste!!!"){
-                            //this.model.password=''
-                            //this.model.username=''
-                            console.log("Niste aktivni!!")
-                            this.textUsr = "Neaktivni ste!!"
-                            this.textPsw = "Neaktivni ste!!"
+                                //this.flgLoadingHome = true;
+                                //this.model.password=''
+                                //this.model.username=''
+                                console.log("Niste aktivni!!");
+                                this.textUsr = "Neaktivni ste!!";
+                                this.textPsw = "Neaktivni ste!!";
+                                this.flgLoadingHome = true;         
                             }
                             else{
+                                
+                                console.log("false" + this.flgLoadingHome)
+                                if(this.users == {}){
+                                   
+                                }
+                                else{
+                                    
+                                    //this.flgLoadingHome = true;
+
+                                }
                                 //this.router.navigate(['/firstpage']);
                             }
                         },
-                        error => {
-                            console.log("error");
-                            console.log("error");
-                                localStorage.clear();
-                                this.textError = 'Došlo je do greške na serveru!!'
-                                this.textErrorIzlaz = 'Gotovo';
-                                this.showDialogError();
-
-                        });
+                    error => {
+                        console.log("error");
+                        console.log("error");
+                        localStorage.clear();
+                        this.textError = 'Došlo je do greške na serveru!!'
+                        this.textErrorIzlaz = 'Gotovo';
+                        this.showDialogError();
+                });
 
                /* this.authenticationService.trenutni_mesec()
                     .then(

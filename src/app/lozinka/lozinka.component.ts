@@ -38,7 +38,8 @@ export class LozinkaComponent implements OnInit,OnDestroy {
   base64:any;
   ispisToken:any;
   tokenAdmin:any;
-  message:any; 
+  message:any;
+  flgLoadingLozinka:boolean = false; 
 
   constructor(private route: ActivatedRoute,
                private location: Location,
@@ -67,6 +68,9 @@ export class LozinkaComponent implements OnInit,OnDestroy {
       this.lozinkService.RefresujToken(this.currentUser_ne,this.tokenAdmin)
         .subscribe(
             pamtiToken => { this.pamtiToken = pamtiToken
+
+              
+
           },
         error => {                     
       });
@@ -91,6 +95,8 @@ export class LozinkaComponent implements OnInit,OnDestroy {
         return;
 
     } 
+
+    this.flgLoadingLozinka = true;
 
   }
 
