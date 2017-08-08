@@ -1,15 +1,16 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewChild } from '@angular/core';
 import { ServiceTabela } from '../service.tabela';
 import { ActivatedRoute, Params,Router }   from '@angular/router';
 import { DataTableModule,SharedModule} from 'primeng/primeng';
 import { FooterOstaloComponent } from '../footer-ostalo/footer-ostalo.component';
-import {SpinnerModule} from 'primeng/primeng';
+import { SpinnerModule } from 'primeng/primeng';
 import { HeaderComponent } from '../header/header.component';
 import { ListaProjekataModel } from '../models/ListaProjekata.model';
 import { ListaBazaPodaciModel } from '../models/ListaBazaPodaci.model';
 import { Directive, ElementRef, HostListener, Input,Renderer } from '@angular/core';
-import {Observable} from 'rxjs/Rx';
+import { Observable} from 'rxjs/Rx';
 import { User } from '../models/user';
+//import { DatatableComponent } from '@swimlane/ngx-datatable/src/components/datatable.component';
 
 
 @Component({
@@ -65,6 +66,29 @@ export class TabelaComponent implements OnInit,OnDestroy {
   tokenAdmin:string;
   currentUser_ne:User[] = [];
 
+
+  ngXColumn:any[] = [];
+  ngXColumnObject:any[] = [];
+  ngXsize:number = 0;
+  rows:any[] = [];
+
+
+  columns1 = [
+    { prop: 'name' },
+    { name: 'Gender' },
+    { name: 'Company' }
+  ];
+
+  rows1 = [
+      { name: 'Austin', gender: 12, company: 2},
+      { name: 'Dany', gender: 5, company: 4},
+      { name: 'Molly', gender: 1, company: 6},
+  ];
+
+  temp = [];
+
+ // @ViewChild(DatatableComponent) table: DatatableComponent;
+
   constructor(private router: Router,
               private serviceTabela : ServiceTabela,
               private el: ElementRef,
@@ -74,7 +98,10 @@ export class TabelaComponent implements OnInit,OnDestroy {
 
       this.NizObject = [{ 
             Project:'Erviko',nedelja1:1,nedelja2:2,nedelja3:3,nedelja4:4,nedelja5:5,nedelja6:6
-      }]     
+      }]
+
+      
+
     }
 
   ngOnDestroy(){
@@ -85,6 +112,11 @@ export class TabelaComponent implements OnInit,OnDestroy {
   }  
 
   ngOnInit() {
+
+
+    
+
+
 
     this.interval = setInterval(() => { 
           console.log("Tabela!!");
@@ -100,6 +132,39 @@ export class TabelaComponent implements OnInit,OnDestroy {
               error => {                     
           });
     }, 1000 * 5 * 60 * 60 );//1000 * 5 * 60 * 60 = 5h
+
+
+    this.ngXsize = 100;
+
+    let cuvajMesecGodina = this.ngXBrojNedeljaZaDatiMesec('Jun',2017);
+
+    this.ngXColumn = cuvajMesecGodina;
+
+    let z = {};
+    z['ime'] = 'Projekti';
+    z['oznaka'] = 'Projekti';
+
+    this.ngXColumnObject.push(z);
+
+    for(let nd in this.ngXColumn){
+      let k = {};
+      let br;
+      br = 1 + Number(nd);
+      k['ime'] = 'nedelja' + br;
+      k['oznaka'] = br + ".Nedelja";
+      this.ngXColumnObject.push(k); 
+    }
+
+    let x = {};
+    x['ime'] = 'Ukupno';
+    x['oznaka'] = 'Ukupno';
+
+    this.ngXColumnObject.push(x);
+
+    console.log(this.ngXColumnObject);
+
+    //this.rows = [{ Projekti:'Erviko', nedelja1:1, nedelja2:2, nedelja3:3, nedelja4:4, nedelja5:5, nedelja6:6, Ukupno: 15 }];  
+
 
     this.selectedMesecTabela = this.deviceObjects[0].name;
     this.broj_nedelja_za_dati_mesec();
@@ -117,17 +182,16 @@ export class TabelaComponent implements OnInit,OnDestroy {
            this.serviceTabela.projektiNaKojimaRadiKorisnik(this.nadimak_tabela)
                     .subscribe(
 
-                //console.log(this.satnica);
-                projekti => { this.projekti= projekti
+              projekti => { this.projekti= projekti
 
-                 //console.log(projekti);
+              //console.log(projekti);
                
-                 this.serviceTabela.satnicaKorisnik(this.selectedMesecTabela,this.nadimak_tabela,this.selectedGodinaTabelaKorisnik)
-                    .subscribe(      
+              this.serviceTabela.satnicaKorisnik(this.selectedMesecTabela,this.nadimak_tabela,this.selectedGodinaTabelaKorisnik)
+                .subscribe(      
 
-                        satnica => { this.satnica= satnica
+                satnica => { this.satnica= satnica
 
-                        //console.log(this.satnica);
+                //console.log(this.satnica);
 
                         this.broj_nedelja_za_dati_mesec();
 
@@ -160,6 +224,8 @@ export class TabelaComponent implements OnInit,OnDestroy {
                               }
                           }
                         }
+
+
 
                         for(let ar in this.sumNedelja){//Brisanje Niza-objekata!!!
 
@@ -199,7 +265,9 @@ export class TabelaComponent implements OnInit,OnDestroy {
                           }
                           this.projektiObjekiNedelje[pr]['Ukupno'] = this.sumProjekti[pr];
                         }
-
+                        
+                        console.log(this.projektiObjekiNedelje);
+                        this.temp = this.projektiObjekiNedelje;
                     },
                     error => {
                       console.log("error");
@@ -250,6 +318,8 @@ export class TabelaComponent implements OnInit,OnDestroy {
                       this.showDialog();
     });*/
 
+    
+
     //Zastita ako je odjavljen korisnik iz nekog drugog taba da ne moze da dalje radi u aplikaciji!!
     if(JSON.parse(localStorage.getItem('Token')) == null){
 
@@ -271,6 +341,22 @@ export class TabelaComponent implements OnInit,OnDestroy {
 
 	}
 
+  /*updateFilter(event) {
+    const val = event.target.value.toLowerCase();
+    //console.log("val" + val);
+    // filter our data
+    const temp = this.temp.filter(function(d) {
+      return d.Projekti.toLowerCase().indexOf(val) !== -1 || !val;
+    });
+
+    //console.log("temp"+temp)
+    // update the rows
+    this.projektiObjekiNedelje = temp;
+    // Whenever the filter changes, always go back to the first page
+    //this.table.offset = 0;
+  }*/
+  
+
   broj_nedelja(month:number,year:any){
 
     var year = year || new Date().getFullYear();
@@ -287,6 +373,62 @@ export class TabelaComponent implements OnInit,OnDestroy {
 		this.prva_nedelja = 1;
  
 		return  [this.prva_nedelja, this.poslednja_nedelja];
+
+  }
+
+  ngXbrojNedelja(mesec:number,godina:number){
+
+    let ngXgodina = godina || new Date().getFullYear();
+    let ngXgodinaPocetak = new Date(ngXgodina,0,1); // 1st Jan of the Year
+		
+    let ngXprviDanUMesecu = new Date(ngXgodina,mesec,1);
+    let ngXprvaNedeljaMesec = Math.ceil((((Number(ngXprviDanUMesecu) - Number(ngXgodinaPocetak)) / 86400000) + ngXgodinaPocetak.getDay()+ 1)/7);//Prva nedelja u mesecu
+    //console.log("ngXprvaNedeljaMesec" + ngXprvaNedeljaMesec);
+
+    let ngXposlednjiDanUMesecu = new Date(ngXgodina, mesec+1, 0);
+    let ngXposlednjaNedeljaMesec = Math.ceil((((Number(ngXposlednjiDanUMesecu) - Number(ngXgodinaPocetak)) / 86400000) + ngXgodinaPocetak.getDay()+ 1)/7);//Poslednja nedelja u mesecu
+    //console.log("ngXposlednjaNedeljaMesec" + ngXposlednjaNedeljaMesec);
+
+    let razlika = (ngXposlednjaNedeljaMesec - ngXprvaNedeljaMesec) + 1
+    let ngXposlednjaNedelja = razlika;
+    let ngXprvaNedelja = 1
+
+    return [ngXprvaNedelja, ngXposlednjaNedelja];
+
+  }
+
+  ngXBrojNedeljaZaDatiMesec(mesec:any,godina:any){
+
+    let ngXmesec,ngXodabranMesec;
+    let ngXgodina,ngXodabranaGodina;
+
+    ngXmesec = mesec;
+    ngXgodina = godina;
+
+    if( ngXmesec  == 'Januar'){ngXodabranMesec = 0;}
+    else if( ngXmesec  == 'Februar'){ ngXodabranMesec = 1;}
+    else if( ngXmesec  == 'Mart'){ngXodabranMesec = 2;}
+    else if( ngXmesec  == 'April'){ngXodabranMesec = 3;}
+    else if( ngXmesec  == 'Maj'){ngXodabranMesec = 4;}
+    else if( ngXmesec  == 'Jun'){ngXodabranMesec = 5;}
+    else if( ngXmesec  == 'Jul'){ngXodabranMesec = 6;}
+    else if( ngXmesec  == 'Avgust'){ngXodabranMesec = 7;}
+    else if( ngXmesec  == 'Septembar'){ngXodabranMesec = 8;}
+    else if( ngXmesec  == 'Oktobar'){ngXodabranMesec = 9;}
+    else if( ngXmesec  == 'Novembar'){ngXodabranMesec = 10;}
+    else if( ngXmesec  == 'Decembar'){ngXodabranMesec = 11;}
+    else{ ngXmesec = 20;}
+
+    let ngXdatum,ngXpamtiNedelje = [];
+    ngXdatum = new Date();
+
+    ngXpamtiNedelje = this.ngXbrojNedelja(ngXodabranMesec,ngXgodina);
+    let ngXlistaNedelja = [];
+    for(let i = ngXpamtiNedelje[0];i <= ngXpamtiNedelje[1];i++){
+      ngXlistaNedelja[i-1] = i;
+    }
+
+    return ngXlistaNedelja;
 
   }
 
@@ -353,7 +495,7 @@ export class TabelaComponent implements OnInit,OnDestroy {
 
        this.NizObjekiNedelje.push(z);
 
-       console.log(this.NizObjekiNedelje);
+       //console.log(this.NizObjekiNedelje);
 
   }
 

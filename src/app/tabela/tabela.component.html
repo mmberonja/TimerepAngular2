@@ -32,12 +32,51 @@
           <!--<td><button id="1{{ idNiz }}" style="width:75px;" class="btn btn-danger"  (click)="NizVidljivost(niz.Projekti,idNiz)">Prikazi</button></td>-->
         </tr>
         <tr>
-          <th>Ukupno</th>
+          <th>Ukupnoo</th>
           <th *ngFor="let sum of this.sumNedelja">{{sum}}</th>
         </tr>
       </table><br><br><br>  
     </div>
   </div>
+
+  <!--<div class="col-sm-12 col-md-12">
+
+     <div class="col-sm-8 col-sm-offset-1 col-md-8 col-md-offset-1 col-lg-8 col-lg-offset-1 col-xl-8 col-xl-offset-1">
+      <input
+        type='text'
+        style='padding:8px;margin:15px auto;width:30%;'
+        placeholder='Type to filter the name column...'
+        (keyup)='updateFilter($event)'
+      />
+
+     </div>
+
+    <div class="col-sm-8 col-sm-offset-1 col-md-8 col-md-offset-1 col-lg-8 col-lg-offset-1 col-xl-8 col-xl-offset-1">
+      <ngx-datatable  class="material ngXDatatable"
+         [headerHeight]="30"
+         [footerHeight]="50"
+         [columnMode]="'force'" 
+         [rows] = "this.projektiObjekiNedelje"
+         >
+         <div *ngFor="let z of this.ngXColumnObject;let id = index;" >
+          <div *ngIf="z.ime == 'Projekti'" class="projekti-css">  
+            <ngx-datatable-column style="color:red" prop="{{z.oznaka}}"  name="{{z.oznaka}}" [width]="390">
+              <template let-row="row" let-value="value" ngx-datatable-cell-template>
+                <strong>{{ row[z.oznaka] }}</strong>
+              </template>
+            </ngx-datatable-column>
+          </div>
+          <div *ngIf="z.ime != 'Projekti'">
+            <ngx-datatable-column    prop="{{z.oznaka}}" name="{{z.oznaka}}">
+              <template let-row="row" let-value="value" ngx-datatable-cell-template>
+                <strong>{{ row[z.oznaka] }}</strong>
+              </template>
+            </ngx-datatable-column>
+          </div>
+         </div>
+      </ngx-datatable><br><br><br><br><br><br>
+    </div>  
+  </div>  -->
   <div>
       <p-dialog header="Obavestenje!!" [ngStyle]="{'width': valueSize +'px'}"  [(visible)]="display" modal="modal">
           {{ textError  }}

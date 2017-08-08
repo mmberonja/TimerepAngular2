@@ -20,8 +20,12 @@ import { Godina} from '../models/godina.model';
 import { ProjektiSTNICA } from '../models/projektiSatnica.model';
 import { ListaProjekataModel } from '../models/ListaProjekata.model';
 import { ListaKorisnikaModel } from '../models/ListaKorisnika.model';
+import { prevodPodaciModel } from '../models/prevodPodaci';
+import { tabelaFunkcijeModel } from '../models/tabelaFunkcije';
+import { prikazTabelaModel } from '../models/prikazTabela';
+import { snimiProjekatModel } from '../models/snimiProjekat';
 //import { Observable } from 'rxjs/Observable';
-import {Observable} from 'rxjs/Rx';
+import { Observable } from 'rxjs/Rx';
 import { FooterComponent } from '../footer/footer.component';
 import { Directive, ElementRef, HostListener, Input } from '@angular/core';
 
@@ -93,6 +97,7 @@ export class PocetnaComponent implements OnInit,OnDestroy {
   pamti_nedelje:any;
   pamti_nedelje_ngModel:any;
   lista_broja_nedelja:any;
+
   lista_broja_nedelja_ngModel:any;
   objekti_nedelje = [{}];
   objekti_nedelje_ngModel = [{}];
@@ -208,9 +213,9 @@ export class PocetnaComponent implements OnInit,OnDestroy {
    flgHTML:boolean = true;
    //selectedNed:{naziv:string,id:number};
    selectedNed:any = {};
-   email:Email;
+   email:any;
    textEmail:string = "";
-   emailOdg:Email;
+   emailOdg:string = "";
 
    ModelGodina = new Godina; 
 
@@ -250,6 +255,17 @@ export class PocetnaComponent implements OnInit,OnDestroy {
    flgGotovo:boolean = false;
    nestohhhh:boolean = false;
    cuvajprojekti_lista:any[] = [];
+   probaMickoBre = new prevodPodaciModel();
+   nizPush:any[] = [];
+   nizObjekataBre:any [] = [];
+
+   //Nova tabela,promenljive!!
+   prikazTabela:prikazTabelaModel[] = [];
+   opcijeTabelaMicko:tabelaFunkcijeModel[] = [];
+   opcijeTabela:any [] = [];
+   prikazInformacija:number = 1;
+   listaBrojNedelja:any;
+   rez:number[] = [];
 
     constructor(
         
@@ -261,179 +277,171 @@ export class PocetnaComponent implements OnInit,OnDestroy {
         private el: ElementRef,
         private renderer: Renderer,
         //public Probaaaaaa:any
-    ) {   
+      ) 
+      {   
 
-      /*this.mickoTrue[0] = 1;
-      this.mickoTrue[1] = 1;*/
-      
+      if(JSON.parse(localStorage.getItem('Token')) == null){
 
-
-        if(JSON.parse(localStorage.getItem('Token')) == null){
-
-              this.flgHTML = false;
-              this.nekaBrojac1 = this.nekaBrojac1 + 1
-              if(this.nekaBrojac1 == 0){
-                 this.router.navigate(['/login']);
-              }
-             
+        this.flgHTML = false;
+        this.nekaBrojac1 = this.nekaBrojac1 + 1
+        if(this.nekaBrojac1 == 0){
+            this.router.navigate(['/login']);
         }
-        else{
+            
+      }
+      else{
 
-          this.flgHTML = true;
-          this.interval = setInterval(() => { 
-            console.log("Pocetna!!");
+        this.flgHTML = true;
+        this.interval = setInterval(() => { 
+          console.log("Pocetna!!");
 
-            this.currentUser_ne = JSON.parse(localStorage.getItem('currentUser'));
-            this.tokenAdmin = this.ParsirajJWT(JSON.parse(localStorage.getItem('Token')));
+          this.currentUser_ne = JSON.parse(localStorage.getItem('currentUser'));
+          this.tokenAdmin = this.ParsirajJWT(JSON.parse(localStorage.getItem('Token')));
 
-            //console.log("tokenAdmin" + this.tokenAdmin);
-            //console.log("currentUser" + this.currentUser_ne);
-
-            this.sservice.RefresujToken(this.currentUser_ne,this.tokenAdmin)
-                .subscribe(
-                  pamtiToken => { this.pamtiToken = pamtiToken
-                      //console.log("pamtiToken" + this.pamtiToken);
-                  },
-                  error => {                     
-              });
+          this.sservice.RefresujToken(this.currentUser_ne,this.tokenAdmin)
+            .subscribe(
+              pamtiToken => { this.pamtiToken = pamtiToken
+                //console.log("pamtiToken" + this.pamtiToken);
+              },
+            error => {                     
+            });
         },  1000 * 5 * 60 * 60 );
 
-          this.selectedIndex = 0;
-          //this.Trenutna_nedelja();
-          this.racunanje_ukupno = 0;
-          this.racunanje_keydown = 0;
-          this.SumaNizVertikalno[0] = 0;
-          this.SumaNizHorizontalno[0] = 0;
-          this.mumu[0] = 0
-          this.mumu[1] = 0
-          this.mumuSum = 0;
-          this.uvecajNesto = 0;
-          this.saberi = 0;
-          this.brojacV = 0;
-      
-          this.month[0] = "Januar";
-          this.month[1] = "Februar";
-          this.month[2] = "Mart";
-          this.month[3] = "April";
-          this.month[4] = "Maj";
-          this.month[5] = "Jun";
-          this.month[6] = "Jul";
-          this.month[7] = "Avgust";
-          this.month[8] = "Septembar";
-          this.month[9] = "Oktobar";
-          this.month[10] = "Novembar";
-          this.month[11] = "Decembar";
+        this.selectedIndex = 0;
+        this.racunanje_ukupno = 0;
+        this.racunanje_keydown = 0;
+        this.SumaNizVertikalno[0] = 0;
+        this.SumaNizHorizontalno[0] = 0;
+        this.mumu[0] = 0
+        this.mumu[1] = 0
+        this.mumuSum = 0;
+        this.uvecajNesto = 0;
+        this.saberi = 0;
+        this.brojacV = 0;
+    
+        this.month[0] = "Januar";
+        this.month[1] = "Februar";
+        this.month[2] = "Mart";
+        this.month[3] = "April";
+        this.month[4] = "Maj";
+        this.month[5] = "Jun";
+        this.month[6] = "Jul";
+        this.month[7] = "Avgust";
+        this.month[8] = "Septembar";
+        this.month[9] = "Oktobar";
+        this.month[10] = "Novembar";
+        this.month[11] = "Decembar";
 
-          let d = new Date();
-          this.nowMonth = this.month[d.getMonth()];
+        let d = new Date();
+        this.nowMonth = this.month[d.getMonth()];
 
-          this.selectedNedelje = [{ naziv:'Nedelje',id:2 }];
+        this.selectedNedelje = [{ naziv:'Nedelje',id:2 }];
 
-            //this.selectedNed = { naziv:'Nedelje',id:2 }
-            /*
-              var id = "Miroslav Beronja2";
-              var lastChar = id.substr(id.length - 1);
-              
-              this.NizBaza = [{
-                  id: 1,Projekti: 'OTPA',id_projekat: 4,nedelja: "4",mesec: "januar",godina: 2017,razvoj: 4,odrzavanje: 3,dokumentacija: 2,implementacija: 1,reziski_poslovi: 0},
-                  {id: 2,Projekti : 'Erviko',id_projekat: 5,nedelja: "4",mesec: "januar",godina: 2017,razvoj: 9,odrzavanje: 8,dokumentacija: 7,implementacija: 6,reziski_poslovi: 5
-              }]
-
-              this.nizPr = ['Pr1','Pr2','Pr3','Pr4','Pr5','Pr6','Pr7'];
-              //this.nizKor = ['MB','LZ','MT','SF','LS','sum1','MB1','LZ1','MT1','SF1','LS1','sum2'];
-              //this.nizKor = ['MB','LZ','sum1','MB','LZ','sum2'];
-              this.nizKor = [{
-                  ime:'MB',i:'MB'},{ime:'LZ',i:'LZ'},{ime:'sum',i:'sum1'},{ime:'MB',i:'MB1'},{ime:'LZ',i:'LZ1'},{ime:'sum',i:'sum2'}
-              ]
-              
-              this.NizObject = [{ 
-                Project:'Erviko',MB:{ime:'MB',value:1},LZ:{ime:'LZ',value:2},sum1:{ime:'sum1',value:null},MB1:{ime:'MB1',value:3},LZ1:{ime:'LZ1',value:4},sum2:{ime:'sum2',value:null}
-              },
-              {
-                Project:'OTPA',MB:{ime:'MB',value:4},LZ:{ime:'LZ',value:3},sum1:{ime:'sum1',value:null},MB1:{ime:'MB1',value:2},LZ1:{ime:'LZ1',value:1},sum2:{ime:'sum2',value:null}
-              }]
-
-              for(let u in this.NizObject){
-
-                for(let kor in this.nizKor){
-
-                  let pamtiKorisnika1 = this.nizKor[kor].i;
-                
-                }
-              }
-
-              let x = [];
-
-              for (let pr of this.nizPr) {
-                let y = {};
-                y['Projekat'] = pr;
-                for (let kor of this.nizKor) {
-                  y[kor] = null;
-                }
-                x.push(y);
-              
-              }
-            */   
-            /* 
-            this.sservice.trenutni_godina()
-                .then(
-                  ngGodinaP => { this.ngGodinaP = ngGodinaP
-
-                    console.log(this.ngGodinaP);
-
-                        this.ngMesecP = 'Jun';
-
-                          this.sservice.trenutni_nedelja()
-                            .then(
-                              ngNedeljaP => { this.ngNedeljaP = ngNedeljaP
-
-                                //this.broj_nedelja_za_dati_mesec();
-                                this.brojNedeljaZaDatiMesecGodinu();
-
-                                console.log("ngNedeljaP" + ngNedeljaP);
-
-                                console.log("this.currentUser_ne" + this.currentUser_ne);
-                                this.sservice.vrednosti_baza(this.currentUser_ne,this.ngMesecP,this.ngGodinaP,this.ngNedeljaP)
-                                  .then(
-
-                                        projekti_lista => { this.projekti_lista = projekti_lista
-                                                    
-                                                    console.log(this.projekti_lista);
-
-                                                    for(var ii in this.projekti_lista){
-
-                                                      this.Racunaj_proba(Number(this.projekti_lista[ii].Razvoj),Number(this.projekti_lista[ii].odrzavanje),
-                                                      Number(this.projekti_lista[ii].dokumentacija),Number(this.projekti_lista[ii].implementacija),Number(this.projekti_lista[ii].rezijski_poslovi),Number(ii));
-                                                      
-                                                    }
-
-                                                    for(var ii in this.mumu){
-
-                                                      this.mumuSum = Number(this.mumuSum) + Number(this.mumu[ii]);
-                                                    //  console.log("this.mumuSum" + Number(this.mumuSum)) 
-
-                                                    }
-                                        },
-                                        error => { this.error = error
-                                                    
-                                                    this.Erorr(this.error._body);
-                                                    console.log(error);
-                                                    //this.GreskaFunkcija();
-                                });
-
-                              },
-                              error => {
-                                console.log("error");
-                                this.Erorr("Nije moguce ocitati trenutnu nedelju");
-                          });
-                  },
-                  error => {
-                    console.log("error");
-                    this.Erorr("Nije moguce ocitati trenutnu godinu");
-
-            });*/        
+        /*
+          var id = "Miroslav Beronja2";
+          var lastChar = id.substr(id.length - 1);
           
-        }   
+          this.NizBaza = [{
+              id: 1,Projekti: 'OTPA',id_projekat: 4,nedelja: "4",mesec: "januar",godina: 2017,razvoj: 4,odrzavanje: 3,dokumentacija: 2,implementacija: 1,reziski_poslovi: 0},
+              {id: 2,Projekti : 'Erviko',id_projekat: 5,nedelja: "4",mesec: "januar",godina: 2017,razvoj: 9,odrzavanje: 8,dokumentacija: 7,implementacija: 6,reziski_poslovi: 5
+          }]
+
+          this.nizPr = ['Pr1','Pr2','Pr3','Pr4','Pr5','Pr6','Pr7'];
+          //this.nizKor = ['MB','LZ','MT','SF','LS','sum1','MB1','LZ1','MT1','SF1','LS1','sum2'];
+          //this.nizKor = ['MB','LZ','sum1','MB','LZ','sum2'];
+          this.nizKor = [{
+              ime:'MB',i:'MB'},{ime:'LZ',i:'LZ'},{ime:'sum',i:'sum1'},{ime:'MB',i:'MB1'},{ime:'LZ',i:'LZ1'},{ime:'sum',i:'sum2'}
+          ]
+          
+          this.NizObject = [{ 
+            Project:'Erviko',MB:{ime:'MB',value:1},LZ:{ime:'LZ',value:2},sum1:{ime:'sum1',value:null},MB1:{ime:'MB1',value:3},LZ1:{ime:'LZ1',value:4},sum2:{ime:'sum2',value:null}
+          },
+          {
+            Project:'OTPA',MB:{ime:'MB',value:4},LZ:{ime:'LZ',value:3},sum1:{ime:'sum1',value:null},MB1:{ime:'MB1',value:2},LZ1:{ime:'LZ1',value:1},sum2:{ime:'sum2',value:null}
+          }]
+
+          for(let u in this.NizObject){
+
+            for(let kor in this.nizKor){
+
+              let pamtiKorisnika1 = this.nizKor[kor].i;
+            
+            }
+          }
+
+          let x = [];
+
+          for (let pr of this.nizPr) {
+            let y = {};
+            y['Projekat'] = pr;
+            for (let kor of this.nizKor) {
+              y[kor] = null;
+            }
+            x.push(y);
+          
+          }
+        */   
+        /* 
+          this.sservice.trenutni_godina()
+            .then(
+              ngGodinaP => { this.ngGodinaP = ngGodinaP
+
+                console.log(this.ngGodinaP);
+
+                    this.ngMesecP = 'Jun';
+
+                      this.sservice.trenutni_nedelja()
+                        .then(
+                          ngNedeljaP => { this.ngNedeljaP = ngNedeljaP
+
+                            //this.broj_nedelja_za_dati_mesec();
+                            this.brojNedeljaZaDatiMesecGodinu();
+
+                            console.log("ngNedeljaP" + ngNedeljaP);
+
+                            console.log("this.currentUser_ne" + this.currentUser_ne);
+                            this.sservice.vrednosti_baza(this.currentUser_ne,this.ngMesecP,this.ngGodinaP,this.ngNedeljaP)
+                              .then(
+
+                                    projekti_lista => { this.projekti_lista = projekti_lista
+                                                
+                                                console.log(this.projekti_lista);
+
+                                                for(var ii in this.projekti_lista){
+
+                                                  this.Racunaj_proba(Number(this.projekti_lista[ii].Razvoj),Number(this.projekti_lista[ii].odrzavanje),
+                                                  Number(this.projekti_lista[ii].dokumentacija),Number(this.projekti_lista[ii].implementacija),Number(this.projekti_lista[ii].rezijski_poslovi),Number(ii));
+                                                  
+                                                }
+
+                                                for(var ii in this.mumu){
+
+                                                  this.mumuSum = Number(this.mumuSum) + Number(this.mumu[ii]);
+                                                //  console.log("this.mumuSum" + Number(this.mumuSum)) 
+
+                                                }
+                                    },
+                                    error => { this.error = error
+                                                
+                                                this.Erorr(this.error._body);
+                                                console.log(error);
+                                                //this.GreskaFunkcija();
+                            });
+
+                          },
+                          error => {
+                            console.log("error");
+                            this.Erorr("Nije moguce ocitati trenutnu nedelju");
+                      });
+              },
+              error => {
+                console.log("error");
+                this.Erorr("Nije moguce ocitati trenutnu godinu");
+
+          });
+        */        
+          
+      }   
     }
 
 
@@ -444,6 +452,161 @@ export class PocetnaComponent implements OnInit,OnDestroy {
     }
   
     ngOnInit() {
+
+      this.currentUser_ne = JSON.parse(localStorage.getItem('currentUser'));
+
+      this.sservice.trenutni_godina()
+        .subscribe(
+          ngGodinaP => { this.ngGodinaP.godina = Number(ngGodinaP)
+
+            this.trenutnaGodina = Number(this.ngGodinaP.godina);
+            let d = new Date();
+            this.ngMesecP = this.month[d.getMonth()];
+            this.trenutniMesec = this.ngMesecP
+
+            this.racunanjeRadnihDana(this.ngMesecP,this.ngGodinaP.godina);
+
+            this.sservice.trenutni_nedelja()
+              .then(
+                ngNedeljaP => { this.ngNedeljaP.nedelja = ngNedeljaP
+
+                  this.trenutnaNedelja = Number(this.ngNedeljaP.nedelja);
+                  let izabraniMesec:number;
+
+                  if( this.ngMesecP  == 'Januar'){izabraniMesec = 0;}
+                  else if( this.ngMesecP  == 'Februar'){ izabraniMesec= 1;}
+                  else if( this.ngMesecP  == 'Mart'){izabraniMesec = 2;}
+                  else if( this.ngMesecP  == 'April'){izabraniMesec = 3;}
+                  else if( this.ngMesecP  == 'Maj'){izabraniMesec = 4;}
+                  else if( this.ngMesecP  == 'Jun'){izabraniMesec = 5;}
+                  else if( this.ngMesecP  == 'Jul'){izabraniMesec = 6}
+                  else if( this.ngMesecP  == 'Avgust'){izabraniMesec = 7;}
+                  else if( this.ngMesecP  == 'Septembar'){izabraniMesec = 8;}
+                  else if( this.ngMesecP  == 'Oktobar'){izabraniMesec = 9;}
+                  else if( this.ngMesecP  == 'Novembar'){izabraniMesec = 10;}
+                  else if( this.ngMesecP  == 'Decembar'){izabraniMesec = 11;}
+                  else{ this.ngMesecP = 20;}
+
+                  //console.log("izabraniMesec"+ izabraniMesec);  
+                  let pamtiNedelje = this.brojNedelja(izabraniMesec,this.ngGodinaP.godina)
+
+                  //console.log(pamtiNedelje);
+                  for(var index = pamtiNedelje[0]; index<=pamtiNedelje[1]; index++){
+                    this.listaBrojNedelja = index;
+                  }
+
+                  for(var i = 1; this.listaBrojNedelja >= i ; i++){
+                    this.objekti_nedelje[i-1] = i;
+                  }
+
+                  for(let ar in this.objectNedelje){//Brisanje Niza-objekata!!!
+                    let index = this.objectNedelje.indexOf(this.objectNedelje[ar]);
+                    this.objectNedelje.splice(index, this.objectNedelje.length);
+                  }
+
+                  for (let pr of this.objekti_nedelje) {
+                    let y = {};
+                    y['id'] = pr;
+                    y['Naziv'] = 'Nedelja' + pr
+                    this.objectNedelje.push(y);
+                  }
+
+                  this.sservice.projektiPrevodPodaci(this.currentUser_ne,this.ngGodinaP.godina,this.ngMesecP,this.ngNedeljaP.nedelja)
+                    .subscribe(probaMickoBre => { this.probaMickoBre = probaMickoBre
+
+                      console.log(this.probaMickoBre);
+                      /*if(this.probaMickoBre.Podaci.success == false){                                  
+                          localStorage.clear();
+                          this.router.navigate(['/login']);
+                          return;  
+                      }*/
+
+                      for(let pr in this.probaMickoBre.Podaci){
+                        let k = {};
+                        k['pretraga'] = 1;
+                        k['prikaz'] = 0;
+                        k['text'] = "Prikaži";
+                        k['Projekti'] = this.probaMickoBre.Podaci[pr].Projekti;
+                        this.opcijeTabela.push(k);
+                      }
+
+                      this.opcijeTabelaMicko = this.opcijeTabela;
+
+                      let nizIme = [];
+                      let nizVrednost = []; 
+                      let nizBazaIme = []; 
+                      for(let i in this.probaMickoBre.Podaci){
+                      //for(let i = 0; i < 3; i++){  
+                        let z:number = 0
+                        z = Number(i);
+                        
+                        for(let g in this.probaMickoBre.Podaci[z]){
+                          for(let k in this.probaMickoBre.Prevod[0]){
+                            if(k == g){
+                              nizIme[k] = this.probaMickoBre.Prevod[0][g];
+                              nizVrednost[k] = this.probaMickoBre.Podaci[z][g];
+                              nizBazaIme[k] = g;
+                            }
+                          }
+                        }
+
+                        let nizPodaci:any[] = [];
+                        
+                        for(let h in nizVrednost){
+                          let tt = {};
+                          tt['ime'] = nizIme[h];
+                          tt['satnica'] = nizVrednost[h];
+                          tt['baza'] = nizBazaIme[h];
+                          nizPodaci.push(tt)
+
+                        }
+                        
+                        let gg = {};
+                        gg['Podaci'] = nizPodaci;
+                        gg['Projekti'] = this.probaMickoBre.Podaci[z]['Projekti'];
+                        gg['id_pr'] = this.probaMickoBre.Podaci[z]['id_pr'];
+                        this.nizObjekataBre.push(gg);
+                      }
+
+                      this.prikazTabela = this.nizObjekataBre
+
+                      if(this.probaMickoBre == {}){                                        
+                        this.flgLoading = false;
+                      }
+                      else{                                    
+                        this.flgLoading = true;
+                      }
+
+                      for(var ii in this.prikazTabela){
+                      //for(let ii = 0;ii<1;ii++){  
+                        this.rez[ii] = 0
+                        for(var zz in this.prikazTabela[ii].Podaci){
+                          this.rez[ii] += this.prikazTabela[ii].Podaci[zz].satnica;
+                        }
+                        //console.log("rez"+ ": " + this.rez[ii]);
+                        this.mumuSum += this.rez[ii];
+                      }
+                      //console.log(this.prikazTabela);
+
+                    },
+                    error => {
+                      console.log("error");
+                      this.Erorr(this.error._body);
+                    }
+                  );
+              },
+              error => {
+                console.log("error");
+                this.Erorr("Nije moguce ocitati trenutnu nedelju");
+              }
+            );     
+
+        },
+        error => {
+          console.log("error");
+          this.Erorr("Nije moguce ocitati trenutnu godinu");
+        }
+      );  
 
       if(JSON.parse(localStorage.getItem('Token')) == null){
 
@@ -460,141 +623,138 @@ export class PocetnaComponent implements OnInit,OnDestroy {
         this.flagGG = true;
         this.flagTT = true;
         this.vidljivost = "Prikazi";
-        //this.textPrikazi = "Prikaži";
+        /*   
+          this.sservice.trenutni_godina()
+            .subscribe(
+              ngGodinaP => { this.ngGodinaP.godina = Number(ngGodinaP)
 
-        //this.ngGodinaP.godina = "2017";
+                this.trenutnaGodina = Number(this.ngGodinaP.godina);
+                let d = new Date();
+                this.nowMonth = this.month[d.getMonth()];
+                this.ngMesecP = this.nowMonth;
+                this.trenutniMesec = this.ngMesecP
 
-        
+                  this.racunanjeRadnihDana(this.trenutniMesec,this.ngGodinaP.godina);
 
-        this.sservice.trenutni_godina()
-          .subscribe(
-            ngGodinaP => { this.ngGodinaP.godina = Number(ngGodinaP)
+                  this.sservice.trenutni_nedelja()
+                        .then(
+                          ngNedeljaP => { this.ngNedeljaP.nedelja = ngNedeljaP
 
-              this.trenutnaGodina = Number(this.ngGodinaP.godina);
-              //console.log(this.ngGodinaP.godina);
-              let d = new Date();
-              this.nowMonth = this.month[d.getMonth()];
-              this.ngMesecP = this.nowMonth;
-              this.trenutniMesec = this.ngMesecP
+                            this.trenutnaNedelja = Number(this.ngNedeljaP.nedelja);
+                            this.odaberi_mesecP = this.ngMesecP;
+                            this.odaberi_godinaP = String(this.ngGodinaP.godina);
 
-                this.racunanjeRadnihDana(this.trenutniMesec,this.ngGodinaP.godina);
+                            if( this.odaberi_mesecP  == 'Januar'){this.izabrani_mesecP = 0;}
+                            else if( this.odaberi_mesecP  == 'Februar'){ this.izabrani_mesecP = 1;}
+                            else if( this.odaberi_mesecP  == 'Mart'){this.izabrani_mesecP = 2;}
+                            else if( this.odaberi_mesecP  == 'April'){this.izabrani_mesecP = 3;}
+                            else if( this.odaberi_mesecP  == 'Maj'){this.izabrani_mesecP = 4;}
+                            else if( this.odaberi_mesecP  == 'Jun'){this.izabrani_mesecP = 5;}
+                            else if( this.odaberi_mesecP  == 'Jul'){this.izabrani_mesecP = 6}
+                            else if( this.odaberi_mesecP  == 'Avgust'){this.izabrani_mesecP = 7;}
+                            else if( this.odaberi_mesecP  == 'Septembar'){this.izabrani_mesecP = 8;}
+                            else if( this.odaberi_mesecP  == 'Oktobar'){this.izabrani_mesecP = 9;}
+                            else if( this.odaberi_mesecP  == 'Novembar'){this.izabrani_mesecP = 10;}
+                            else if( this.odaberi_mesecP  == 'Decembar'){this.izabrani_mesecP = 11;}
+                            else{ this.izabrani_mesecP = 20;}
 
-                this.sservice.trenutni_nedelja()
-                      .then(
-                        ngNedeljaP => { this.ngNedeljaP.nedelja = ngNedeljaP
+                            var datum_sada_prijava = new Date()
+                            var trenutna_godina_prijava = datum_sada_prijava.getFullYear()
 
-                          this.trenutnaNedelja = Number(this.ngNedeljaP.nedelja);
-                          this.odaberi_mesecP = this.ngMesecP;
-                          this.odaberi_godinaP = String(this.ngGodinaP.godina);
+                            this.pamti_nedelje = this.brojNedelja( this.izabrani_mesecP,this.odaberi_godinaP)
 
-                          if( this.odaberi_mesecP  == 'Januar'){this.izabrani_mesecP = 0;}
-                          else if( this.odaberi_mesecP  == 'Februar'){ this.izabrani_mesecP = 1;}
-                          else if( this.odaberi_mesecP  == 'Mart'){this.izabrani_mesecP = 2;}
-                          else if( this.odaberi_mesecP  == 'April'){this.izabrani_mesecP = 3;}
-                          else if( this.odaberi_mesecP  == 'Maj'){this.izabrani_mesecP = 4;}
-                          else if( this.odaberi_mesecP  == 'Jun'){this.izabrani_mesecP = 5;}
-                          else if( this.odaberi_mesecP  == 'Jul'){this.izabrani_mesecP = 6}
-                          else if( this.odaberi_mesecP  == 'Avgust'){this.izabrani_mesecP = 7;}
-                          else if( this.odaberi_mesecP  == 'Septembar'){this.izabrani_mesecP = 8;}
-                          else if( this.odaberi_mesecP  == 'Oktobar'){this.izabrani_mesecP = 9;}
-                          else if( this.odaberi_mesecP  == 'Novembar'){this.izabrani_mesecP = 10;}
-                          else if( this.odaberi_mesecP  == 'Decembar'){this.izabrani_mesecP = 11;}
-                          else{ this.izabrani_mesecP = 20;}
+                            var brojac = 0
+                            for(var index = this.pamti_nedelje[0]; index<=this.pamti_nedelje[1]; index++){
+                              this.lista_broja_nedelja = index;
+                            }
+                            for(var i = 1; this.lista_broja_nedelja >= i ; i++){
+                              this.objekti_nedelje[i-1] = i;
+                            }
 
-                          var datum_sada_prijava = new Date()
-                          var trenutna_godina_prijava = datum_sada_prijava.getFullYear()
+                            for(let ar in this.objectNedelje){//Brisanje Niza-objekata!!!
+                              let index = this.objectNedelje.indexOf(this.objectNedelje[ar]);
+                              this.objectNedelje.splice(index, this.objectNedelje.length);
+                            }
 
-                          this.pamti_nedelje = this.brojNedelja( this.izabrani_mesecP,this.odaberi_godinaP)
+                            for (let pr of this.objekti_nedelje) {
+                              let y = {};
+                              y['id'] = pr;
+                              y['Naziv'] = 'Nedelja' + pr
+                              this.objectNedelje.push(y);
+                            }
 
-                          var brojac = 0
-                          for(var index = this.pamti_nedelje[0]; index<=this.pamti_nedelje[1]; index++){
-                            this.lista_broja_nedelja = index;
-                          }
-                          for(var i = 1; this.lista_broja_nedelja >= i ; i++){
-                            this.objekti_nedelje[i-1] = i;
-                          }
+                            this.nizNedelja = [{ naziv:'Nedelje',id:1 },{ naziv:'Nedelje',id:2 },{ naziv:'Nedelje',id:3 }]
+                            //this.broj_nedelja_za_dati_mesec();  
+                            this.selectedNedelje[0].id = this.ngNedeljaP.nedelja;
+                            this.selectedNed.id = this.ngNedeljaP.nedelja;
 
-                          for(let ar in this.objectNedelje){//Brisanje Niza-objekata!!!
-                            let index = this.objectNedelje.indexOf(this.objectNedelje[ar]);
-                            this.objectNedelje.splice(index, this.objectNedelje.length);
-                          }
+                            this.sservice.vrednosti_baza(this.currentUser_ne,this.ngMesecP,this.ngGodinaP.godina,this.ngNedeljaP.nedelja)
+                            //this.sservice.vrednosti_baza(this.currentUser_ne,this.ngMesecP,this.ngGodinaP.godina,this.selectedNed.id)
+                              .subscribe(
 
-                          for (let pr of this.objekti_nedelje) {
-                            let y = {};
-                            y['id'] = pr;
-                            y['Naziv'] = 'Nedelja' + pr
-                            this.objectNedelje.push(y);
-                          }
+                                projekti_lista => { this.projekti_lista = projekti_lista
 
-                          this.nizNedelja = [{ naziv:'Nedelje',id:1 },{ naziv:'Nedelje',id:2 },{ naziv:'Nedelje',id:3 }]
-                          //this.broj_nedelja_za_dati_mesec();  
-                          this.selectedNedelje[0].id = this.ngNedeljaP.nedelja;
-                          this.selectedNed.id = this.ngNedeljaP.nedelja;
+                                  //console.log(this.projekti_lista);
 
-                          this.sservice.vrednosti_baza(this.currentUser_ne,this.ngMesecP,this.ngGodinaP.godina,this.ngNedeljaP.nedelja)
-                          //this.sservice.vrednosti_baza(this.currentUser_ne,this.ngMesecP,this.ngGodinaP.godina,this.selectedNed.id)
-                            .subscribe(
+                                  for(let kk in this.projekti_lista){
+                                    this.mickoTrue[kk] = 1;
+                                    this.prikazObavestenja[kk] = 0;
+                                    this.textPrikazi[kk] = "Prikaži";
+                                    
+                                  }
+                                  for(let kk in this.projekti_lista){
+                                    let k = {};
+                                    k['search'] = 1;
+                                    k['prikaz'] = 0;
+                                    k['text'] = "Prikaži";
+                                    k['imeProjekta'] = this.projekti_lista[kk].Projekti;
+                                    this.objektPrikazi.push(k);    
+                                  }
+                                  //console.log(this.objektPrikazi);
 
-                              projekti_lista => { this.projekti_lista = projekti_lista
+                                  if(this.projekti_lista == {}){                                        
+                                    this.flgLoading = false;
+                                  }
+                                  else{                                    
+                                    this.flgLoading = true;
+                                  }
 
-                                for(let kk in this.projekti_lista){
-                                  this.mickoTrue[kk] = 1;
-                                  this.prikazObavestenja[kk] = 0;
-                                  this.textPrikazi[kk] = "Prikaži";
-                                  
-                                }
-                                for(let kk in this.projekti_lista){
-                                  let k = {};
-                                  k['search'] = 1;
-                                  k['prikaz'] = 0;
-                                  k['text'] = "Prikaži";
-                                  k['imeProjekta'] = this.projekti_lista[kk].Projekti;
-                                  this.objektPrikazi.push(k);    
-                                }
-                                //console.log(this.objektPrikazi);
-                                if(this.projekti_lista == {}){                                        
-                                  this.flgLoading = false;
-                                }
-                                else{                                    
-                                  this.flgLoading = true;
-                                }
+                                  if(this.projekti_lista.success == false){                                  
+                                      localStorage.clear();
+                                      this.router.navigate(['/login']);
+                                      return;  
+                                  }
 
-                                if(this.projekti_lista.success == false){                                  
-                                    localStorage.clear();
-                                    this.router.navigate(['/login']);
-                                    return;  
-                                }
+                                  for(var ii in this.projekti_lista){
+                                    this.Racunaj_proba(Number(this.projekti_lista[ii].Razvoj),Number(this.projekti_lista[ii].odrzavanje),
+                                    Number(this.projekti_lista[ii].dokumentacija),Number(this.projekti_lista[ii].implementacija),Number(this.projekti_lista[ii].rezijski_poslovi),Number(ii));                                    
+                                  }
 
-                                for(var ii in this.projekti_lista){
-                                  this.Racunaj_proba(Number(this.projekti_lista[ii].Razvoj),Number(this.projekti_lista[ii].odrzavanje),
-                                  Number(this.projekti_lista[ii].dokumentacija),Number(this.projekti_lista[ii].implementacija),Number(this.projekti_lista[ii].rezijski_poslovi),Number(ii));                                    
-                                }
+                                  for(var ii in this.mumu){
+                                    this.mumuSum = Number(this.mumuSum) + Number(this.mumu[ii]);
+                                  }
+                                },
+                                error => { this.error = error
+                                                
+                                  this.Erorr(this.error._body);
+                                  console.log(error);
+                                  //this.GreskaFunkcija();
+                                },
+                                () => {console.log('done')}            
+                            );
+                    
+                          },
+                          error => {
+                            console.log("error");
+                            this.Erorr("Nije moguce ocitati trenutnu nedelju");
+                    });
+              },
+              error => {
+                console.log("error");
+                this.Erorr("Nije moguce ocitati trenutnu godinu");
 
-                                for(var ii in this.mumu){
-                                  this.mumuSum = Number(this.mumuSum) + Number(this.mumu[ii]);
-                                }
-                              },
-                              error => { this.error = error
-                                              
-                                this.Erorr(this.error._body);
-                                console.log(error);
-                                //this.GreskaFunkcija();
-                              },
-                              () => {console.log('done')}            
-                          );
-                  
-                        },
-                        error => {
-                          console.log("error");
-                          this.Erorr("Nije moguce ocitati trenutnu nedelju");
-                  });
-            },
-            error => {
-              console.log("error");
-              this.Erorr("Nije moguce ocitati trenutnu godinu");
-
-        });
-        
+          });
+        */  
         if(JSON.parse(localStorage.getItem('Token')) == null){
 
               console.log("Miroslav Beronja!!");
@@ -603,17 +763,191 @@ export class PocetnaComponent implements OnInit,OnDestroy {
               return;
         }
       }  
-        try {
-      
-          //this.ParsirajJWTVreme(JSON.parse(localStorage.getItem('Token')));
-          this.currentUser_ne = JSON.parse(localStorage.getItem('currentUser'));
+      try {
+    
+        //this.ParsirajJWTVreme(JSON.parse(localStorage.getItem('Token')));
+        this.currentUser_ne = JSON.parse(localStorage.getItem('currentUser'));
 
-        }
-        catch(err){
+      }
+      catch(err){
+        /*
+          this.cuvajNesto = {Podaci:[{Razvoj:10,odrzavanje:5}],Prevod:[{Razvoj:'Razvoj',odrzavanje:'Odrzavanje'}]}
 
-        }
+
+          let juhu = [];
+          let yyyy = [];
+          let juhu1 = 'Erviko';
+
+          //let nizPush = [];
+          for(let jj in this.cuvajNesto){
+            let p = {};
+            p['ime'] = this.cuvajNesto[jj].Podaci
+            p['satnic'] = this.cuvajNesto.Prevod[0];
+            yyyy.push(p);
+          }
+          console.log(yyyy);
+
+          juhu[0] = [{ime:'Razvoj',satnica:10},{ime:'Odrzavanje',satnica:5}];
+          let kk = {};
+          kk['Projekti'] = juhu1;
+          kk['Podaci'] = juhu[0];
+
+          this.nizPush.push(kk);
+          console.log(this.nizPush);
+          console.log(this.cuvajNesto);
+        */
+      }
 
         
+    }
+
+    prikazPr(id:number,tabela:any){
+
+      if(this.opcijeTabelaMicko[id]['text'] == 'Prikaži'){
+        this.opcijeTabelaMicko[id]['text'] = 'Sakrij'
+        this.opcijeTabelaMicko[id]['prikaz'] = 1;
+      }
+      else if(this.opcijeTabelaMicko[id]['text'] == 'Sakrij'){
+        this.opcijeTabelaMicko[id]['text'] = 'Prikaži';
+        this.opcijeTabelaMicko[id]['prikaz'] = 0;
+      }
+
+    }
+
+    sumiranje(){
+
+      this.mumuSum = 0;
+      for(var ii in this.prikazTabela){
+      //for(let ii = 0;ii<1;ii++){  
+        this.rez[ii] = 0
+        for(var zz in this.prikazTabela[ii].Podaci){
+          this.rez[ii] += this.prikazTabela[ii].Podaci[zz].satnica;
+        }
+        if( this.opcijeTabelaMicko[ii]['pretraga'] == 1){
+          this.mumuSum += this.rez[ii];
+        }
+      }
+    }
+
+    sacuvajProjekat(vrednosti:snimiProjekatModel[] = [],idProjekta:number){
+
+      let flg:boolean = false;
+
+      for(let z in vrednosti){
+        if(vrednosti[z].satnica == null){
+          flg = true;
+        }
+      }  
+
+      //console.log(vrednosti);
+    
+      this.zastitaUnosa();
+
+      if(this.gotovaFunkcija == true){
+        console.log("Gotova je funkcija!!")
+    
+        if(this.ngGodinaP.godina == null || (this.ngGodinaP.godina != 2017 &&  this.ngGodinaP.godina != 2018 && this.ngGodinaP.godina != 2019)){
+          this.text = "Nije dobro uneta godina!!"
+          this.text_izlaz = 'Izlaz'; 
+          this.showDialog();
+          this.ngGodinaP.godina = (new Date().getFullYear());
+        }
+        else{
+
+          if(flg==true){
+             this.Erorr("Satnica za dati projekat nije dobro uneta");
+          }
+          else{
+            this.sservice.CuvajProjekat(this.currentUser_ne,this.ngMesecP,this.ngGodinaP.godina,this.ngNedeljaP.nedelja,vrednosti,idProjekta)
+                .subscribe(
+                    cuvaj_sate => { this.cuvaj_sate = cuvaj_sate
+
+                    if((this.cuvaj_sate._body) == '"Uspesan Insert"'){
+
+                      this.text = "Uspešno ste sačuvali satnice!!"
+                      this.text_izlaz = 'Uredu'; 
+                      this.showDialog()
+
+                    }
+                    else if(String(this.cuvaj_sate) == 'Prazno'){
+
+                      console.log("Prazno" +  this.cuvaj_sate);
+                      this.text = "Izlogovani ste!!";
+                      this.text_izlaz = 'Uredu'; 
+                      this.showDialog();
+
+                    }
+                    else{
+
+                      this.text = this.cuvaj_sate._body
+                      this.text_izlaz = 'Uredu'; 
+                      this.showDialog()
+
+                    }
+                  },
+                  error => { this.error = error   
+                    this.Erorr(this.error._body);
+                    console.log(error);
+            });
+          }
+        }
+      }
+      else{
+        console.log("Prosao je!!")
+      }  
+    }
+
+    sacuvajSveProjekate(){
+
+      this.zastitaUnosa();
+
+      if(this.gotovaFunkcija == true){
+        let cujajBree;
+        //this.currentUser_ne,this.ngMesecP,this.ngGodinaP.godina,this.ngNedeljaP.nedelja,nizPodataka
+        this.sservice.SaljiSve(this.currentUser_ne,this.ngMesecP,this.ngGodinaP.godina,this.ngNedeljaP.nedelja,this.prikazTabela)
+          .subscribe(
+
+              cujajBree => { cujajBree = cujajBree
+                
+                console.log("cujajBree" + cujajBree);
+                /*if(cujajBree == "Insert bre"){
+                  this.text = "Uspešno ste sačuvali satnice!!"
+                  this.text_izlaz = 'Uredu'; 
+                  this.showDialog();   
+                }*/
+            },
+            error => {
+                console.log("error");
+                this.Erorr("Nije moguce ocitati trenutnu godinu");
+            },
+            () => {
+              console.log("done");
+
+            });
+      }
+      else{
+
+      }     
+    }
+
+    racunanjeUzivo(satnica:number,ime:string,id:number,projekti:string,pd:any){
+
+      //console.log(this.prikazTabela)
+
+      this.zastita = this.renderer.listen(this.el.nativeElement, 'keypress', (event) => {
+      
+        if(event.key == '-' || event.key == '+' || event.key == '.'){
+          if(satnica == null){
+            event.preventDefault();
+           }
+           else{
+             //console.log("usao ovde bree");
+           }
+        }
+      })
+
+      this.sumiranje();
+
     }
 
     ViditiSort(){
@@ -1296,7 +1630,9 @@ export class PocetnaComponent implements OnInit,OnDestroy {
           this.Racunaj_proba(Number(this.projekti_lista[ii].Razvoj),Number(this.projekti_lista[ii].odrzavanje),Number(this.projekti_lista[ii].dokumentacija),Number(this.projekti_lista[ii].implementacija),Number(this.projekti_lista[ii].rezijski_poslovi),Number(ii));
       }
       for(var ii in this.mumu){
-        this.mumuSum = Number(this.mumuSum) + Number(this.mumu[ii]);
+        if(this.objektPrikazi[ii]['search'] == 1){  
+          this.mumuSum = Number(this.mumuSum) + Number(this.mumu[ii]);
+        }
       }
 
     }
@@ -1308,207 +1644,213 @@ export class PocetnaComponent implements OnInit,OnDestroy {
           this.Racunaj_proba(Number(this.projekti_lista[ii].Razvoj),Number(this.projekti_lista[ii].odrzavanje),Number(this.projekti_lista[ii].dokumentacija),Number(this.projekti_lista[ii].implementacija),Number(this.projekti_lista[ii].rezijski_poslovi),Number(ii));
       }
       for(var ii in this.mumu){
-        if(this.objektPrikazi[ii]['search'] == 1){
+        //if(this.opcijeTabelaMicko[ii]['pretraga'] == 1){
           this.mumuSum = Number(this.mumuSum) + Number(this.mumu[ii]);
-        }
-      }  
+        //}
+      }
 
     }
 
-    onChangeNedelja(godina:any,mesec:any,nedelja:any){
-      
-     /*
-      let niz = [];  
-      for(let ii in this.projekti_lista){
-        this.x = document.getElementById(ii).style.display;
-        if(this.mickoTrue[ii] == 1){
-            if(this.x == 'block'){     
-              this.nizBlock[ii] = 0;
+    projektiSatnice(){
+
+      for(let ar in this.prikazTabela){//Brisanje Niza-objekata!!!
+        let index = this.prikazTabela.indexOf(this.prikazTabela[ar]);
+        this.prikazTabela.splice(index, this.prikazTabela.length);
+      }
+
+      for(let pr in this.probaMickoBre.Podaci){
+        let k = {};
+        k['pretraga'] = 1;
+        k['prikaz'] = 0;
+        k['text'] = "Prikaži";
+        k['Projekti'] = this.probaMickoBre.Podaci[pr].Projekti;
+        this.opcijeTabela.push(k);
+      }
+
+      this.opcijeTabelaMicko = this.opcijeTabela;
+
+      let nizIme = [];
+      let nizVrednost = [];
+      let nizBazaIme = [];   
+      for(let i in this.probaMickoBre.Podaci){
+      //for(let i = 0; i < 3; i++){  
+        let z:number = 0
+        z = Number(i);
+        
+        for(let g in this.probaMickoBre.Podaci[z]){
+          for(let k in this.probaMickoBre.Prevod[0]){
+            if(k == g){
+              nizIme[k] = this.probaMickoBre.Prevod[0][g];
+              nizVrednost[k] = this.probaMickoBre.Podaci[z][g];
+              nizBazaIme[k] = g;
             }
-            else{
-              this.nizBlock[ii] = 1;
-            }
-          }
-          else{
-            this.nizBlock[ii] = 0;
           }
         }
-     */
 
-     this.sservice.vrednosti_baza(this.currentUser_ne,mesec,godina,nedelja)
-          .subscribe(
-            projekti_lista => { this.projekti_lista = projekti_lista
+        let nizPodaci:any[] = [];
+        
+        for(let h in nizVrednost){
+          let tt = {};
+          tt['ime'] = nizIme[h];
+          tt['satnica'] = nizVrednost[h];
+          tt['baza'] = nizBazaIme[h];
+          nizPodaci.push(tt)
+        }
+  
+        let gg = {};
+        gg['Podaci'] = nizPodaci;
+        gg['Projekti'] = this.probaMickoBre.Podaci[z]['Projekti'];
+        gg['id_pr'] = this.probaMickoBre.Podaci[z]['id_pr'];
+        this.nizObjekataBre.push(gg);
+      }
 
-              if(this.pocetakSort  == false){
-                //this.RacunajSume();
-                this.RacunajSumePretraga();
-              }
+      this.prikazTabela = this.nizObjekataBre
 
-              if(this.projekti_lista != null){
-                if(this.pocetakSort  == true){
-                  //this.Filtriraj();
+      if(this.probaMickoBre == {}){                                        
+        this.flgLoading = false;
+      }
+      else{                                    
+        this.flgLoading = true;
+      }
+
+      this.mumuSum = 0;
+      for(var ii in this.prikazTabela){
+      //for(let ii = 0;ii<1;ii++){  
+        this.rez[ii] = 0
+        for(var zz in this.prikazTabela[ii].Podaci){
+          this.rez[ii] += this.prikazTabela[ii].Podaci[zz].satnica;
+        }
+        //console.log("rez"+ ": " + this.rez[ii]);
+        this.mumuSum += this.rez[ii];
+      }
+    }
+
+    onChangeNedelja(godina:any,mesec:any,nedelja:any){
+
+      this.brisanje_vrednosti_iz_selecta();
+      this.brojNedeljaZaDatiMesecGodinu();
+
+      this.sservice.projektiPrevodPodaci(this.currentUser_ne,godina,mesec,nedelja)
+        .subscribe(probaMickoBre => { this.probaMickoBre = probaMickoBre
+
+          this.projektiSatnice();
+
+        },
+        error => {
+          console.log("error");
+          this.Erorr(this.error._body);
+        }
+      );
+
+      /*
+        this.sservice.vrednosti_baza(this.currentUser_ne,mesec,godina,nedelja)
+            .subscribe(
+              projekti_lista => { this.projekti_lista = projekti_lista
+
+                
+                if(this.projekti_lista != null){
+                  if(this.pocetakSort  == true){
+                    //this.Filtriraj();
+                    for(var ii in this.prikazTabela){
+                        //for(let ii = 0;ii<1;ii++){  
+                      this.rez[ii] = 0
+                      for(var zz in this.prikazTabela[ii].Podaci){
+                        this.rez[ii] += this.prikazTabela[ii].Podaci[zz].satnica;
+                      }
+                      console.log("rez"+ ": " + this.rez[ii]);
+                      this.mumuSum += this.rez[ii];
+                    }
+                  }
                 }
+                  
+                if(this.brojacV < 2){
+                  
+                  this.brojacV++;
+                  this.intrevalPamtiOtvoreneprojekte = setInterval(() => { 
+
+                    if(this.brojacV == 1){
+                      clearInterval(this.intrevalPamtiOtvoreneprojekte);
+                      this.brojacV = 0;
+                    }
+
+                    for(let i = 0;Object.keys(this.projekti_lista).length > i;i++){
+                    } 
+  
+                  }, 1 );
+                }
+            },
+            error => { this.error = error
+              this.Erorr(this.error._body);
+              console.log(error);
+            },
+            () => {
+              console.log("done");
+              if(this.pocetakSort  == true){
+                //this.SortFunkcija(); 
               }
+            }
+        );
+      */
+    } 
+    
+    onChangeMesec(godina:any,mesec:any,nedelja:any){
+
+      this.racunanjeRadnihDana(mesec,godina);
+
+      this.brisanje_vrednosti_iz_selecta();
+      this.brojNedeljaZaDatiMesecGodinu();
+      if(this.objectNedelje.length < nedelja)
+      { 
+        this.ngNedeljaP.nedelja = 1;
+        nedelja = 1;
+      }
+
+      this.sservice.projektiPrevodPodaci(this.currentUser_ne,godina,mesec,nedelja)
+        .subscribe(probaMickoBre => { this.probaMickoBre = probaMickoBre
+
+          this.projektiSatnice();
+
+        },
+        error => {
+          console.log("error");
+          this.Erorr(this.error._body);
+        }
+      );
+      /*
+        this.sservice.vrednosti_baza(this.currentUser_ne,mesec,godina,nedelja)
+            .subscribe(
+              projekti_lista => { this.projekti_lista = projekti_lista
                 
-              if(this.brojacV < 2){
-                
-                this.brojacV++;
-                this.intrevalPamtiOtvoreneprojekte = setInterval(() => { 
+                if(this.pocetakSort  == false){  
+                  this.RacunajSumePretraga();
+                }
+
+                if(this.brojacV < 2){
+                  
+                  this.brojacV++;
+                  this.intrevalPamtiOtvoreneprojekte = setInterval(() => { 
 
                   if(this.brojacV == 1){
                     clearInterval(this.intrevalPamtiOtvoreneprojekte);
                     this.brojacV = 0;
                   }
-
                   for(let i = 0;Object.keys(this.projekti_lista).length > i;i++){
-                  } 
- 
-                }, 1 );
+                  }
+                  }, 1 );
+                }  
+            },
+            error => { this.error = error
+              this.Erorr(this.error._body);
+              console.log(error);
+            },
+            () => {
+              console.log('done')
+              if(this.pocetakSort  == true){
+                this.SortFunkcija();
               }
-          },
-          error => { this.error = error
-            this.Erorr(this.error._body);
-            console.log(error);
-          },
-          () => {
-            console.log("done");
-            if(this.pocetakSort  == true){
-              this.SortFunkcija(); 
-            }
           }
-      );
-    }
-    
-    onChangeMesec(godina:any,mesec:any,nedelja:any){
-
-      //let cuvajprojekti_lista = [];
-
-      /*
-        let nizDani = ['Ponedeljak','Utorak','Sreda','Cetvrtak','Petak','Subota','Nedelja'];
-        let mesecOdabrani;
-        let redniBrojMesec;
-
-        if(mesec == 'Januar'){mesecOdabrani = 'Jan',redniBrojMesec = 1}
-        else if(mesec == 'Februar'){mesecOdabrani = 'Feb',redniBrojMesec = 2}
-        else if(mesec == 'Mart'){mesecOdabrani = 'Mar',redniBrojMesec = 3}
-        else if(mesec == 'April'){mesecOdabrani = 'Apr',redniBrojMesec = 4}
-        else if(mesec == 'Maj'){mesecOdabrani = 'May',redniBrojMesec = 5}
-        else if(mesec == 'Jun'){mesecOdabrani = 'Jun',redniBrojMesec = 6}
-        else if(mesec == 'Jul'){mesecOdabrani = 'Jul',redniBrojMesec = 7}
-        else if(mesec == 'Avgust'){mesecOdabrani = 'Aug',redniBrojMesec = 8}
-        else if(mesec == 'Septembar'){mesecOdabrani = 'Sep',redniBrojMesec = 9}
-        else if(mesec == 'Oktobar'){mesecOdabrani = 'Oct',redniBrojMesec = 10}
-        else if(mesec == 'Novembar'){mesecOdabrani = 'Nov',redniBrojMesec = 11}
-        else if(mesec == 'Decembar'){mesecOdabrani = 'Dec',redniBrojMesec = 12}
-
-        let date = new Date();
-      
-
-        let brojDanaUMesecu = new Date(2017, redniBrojMesec , 0).getDate();
-        //console.log("brojDanaUMesecu" + brojDanaUMesecu);
-
-        let prvi = String(new Date(""+mesecOdabrani+" 01, "+godina+" 01:00:00"));
-        let poslednji = String(new Date(""+mesecOdabrani+""+brojDanaUMesecu+", "+godina+" 11:00:00"));
-
-        let danPrvi = prvi.substring(0,3);
-        console.log("danPrvi" + danPrvi)
-        let danPoslednji = poslednji.substring(0,3);
-
-        if(danPrvi == 'Mon'){danPrvi = nizDani[0],this.textObavestenjaMesecPrvi = "Prva nedelja ima 5 radnih dana"}
-        else if(danPrvi == 'Tue'){danPrvi = nizDani[1],this.textObavestenjaMesecPrvi = "Prva nedelja ima 4 radna dana"}
-        else if(danPrvi == 'Wed'){danPrvi = nizDani[2],this.textObavestenjaMesecPrvi = "Prva nedelja ima 3 radna dana"}
-        else if(danPrvi == 'Thu'){danPrvi = nizDani[3],this.textObavestenjaMesecPrvi = "Prva nedelja ima 2 radna dana"}
-        else if(danPrvi == 'Fri'){danPrvi = nizDani[4],this.textObavestenjaMesecPrvi = "Prva nedelja ima 1 radni dan"}
-        else if(danPrvi == 'Sat'){danPrvi = nizDani[5],this.textObavestenjaMesecPrvi = "Prva nedelja nema radnih dana"}
-        else if(danPrvi == 'Sun'){danPrvi = nizDani[6],this.textObavestenjaMesecPrvi = "Prva nedelja nema radnih dana"}
-
-        if(danPoslednji == 'Mon'){danPoslednji = nizDani[0],this.textObavestenjaMesecPoslednji = "Poslednja nedelja ima 1 radni dana"}
-        else if(danPoslednji == 'Tue'){danPoslednji = nizDani[1],this.textObavestenjaMesecPoslednji = "Poslednja nedelja ima 2 radna dana"}
-        else if(danPoslednji == 'Wed'){danPoslednji = nizDani[2],this.textObavestenjaMesecPoslednji = "Poslednja nedelja ima 3 radna dana"}
-        else if(danPoslednji == 'Thu'){danPoslednji = nizDani[3],this.textObavestenjaMesecPoslednji = "Poslednja nedelja ima 4 radna dana"}
-        else if(danPoslednji == 'Fri'){danPoslednji = nizDani[4],this.textObavestenjaMesecPoslednji = "Poslednja nedelja ima 5 radnih dana"}
-        else if(danPoslednji == 'Sat'){danPoslednji = nizDani[5],this.textObavestenjaMesecPoslednji = "Poslednja nedelja nema radnih dana"}
-        else if(danPoslednji == 'Sun'){danPoslednji = nizDani[6],this.textObavestenjaMesecPoslednji = "Poslednja nedelja nema radnih dana"}
-
-        console.log("Prvi dan" + danPrvi);
-        console.log("Poslednji dan" + danPoslednji);
-      */
-      /*  
-        let niz = [];
-        for(let ii in this.projekti_lista){
-          if(this.mickoTrue[ii] == 1){
-            this.x = document.getElementById(ii).style.display;
-
-            if(this.x == 'block'){     
-              niz[ii] = 0;
-           }
-            else{
-              niz[ii] = 1;
-            }
-          }
-        }
-      */
-        /*for(let ii in this.projekti_lista){
-          if(this.mickoTrue[ii] == 1){
-
-            this.x = document.getElementById(ii).style.display;
-
-            if(this.x == 'block'){     
-              this.nizBlock[ii] = 0;
-            }
-            else{
-              this.nizBlock[ii] = 1;
-            }
-          }
-          else{
-            this.nizBlock[ii] = 0;
-          }
-        }
-      */
-
-      this.racunanjeRadnihDana(mesec,godina);
-
-      this.sservice.vrednosti_baza(this.currentUser_ne,mesec,godina,nedelja)
-          .subscribe(
-            projekti_lista => { this.projekti_lista = projekti_lista
-              
-              if(this.pocetakSort  == false){  
-                //this.RacunajSume();
-                this.RacunajSumePretraga();
-              }
-
-              if(this.brojacV < 2){
-                
-                this.brojacV++;
-                this.intrevalPamtiOtvoreneprojekte = setInterval(() => { 
-
-                if(this.brojacV == 1){
-                  clearInterval(this.intrevalPamtiOtvoreneprojekte);
-                  this.brojacV = 0;
-                }
-                for(let i = 0;Object.keys(this.projekti_lista).length > i;i++){
-                }
-                }, 1 );
-              }  
-          },
-          error => { this.error = error
-            this.Erorr(this.error._body);
-            console.log(error);
-          },
-          () => {
-            console.log('done')
-            if(this.pocetakSort  == true){
-
-              this.SortFunkcija();
-
-            }
-            /*
-              console.log(this.cuvajprojekti_lista);  
-              console.log(this.objektPrikazi);
-              console.log(this.projekti_lista);
-            */
-        }
-      );
+        );
+      */  
     }
 
     klikGodina(godina:any,mesec:any,nedelja:any){
@@ -1567,16 +1909,26 @@ export class PocetnaComponent implements OnInit,OnDestroy {
       this.brisanje_vrednosti_iz_selecta();
       this.brojNedeljaZaDatiMesecGodinu();
 
-      console.log("ngGodinaP" + godina);
-      console.log("ngMesecP" + mesec);
-      console.log("ngNedeljaP" + nedelja);
 
       this.NizMesecBackspace[0] = godina;
 
       this.renderer.listen(this.el.nativeElement, 'keyup', (event) => {
             this.ngGodinaP.godina = this.NizMesecBackspace[0];
-      })
+      });
 
+      this.sservice.projektiPrevodPodaci(this.currentUser_ne,godina,mesec,nedelja)
+        .subscribe(probaMickoBre => { this.probaMickoBre = probaMickoBre
+
+          this.projektiSatnice();
+
+        },
+        error => {
+          console.log("error");
+          this.Erorr(this.error._body);
+        }
+      );
+
+      /*
       this.sservice.vrednosti_baza(this.currentUser_ne,mesec,godina,nedelja)
             .subscribe(
 
@@ -1613,25 +1965,27 @@ export class PocetnaComponent implements OnInit,OnDestroy {
               },
               () => {console.log('done')}
       );
+      */
     }
 
     Pretraga(text:any){
 
       let brojacSlova = 0;
 
-      for(let pr in this.projekti_lista){
-        if(this.projekti_lista[pr]['Projekti'].toLowerCase().indexOf(""+this.textInput+"") > -1){
-          this.mickoTrue[pr] = 1;
-          this.objektPrikazi[pr]['search'] = 1;
+      for(let pr in this.prikazTabela){
+        if(this.prikazTabela[pr]['Projekti'].toLowerCase().indexOf(""+this.textInput+"") > -1){
+         
+          this.opcijeTabelaMicko[pr]['pretraga'] = 1;
           brojacSlova++;
+          console.log("brojacSlova" + this.prikazTabela[pr]['Projekti'])
         }
         else{
-          this.mickoTrue[pr] = 0;
-          this.objektPrikazi[pr]['search'] = 0;
+          //this.mickoTrue[pr] = 0;
+          this.opcijeTabelaMicko[pr]['pretraga'] = 0;
         }
       }
-
-      this.RacunajSumePretraga();
+      console.log(this.opcijeTabelaMicko);
+      this.sumiranje();
 
       if(this.pocetakSort  == true){
         this.Filtriraj();
@@ -1661,37 +2015,33 @@ export class PocetnaComponent implements OnInit,OnDestroy {
 
     posaljiEmail(){
 
-      this.sservice.Email(this.currentUser_ne)
+      this.sservice.fullName(this.currentUser_ne)
           .then(
             email => { this.email = email
 
-              //console.log(email);
-              //console.log("textEmail" + this.textEmail);
-
               if(this.textEmail == " " || this.textEmail == undefined || this.textEmail == ""){
-
-                //console.log("Nije moguce upisati projekat");
                 this.Erorr("Nije moguce poslati prazan zahtev.");
-
-              }//
+              }
               else{
-
-                  console.log("text" + this.textEmail)
-                  console.log("Micko")
                   this.sservice.slanjeMejla(this.textEmail,email)
-                    .then(
-                      emailOdg => { this.emailOdg = emailOdg
-                        console.log(emailOdg);
+                    .subscribe(
+                      emailOdg => { this.emailOdg = String(emailOdg)
+
+                        if(this.emailOdg != "Poslat mejl"){
+                          console.log("Nije poslat mejl");
+                        }
+                        else{
+                          console.log(emailOdg);
+                        }
                         this.textEmail = " ";
                         this.Erorr("Uspešno ste poslali zahtev za novi projekat.");
 
                       }, 
                       error => {
-                          console.log("error");
-                          this.Erorr("Nije moguce poslati zahtev za novi projekat");
-
+                        console.log("error");
+                        this.Erorr("Nije moguce poslati zahtev za novi projekat");
                   }); 
-              } 
+              }
             },
             error => {
                   console.log("error");
@@ -1710,7 +2060,7 @@ export class PocetnaComponent implements OnInit,OnDestroy {
 
       this.zastitaUnosa();
 
-      if(this.gotovaFunkcija == true){
+      /*if(this.gotovaFunkcija == true){
         let cujajBree;
         //this.currentUser_ne,this.ngMesecP,this.ngGodinaP.godina,this.ngNedeljaP.nedelja,nizPodataka
         this.sservice.SaljiSve(this.currentUser_ne,this.ngMesecP,this.ngGodinaP.godina,this.ngNedeljaP.nedelja,this.projekti_lista)
@@ -1736,7 +2086,7 @@ export class PocetnaComponent implements OnInit,OnDestroy {
       }
       else{
 
-      }     
+      }   */  
     }
 
     zahtevIzlaz(){
@@ -1916,19 +2266,18 @@ export class PocetnaComponent implements OnInit,OnDestroy {
 
         var brojac = 0
         for(var index = this.pamti_nedelje[0]; index<=this.pamti_nedelje[1]; index++){
-
-            this.lista_broja_nedelja = index;
-          
+          this.lista_broja_nedelja = index;
         }
         for(var i = 1; this.lista_broja_nedelja >= i ; i++){
-            this.objekti_nedelje[i-1] = i
+          this.objekti_nedelje[i-1] = i
         }
 
         for(let ar in this.objectNedelje){//Brisanje Niza-objekata!!!
-                let index = this.objectNedelje.indexOf(this.objectNedelje[ar]);
-                //console.log("NizObjectIndex" + index);
-                this.objectNedelje.splice(index, this.objectNedelje.length);
+          let index = this.objectNedelje.indexOf(this.objectNedelje[ar]);
+          this.objectNedelje.splice(index, this.objectNedelje.length);
         }
+
+
 
         for (let pr of this.objekti_nedelje) {
           let y = {};
@@ -2006,14 +2355,11 @@ export class PocetnaComponent implements OnInit,OnDestroy {
     }
 
     brisanje_vrednosti_iz_selecta(){
-      //this.lista_broja_nedelja = 0
+
       for(var i = 0; this.lista_broja_nedelja >= i ; i++){
           this.objekti_nedelje.splice(this.objekti_nedelje.indexOf(i), 1);
       }
-      /*for(var i = 0; this.lista_broja_nedelja_ngModel >= i ; i++){
-          this.objekti_nedelje_ngModel.splice(this.objekti_nedelje_ngModel.indexOf(i), 1);
-      }*/
-
+    
       
     }
 
@@ -2079,7 +2425,7 @@ export class PocetnaComponent implements OnInit,OnDestroy {
     }
 
     showDialog() {
-          this.display = true;
+        this.display = true;
     }
 
     showDialogError() {
@@ -2317,7 +2663,7 @@ export class PocetnaComponent implements OnInit,OnDestroy {
 
         }
         else{
-
+          /*
           this.sservice.CuvajProjekat(this.currentUser_ne,this.ngMesecP,this.ngGodinaP.godina,this.ngNedeljaP.nedelja,nizPodataka)
               .subscribe(
                   cuvaj_sate => { this.cuvaj_sate = cuvaj_sate
@@ -2349,6 +2695,7 @@ export class PocetnaComponent implements OnInit,OnDestroy {
                   this.Erorr(this.error._body);
                   console.log(error);
           });
+          */
         }
       }
       else{

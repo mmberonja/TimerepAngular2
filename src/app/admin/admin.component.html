@@ -36,14 +36,27 @@
             </tr>
            
             <tr *ngFor="let obj of this.PakovanjeProjekata; let i = index;">
-              <th style="display:inline-block;width: 350px;">{{obj.Projekat}}</th>
-              <th *ngFor="let korisnici of this.nizObjKorisnik;" style="font-weight: lighter;font-style: normal; " >{{obj[korisnici.oznaka]}}</th><!--[ngStyle]="{'background-color':boja}"-->
-              <th >{{SumaPoProjektu[i]}}</th>
+                <th style="display:inline-block;width: 350px;">{{obj.Projekat}}</th>
+                <th *ngFor="let korisnici of this.nizObjKorisnik;let zzz = index;" style="font-weight: lighter;font-style: normal;">
+                  <div *ngIf="korisnici.boja == 1" >
+                    <div style="background-color: #ffffb3">
+                      {{obj[korisnici.oznaka]}}
+                    </div>
+                  </div>
+                  <div *ngIf="korisnici.boja == 0" >
+                    <div style="background-color:white ">
+                      {{obj[korisnici.oznaka] }}
+                    </div>
+                  </div>  
+                  
+                </th><!--[ngStyle]="{'background-color':boja}"-->
+                <th style="background-color: yellow">{{SumaPoProjektu[i]}}</th>
             </tr>
            
             <tr>
               <th>Ukupno</th>
-              <th *ngFor="let sumHor of this.SumaPoKorisniku;" >{{sumHor}}</th>
+              <th style="background-color: yellow" *ngFor="let sumHor of this.SumaPoKorisniku;" >{{sumHor}}</th>
+              <th style="background-color: yellow" > {{ sumSvih }} </th><!-- -->
             </tr>  
         </table>
      </div>
@@ -52,24 +65,6 @@
         <button style="background-color:white" class="btn btn-lg"><span class="glyphicon glyphicon-refresh glyphicon-refresh-animate"></span> Loading...</button>
       </div>
      </div>
-    <!--<div class="wrapper">
-      <table class="micko">
-        <tr id="groups">
-          <th class="rotate">&nbsp;</th>
-          <th class="rotate" *ngFor="let korisnici of this.NizKorisnici;" ><span class="intact">{{korisnici}}</span></th>
-          <th class="rotate"  ><span class="intact">sum</span></th>
-        </tr>
-        <tr *ngFor="let obj of this.NizObjekataKorPr; let i = index;">
-          <th style="display:inline-block;width: 350px;">{{obj.Projekat}}</th>
-          <th *ngFor="let korisnici of this.NizKorisnici;" style="font-weight: lighter;font-style: normal;">{{obj[korisnici]}}</th>
-          <th  >{{SumaNizVertikalno[i]}}</th>
-        </tr>
-        <tr>
-          <th>sum</th>
-          <th *ngFor="let sumHor of this.SumaNizHorizontalno;" style="font-weight: lighter;font-style: normal;">{{sumHor}}</th>
-        </tr>  
-      </table>
-    </div>  --> 
   </div>
   <br>
   <hr>
@@ -91,7 +86,7 @@
           &nbsp; &nbsp; &nbsp;
         <div class="projekat-button">
           <h4 class="first">Projekat:</h4>
-          <p-dropdown (ngModelChange)="KlikProjektiAdmin()" [options]="projektiDropDown" [(ngModel)]="selectedProjektiAktivni" [style]="{'width':'250px', 'height':'34px'}"  filter="filter"></p-dropdown>
+          <p-dropdown  [options]="projektiDropDown" [(ngModel)]="selectedProjektiAktivni" [style]="{'width':'250px', 'height':'34px'}" (ngModelChange)="KlikProjektiAdmin(this.selectedGodinaProjektiAdmin,this.ProjektiMesecAdmin,this.selectedProjektiAktivni)" filter="filter"></p-dropdown>
         </div>
       </div> 
     </div>  
@@ -108,12 +103,24 @@
            
             <tr *ngFor="let obj of this.pakovanjeDetalji; let i = index;"> 
               <th style="display:inline-block;width: 350px;">{{obj.Projekat}}</th>
-              <th *ngFor="let korisnici of this.detaljiNizObjKorisnik;" style="font-weight: lighter;font-style: normal; " >{{obj[korisnici.oznaka]}}</th> <!--[ngStyle]="{'background-color':boja}"-->
-              <th >{{SumaPoNedeljamaDetalji[i]}}</th>
+              <th *ngFor="let korisnici of this.detaljiNizObjKorisnik;" style="font-weight: lighter;font-style: normal;">
+                <div *ngIf="korisnici.boja == 1" >
+                  <div style="background-color: #ffffb3">
+                    {{obj[korisnici.oznaka]}}
+                  </div>
+                </div>
+                <div *ngIf="korisnici.boja == 0" >
+                  <div style="background-color:white ">
+                    {{obj[korisnici.oznaka]}}
+                  </div>
+                </div>  
+              </th> <!--[ngStyle]="{'background-color':boja}"-->
+              <th style="background-color: yellow">{{SumaPoNedeljamaDetalji[i]}}</th>
             </tr>
             <tr>
               <th>Ukupno</th>
-              <th *ngFor="let sum of this.SumaPoKorisnikuProjekat;">{{sum}}</th>
+              <th style="background-color: yellow" *ngFor="let sum of this.SumaPoKorisnikuProjekat;">{{sum}}</th>
+              <th style="background-color: yellow" > {{ sumSvihProjekti }} </th>
             </tr>  
         </table>
      </div>
@@ -161,7 +168,7 @@
       </div>
        &nbsp; &nbsp;
        <div class="projekat-button" style="vertical-align: top; padding: 0;">
-         <button type="submit" class="btn btn-danger">Dodaj</button>
+         <button type="submit" class="btn btn-danger">Izvrši</button>
       </div>   
      </form>
      <div>
@@ -190,7 +197,7 @@
         </div>
         &nbsp; &nbsp;
         <div class="button-dodavanje">
-          <button type="" (click)="Dodaj()" class="btn btn-danger">Dodaj</button>
+          <button type="" (click)="Dodaj()" class="btn btn-danger">Izvrši</button>
           <!-- <button type="" class="btn btn-danger">Posalji zahtev</button> -->
         </div>  
       </div>
@@ -227,7 +234,7 @@
         </div>
         &nbsp; &nbsp;
         <div class="button-dodavanje">
-            <button type="" (click)="UklanjanjeKorisnikaSaProjekta()" class="btn btn-danger">Ukloni</button>
+            <button type="" (click)="UklanjanjeKorisnikaSaProjekta()" class="btn btn-danger">Izvrši</button>
         </div>
       </div>
       <div class="col-sm-12 col-md-12 col-lg-12">
@@ -259,7 +266,7 @@
         </div>
         &nbsp; &nbsp;
         <div class="button-dodavanje">
-            <button type="" (click)="Deaktivacija()" class="btn btn-danger">Deaktivacija</button>
+            <button type="" (click)="Deaktivacija()" class="btn btn-danger">Izvrši</button>
         </div>   
       </div>
       <div class="col-sm-12 col-md-12 col-lg-12">
@@ -285,7 +292,7 @@
         </div>
         &nbsp; &nbsp;
         <div class="button-dodavanje">
-            <button type="" (click)="Aktivacija()" class="btn btn-danger">Aktivacija</button>
+            <button type="" (click)="Aktivacija()" class="btn btn-danger">Izvrši</button>
         </div>   
       </div>
       <div class="col-sm-12 col-md-12 col-lg-12">

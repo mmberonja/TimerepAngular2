@@ -88,7 +88,7 @@
         <p>Naziv:</p>
       </div>
       <div>
-          <input [(ngModel)]="textEmail" class="form-control" style="width:250px;">     
+          <input [(ngModel)]="textEmail" class="form-control" maxlength="40" style="width:250px;">     
       </div><br>
       <div>
           <button  class="btn btn-danger" (click)="posaljiEmail()">Pošalji zahtev</button>
@@ -99,232 +99,194 @@
           style="width:280px;background-color: white;margin-top:40px; position: fixed; right: 5;z-index: 0;" >
           <div class="snimi-sve" >
             <p></p>
-            <button  class="btn btn-danger" (click)="snimiSve();">Snimi sve</button><br><br>
+            <button  class="btn btn-danger" (click)="sacuvajSveProjekate();">Snimi sve</button><br><br>
             <p>Ukupna suma:</p>
             <input style="width: 167px;vertical-align:top;" class="form-control" value="{{mumuSum}}" disabled/>
           </div>
         </div> 
       </div>
   </div>
-
-  <div class="row"> 
-    <div *ngIf="flgLoading" class="col-sm-7 col-sm-offset-2 col-md-7 col-md-offset-2 col-lg-7 col-lg-offset-2 col-xl-7 col-xl-offset-2" >
-      <table class="table table-bordered">
-        <tr class="active" [ngStyle]="{'height' : '80px'}">
-          <th class="text-center"> Projekti <input type="text"   class="form-control search-input" (keyup)="Pretraga(this.textInput)" [(ngModel)]="this.textInput" /></th>
-          <th class="text-center"> <div class="up-down" style="cursor: pointer;" (click)="ViditiSort();" >Satnice</div> 
-            <!--<button class="btn btn-danger" style="width: 100px;" (click)="Filtriraj(this.projekti_lista)" >Filtriraj</button>-->
-            <div *ngIf="this.sort == true;" class="sort-satnica">
-              <div *ngIf="this.flgFiltar == false" class="up">
-                <button type="button" class="btn btn-default btn-sm" (click)="probaHtmlL = true;Filtriraj();">
-                  <span class="glyphicon glyphicon-chevron-up"></span>
-                </button>
+    <!--<div class="row"> 
+      <div *ngIf="flgLoading" class="col-sm-7 col-sm-offset-2 col-md-7 col-md-offset-2 col-lg-7 col-lg-offset-2 col-xl-7 col-xl-offset-2" >
+        <table class="table table-bordered">
+          <tr class="active" [ngStyle]="{'height' : '80px'}">
+            <th class="text-center"> Projekti <input type="text"   class="form-control search-input" (keyup)="Pretraga(this.textInput)" [(ngModel)]="this.textInput" /></th>
+            <th class="text-center"> <div class="up-down" style="cursor: pointer;" (click)="ViditiSort();" >Satnice</div> 
+              <div *ngIf="this.sort == true;" class="sort-satnica">
+                <div *ngIf="this.flgFiltar == false" class="up">
+                  <button type="button" class="btn btn-default btn-sm" (click)="probaHtmlL = true;Filtriraj();">
+                    <span class="glyphicon glyphicon-chevron-up"></span>
+                  </button>
+                </div>
+                <div *ngIf="this.flgFiltar == true" class="down">
+                  <button [disabled]="disableSort == false" type="button" class="btn btn-default btn-sm" (click)="probaHtmlL = false;Filtriraj();">
+                    <span class="glyphicon glyphicon-chevron-down"></span>
+                  </button>
+                </div>
               </div>
-              <div *ngIf="this.flgFiltar == true" class="down">
-                <button [disabled]="disableSort == false" type="button" class="btn btn-default btn-sm" (click)="probaHtmlL = false;Filtriraj();">
-                  <span class="glyphicon glyphicon-chevron-down"></span>
-                </button>
-              </div>
-            </div>
-          </th> 
-        </tr>
-        <tbody *ngFor="let niz of projekti_lista; let idNiz = index; trackBy: trackByNiz">
-          <tr *ngIf="hideElement == mickoTrue[idNiz]">
-            <td>{{ niz.Projekti }} </td>
-            <td style="width:210px;"><button id="12345{{ idNiz }}" style="width:75px;" class="btn btn-danger pored-prvi" (click)="NizVidljivost(niz.Projekti,idNiz)">{{ objektPrikazi[idNiz]['text'] }}</button>&nbsp; &nbsp;<div style="width:100px;" class="pored-drugi"><input style="width:80px;"  class="form-control"  [(ngModel)]="mumu[idNiz]" value="{{mumu[idNiz]}}" disabled></div></td>
+            </th> 
           </tr>
-            <tr *ngIf="hideElement == objektPrikazi[idNiz]['search']">  
-              <div  style="margin-left:10px;"  *ngIf="hideObavestenja == objektPrikazi[idNiz]['prikaz']" id="{{ idNiz }}">
-                <div class="tabela-detalji-text">
+          <tbody *ngFor="let niz of projekti_lista; let idNiz = index; trackBy: trackByNiz">
+            <tr *ngIf="hideElement == mickoTrue[idNiz]">
+              <td>{{ niz.Projekti }} </td>
+              <td style="width:210px;"><button id="12345{{ idNiz }}" style="width:75px;" class="btn btn-danger pored-prvi" (click)="NizVidljivost(niz.Projekti,idNiz)">{{ objektPrikazi[idNiz]['text'] }}</button>&nbsp; &nbsp;<div style="width:100px;" class="pored-drugi"><input style="width:80px;"  class="form-control"  [(ngModel)]="mumu[idNiz]" value="{{mumu[idNiz]}}" disabled></div></td>
+            </tr>
+              <tr *ngIf="hideElement == objektPrikazi[idNiz]['search']">  
+                <div  style="margin-left:10px;"  *ngIf="hideObavestenja == objektPrikazi[idNiz]['prikaz']" id="{{ idNiz }}">
+                  <div class="tabela-detalji-text">
+                    <div class="tabela-detalji-text-sredjeno" >
+                      <p>Razvoj:</p>
+                    </div>
+                  </div>
+                  <div class="tabela-detalji-input" style="vertical-align: top;">
+                    <input #box type="number" min="0" max="40" step="1" class="form-control" name="Micko" [(ngModel)]="niz.Razvoj" value="{{ niz.razvoj }}" style="width:200px;" 
+                    (keyup)="Racunaj_proba(niz.Razvoj,niz.odrzavanje,niz.dokumentacija,niz.implementacija,niz.rezijski_poslovi,idNiz);Racunaj_Ukupno();" 
+                    (click)="Racunaj_proba(niz.Razvoj,niz.odrzavanje,niz.dokumentacija,niz.implementacija,niz.rezijski_poslovi,idNiz);Racunaj_Ukupno();"/>
+                  </div><br>
+                  <div class="tabela-detalji-text">
+                    <div class="tabela-detalji-text-sredjeno">
+                      <p>Održavanje:</p>
+                    </div>
+                  </div>
+                  <div class="tabela-detalji-input" style="vertical-align: top;">
+                    <input #box1 type="number" min="0" max="40" step="1" class="form-control" [(ngModel)]="niz.odrzavanje" value="{{ niz.odrzavanje }}" style="width:200px;"
+                    (keyup)="Racunaj_proba(niz.Razvoj,niz.odrzavanje,niz.dokumentacija,niz.implementacija,niz.rezijski_poslovi,idNiz);Racunaj_Ukupno();"
+                    (click)="Racunaj_proba(niz.Razvoj,niz.odrzavanje,niz.dokumentacija,niz.implementacija,niz.rezijski_poslovi,idNiz);Racunaj_Ukupno();"/>   
+                  </div><br>
+                  <div class="tabela-detalji-text">
+                    <div class="tabela-detalji-text-sredjeno">
+                      <p>Dokumentacija:</p>
+                    </div>
+                  </div>
+                  <div class="tabela-detalji-input"  style="vertical-align: top;">
+                    <input #box2 type="number" min="0" max="40" step="1" class="form-control" [(ngModel)]="niz.dokumentacija" value="{{ niz.dokumentacija }}" style="width:200px;"
+                    (keyup)="Racunaj_proba(niz.Razvoj,niz.odrzavanje,niz.dokumentacija,niz.implementacija,niz.rezijski_poslovi,idNiz);Racunaj_Ukupno();"
+                    (click)="Racunaj_proba(niz.Razvoj,niz.odrzavanje,niz.dokumentacija,niz.implementacija,niz.rezijski_poslovi,idNiz);Racunaj_Ukupno();"/>         
+                  </div><br>
+                  <div class="tabela-detalji-text">
+                    <div class="tabela-detalji-text-sredjeno">
+                      <p>Implementacija:</p>
+                    </div>
+                  </div>
+                  <div class="tabela-detalji-input"  style="vertical-align: top;">
+                    <input #box3 type="number" min="0" max="40" step="1" class="form-control" [(ngModel)]="niz.implementacija"  value="{{ niz.implementacija }}" style="width:200px;"
+                    (keyup)="Racunaj_proba(niz.Razvoj,niz.odrzavanje,niz.dokumentacija,niz.implementacija,niz.rezijski_poslovi,idNiz);Racunaj_Ukupno();"
+                    (click)="Racunaj_proba(niz.Razvoj,niz.odrzavanje,niz.dokumentacija,niz.implementacija,niz.rezijski_poslovi,idNiz);Racunaj_Ukupno();"/>         
+                  </div><br>
+                  <div class="tabela-detalji-text">
+                    <div class="tabela-detalji-text-sredjeno">
+                      <p>Režijski poslovi:</p>
+                    </div>
+                  </div>
+                  <div class="tabela-detalji-input"  style="vertical-align: top;">
+                    <input #box4 type="number" min="0" max="40" step="1" class="form-control" [(ngModel)]="niz.rezijski_poslovi" value="{{ niz.reziski_poslovi }}" style="width:200px;"
+                    (keyup)="Racunaj_proba(niz.Razvoj,niz.odrzavanje,niz.dokumentacija,niz.implementacija,niz.rezijski_poslovi,idNiz);Racunaj_Ukupno();"
+                    (click)="Racunaj_proba(niz.Razvoj,niz.odrzavanje,niz.dokumentacija,niz.implementacija,niz.rezijski_poslovi,idNiz);Racunaj_Ukupno();"/>         
+                  </div>
+                  <br>
+                  <div class="tabela-detalji-text">
+                    <div class="tabela-detalji-text-sredjeno">    
+                        <p>Ukupno:<p>
+                    </div>
+                  </div>
+                  <div class="tabela-detalji-input"  style="vertical-align: top;">     
+                    <p><input style="width:200px;"  class="form-control"  [(ngModel)]="mumu[idNiz]" value="{{mumu[idNiz]}}" disabled><p>   
+                  </div>&nbsp; &nbsp;
+                  <div class="tabela-detalji-button">     
+                    <button class="btn btn-danger" style="width:100px;" (click)="SnimiNiz(niz.Projekti,niz.id_projekat_D,niz.Razvoj,niz.odrzavanje,niz.dokumentacija,niz.implementacija,niz.rezijski_poslovi,niz)">Sačuvaj</button>  
+                  </div>
+                </div>
+              </tr>   
+          </tbody>
+            <tr class="active">
+              <td>
+              <div class="tabela-detalji-text">
+                <div class="tabela-detalji-text-sredjeno">
+                  <p>Ukupna suma:</p>
+                </div>
+              </div>
+              <div class="tabela-detalji-input" style="vertical-align: top;">
+                  
+              </div><br>
+              </td>
+              <td>
+                <input style="width: 167px;vertical-align:top;" class="form-control" value="{{mumuSum}}" disabled/>
+              </td>  
+            </tr>  
+        </table>
+      </div>
+    </div>-->
+  
+  <div class="row">
+     <div *ngIf="flgLoading" class="col-sm-7 col-sm-offset-2 col-md-7 col-md-offset-2 col-lg-7 col-lg-offset-2 col-xl-7 col-xl-offset-2" >
+      <table class="table table-bordered">
+        <tr class="active" [ngStyle]="{'height' : '40px'}">
+          <th class="text-center"> Projekti <input type="text"   class="form-control search-input" (keyup)="Pretraga(this.textInput)" [(ngModel)]="this.textInput" /></th>
+          <th class="text-center"> Satnice </th>
+        </tr>
+        <tbody *ngFor="let prM of this.prikazTabela;let id = index">
+          <tr *ngIf="hideElement == opcijeTabelaMicko[id]['pretraga']">
+            <td>{{ prM.Projekti }}</td>
+            <td style="width:210px;">
+              <button id="12345{{ id }}" style="width:75px;" class="btn btn-danger pored-prvi" (click)="prikazPr(id,this.opcijeTabelaMicko)" >{{ this.opcijeTabelaMicko[id]['text'] }}
+              </button>&nbsp; &nbsp;<div style="width:100px;" class="pored-drugi"> <input style="width:80px;" [(ngModel)]=" this.rez[id]" value="{{ this.rez[id] }}" class="form-control"  disabled /></div>
+            </td>
+          </tr>
+          <div *ngIf="hideElement == opcijeTabelaMicko[id]['pretraga']">
+            <tr *ngIf="prikazInformacija == this.opcijeTabelaMicko[id]['prikaz']">
+              <div *ngFor="let pd of this.prikazTabela[id].Podaci;">
+                <div class="tabela-detalji-text" >
                   <div class="tabela-detalji-text-sredjeno" >
-                    <p>Razvoj:</p>
+                    <p style="margin-left: 10px;width:100%">{{ pd.ime }}:</p>
                   </div>
-                </div>
+                </div> &nbsp; &nbsp;
                 <div class="tabela-detalji-input" style="vertical-align: top;">
-                  <input #box type="number" min="0" max="40" step="1" class="form-control" name="Micko" [(ngModel)]="niz.Razvoj" value="{{ niz.razvoj }}" style="width:200px;" 
-                  (keyup)="Racunaj_proba(niz.Razvoj,niz.odrzavanje,niz.dokumentacija,niz.implementacija,niz.rezijski_poslovi,idNiz);Racunaj_Ukupno();" 
-                  (click)="Racunaj_proba(niz.Razvoj,niz.odrzavanje,niz.dokumentacija,niz.implementacija,niz.rezijski_poslovi,idNiz);Racunaj_Ukupno();"/>
+                  <input #box1 type="number" min="0" max="40" step="1" class="form-control" [(ngModel)]="pd.satnica" value="{{  pd.satnica }}" style="width:200px;"
+                    (keyup)="racunanjeUzivo(pd.satnica,pd.ime,prM.id_pr,prM.Projekti,pd);"
+                    (click)="racunanjeUzivo(pd.satnica,pd.ime,prM.id_pr,prM.Projekti,pd);"    
+                  >
                 </div><br>
-                <div class="tabela-detalji-text">
-                  <div class="tabela-detalji-text-sredjeno">
-                    <p>Odrzavanje:</p>
-                  </div>
-                </div>
-                <div class="tabela-detalji-input" style="vertical-align: top;">
-                  <input #box1 type="number" min="0" max="40" step="1" class="form-control" [(ngModel)]="niz.odrzavanje" value="{{ niz.odrzavanje }}" style="width:200px;"
-                  (keyup)="Racunaj_proba(niz.Razvoj,niz.odrzavanje,niz.dokumentacija,niz.implementacija,niz.rezijski_poslovi,idNiz);Racunaj_Ukupno();"
-                  (click)="Racunaj_proba(niz.Razvoj,niz.odrzavanje,niz.dokumentacija,niz.implementacija,niz.rezijski_poslovi,idNiz);Racunaj_Ukupno();"/>   
-                </div><br>
-                <div class="tabela-detalji-text">
-                  <div class="tabela-detalji-text-sredjeno">
-                    <p>Dokumentacija:</p>
-                  </div>
-                </div>
-                <div class="tabela-detalji-input"  style="vertical-align: top;">
-                  <input #box2 type="number" min="0" max="40" step="1" class="form-control" [(ngModel)]="niz.dokumentacija" value="{{ niz.dokumentacija }}" style="width:200px;"
-                  (keyup)="Racunaj_proba(niz.Razvoj,niz.odrzavanje,niz.dokumentacija,niz.implementacija,niz.rezijski_poslovi,idNiz);Racunaj_Ukupno();"
-                  (click)="Racunaj_proba(niz.Razvoj,niz.odrzavanje,niz.dokumentacija,niz.implementacija,niz.rezijski_poslovi,idNiz);Racunaj_Ukupno();"/>         
-                </div><br>
-                <div class="tabela-detalji-text">
-                  <div class="tabela-detalji-text-sredjeno">
-                    <p>Implementacija:</p>
-                  </div>
-                </div>
-                <div class="tabela-detalji-input"  style="vertical-align: top;">
-                  <input #box3 type="number" min="0" max="40" step="1" class="form-control" [(ngModel)]="niz.implementacija"  value="{{ niz.implementacija }}" style="width:200px;"
-                  (keyup)="Racunaj_proba(niz.Razvoj,niz.odrzavanje,niz.dokumentacija,niz.implementacija,niz.rezijski_poslovi,idNiz);Racunaj_Ukupno();"
-                   (click)="Racunaj_proba(niz.Razvoj,niz.odrzavanje,niz.dokumentacija,niz.implementacija,niz.rezijski_poslovi,idNiz);Racunaj_Ukupno();"/>         
-                </div><br>
-                <div class="tabela-detalji-text">
-                  <div class="tabela-detalji-text-sredjeno">
-                    <p>Režijski poslovi:</p>
-                  </div>
-                </div>
-                <div class="tabela-detalji-input"  style="vertical-align: top;">
-                  <input #box4 type="number" min="0" max="40" step="1" class="form-control" [(ngModel)]="niz.rezijski_poslovi" value="{{ niz.reziski_poslovi }}" style="width:200px;"
-                  (keyup)="Racunaj_proba(niz.Razvoj,niz.odrzavanje,niz.dokumentacija,niz.implementacija,niz.rezijski_poslovi,idNiz);Racunaj_Ukupno();"
-                  (click)="Racunaj_proba(niz.Razvoj,niz.odrzavanje,niz.dokumentacija,niz.implementacija,niz.rezijski_poslovi,idNiz);Racunaj_Ukupno();"/>         
-                </div>
-                <br>
+              </div>
+            </tr>
+            <tr *ngIf="prikazInformacija == this.opcijeTabelaMicko[id]['prikaz']">
                 <div class="tabela-detalji-text">
                   <div class="tabela-detalji-text-sredjeno">    
-                      <p>Ukupno:<p>
+                    <p style="margin-left: 10px;width:100%">Ukupno:<p>
                   </div>
                 </div>
                 <div class="tabela-detalji-input"  style="vertical-align: top;">     
-                  <p><input style="width:200px;"  class="form-control"  [(ngModel)]="mumu[idNiz]" value="{{mumu[idNiz]}}" disabled><p>   
+                  <p><input style="width:200px;margin-left: 15px;" [(ngModel)]="this.rez[id]" value="{{ this.rez[id] }}" class="form-control"  disabled><p>   
                 </div>&nbsp; &nbsp;
                 <div class="tabela-detalji-button">     
-                  <button class="btn btn-danger" style="width:100px;" (click)="SnimiNiz(niz.Projekti,niz.id_projekat_D,niz.Razvoj,niz.odrzavanje,niz.dokumentacija,niz.implementacija,niz.rezijski_poslovi,niz)">Sačuvaj</button>  
+                  <button class="btn btn-danger" style="width:100px;" (click)="sacuvajProjekat(this.prikazTabela[id].Podaci,this.prikazTabela[id].id_pr);" >Sačuvaj</button>  
                 </div>
-              </div>
-            </tr>   
+            </tr> 
+          </div> 
         </tbody>
-          <tr class="active">
-            <td>
-            <div class="tabela-detalji-text">
-              <div class="tabela-detalji-text-sredjeno">
-                <p>Ukupna suma:</p>
-              </div>
+        <tr class="active">
+          <td>
+          <div class="tabela-detalji-text">
+            <div class="tabela-detalji-text-sredjeno">
+              <p>Ukupna suma:</p>
             </div>
-            <div class="tabela-detalji-input" style="vertical-align: top;">
-                 
-            </div><br>
-            </td>
-            <td>
-              <input style="width: 167px;vertical-align:top;" class="form-control" value="{{mumuSum}}" disabled/>
-            </td>  
-          </tr>  
-       </table>
-    </div>
-    <!-- style="width:280px;background-color: white;margin-top:40px; position: fixed; right: 5;z-index: 0;" > -->
-    <!--<div style="position:relative;">
-      <div *ngIf="flgLoading" class="col-sm-3 col-md-3 col-lg-3 col-xl-3 zahtev" >
-          <div class="container snimi-sve" style="width:280px;background-color: white;margin-top:40px; position: fixed; right: 5;">
-            <p></p>
-            <button  class="btn btn-danger" (click)="snimiSve();">Snimi sve</button><br><br>
-            <p>Ukupna suma:</p>
-            <input style="width: 167px;vertical-align:top;" class="form-control pored-prvi" value="{{mumuSum}}" disabled/>
-            <div style="text-align: center;vertical-align: middle;" class="pored-drugi"><span style="font-size: 22px;color: rgb(51, 51, 51);"></span></div>
           </div>
-      </div>
-     </div>  -->
-  </div>
+          <div class="tabela-detalji-input" style="vertical-align: top;">
+          </div><br>
+          </td>
+          <td>
+            <input style="width: 167px;vertical-align:top;" class="form-control" [(ngModel)]="mumuSum" value="{{mumuSum}}" disabled/>
+          </td>  
+        </tr>  
+      </table>
+  </div> 
   <div class="row">
     <div *ngIf="flgLoading == false">
       <div class="col-sm-5 col-sm-offset-5 col-md-5 col-md-offset-5 col-lg-5 col-lg-offset-5 col-xl-5 col-xl-offset-5" style="background-color:white;">
         <button style="background-color:white" class="btn btn-lg"><span class="glyphicon glyphicon-refresh glyphicon-refresh-animate"></span> Loading...</button>
-    </div> 
+      </div> 
+    </div>
   </div>
-    <!--<button (click)="Refresuj()">Refresuj</button>-->
-    <!--<div class="col-sm-2 col-md-2" style="background-color:white;">
-    </div>-->
-    
-    <!--<div class="col-sm-7 col-sm-offset-2 col-md-7 col-md-offset-2 col-lg-7 col-lg-offset-2 col-xl-7 col-xl-offset-2" style="background-color:white;">
-      <div>
-        <div class="godina" style="vertical-align: top; padding: 0;">
-            <p>Godina:</p>
-            <input value="{{godinaP}}" class="form-control" (click)="provera_godina();"  style="width:100px;"  type="number" min="2017" max="2019" step="1"  autocomplete='on' [(ngModel)]="selectedGodina">
-        </div>
-        &nbsp; &nbsp; &nbsp; &nbsp;
-        <div class="mesec">    
-            <p>Mesec:</p>
-          <select [(ngModel)]="selectedMesec" class="form-control" (click)="provera_mesec();" name="mesec" id="mesec" list="mesec" style="width:150px; ">
-              <option *ngFor="let i of deviceObjects" [selected]="i === mesecP" >{{i?.name}}</option>
-          </select>				
-        </div>
-        &nbsp; &nbsp; &nbsp; &nbsp;
-        <div class="probaM">
-          <p>Nedelja:</p>
-          <select [(ngModel)]="selectedNedelja" class="form-control" (click)="provera_nedelja();" name="nedeljaA" id="nedeljaA" list="nedeljaA" style="width:150px; ">
-            <option *ngFor="let i of objekti_nedelje" [selected]="i === nedeljaP">{{i}}</option>
-          </select>	
-        </div>  
-      </div>
-    </div>-->
-</div>
-
-  <!--<div  class="row">
-    <div class="col-md-4 col-md-offset-1 col-sm-4 col-lg-4">
-     <table class="micko">
-        <tr id="groups">
-          <th class="rotate">&nbsp;</th>
-          <th class="rotate" *ngFor="let korisnici of this.nizObjKorisnik;" ><span class="intact">{{korisnici.ime}}</span></th>
-        </tr>
-        <tr *ngFor="let obj of this.PakovanjeProjekata;  let z = index;">
-          <th style="width: 350px;">{{obj.Projekat}}</th>
-          <th *ngFor="let korisnici of this.nizObjKorisnik;">{{obj[korisnici.oznaka]}}</th>
-        </tr>
-     </table>
-    </div>  
-  </div> -->
-   <!--<div class="container-fluid ">
-      <div class="wrapper">
-        <table class="micko">
-            <tr id="groups">
-              <th class="rotate">&nbsp;</th>
-              <th class="rotate" *ngFor="let korisnici of this.nizObjKorisnik;" ><span class="intact">{{korisnici.ime}}</span></th>
-              <th class="rotate"  ><span class="intact">sum</span></th>
-            </tr>
-            <tr *ngFor="let obj of this.PakovanjeProjekata; let i = index;">
-              <th style="display:inline-block;width: 350px;">{{obj.Projekat}}</th>
-              <th *ngFor="let korisnici of this.nizObjKorisnik;" style="font-weight: lighter;font-style: normal;">{{obj[korisnici.oznaka]}}</th>
-              <th  >{{SumaNizVertikalno[i]}}</th>
-            </tr>
-            <tr>
-              <th>sum</th>
-              <th *ngFor="let sumHor of this.SumaNizHorizontalno;" style="font-weight: lighter;font-style: normal;">{{sumHor}}</th>
-            </tr>  
-        </table>
-     </div>
-    </div> -->   
-  <!--<div  class="row">
-     <div class="col-md-4 col-md-offset-1 col-sm-4 col-lg-4">
-        <div class="mesec-proba">    
-              <p>Mesec:</p>
-            <select [(ngModel)]="ngMesec" class="form-control" (click)="ngModelFunkcija();" name="mesec" id="mesec" list="mesec" style="width:150px; ">
-                <option *ngFor="let i of deviceObjects" [selected]="i === mesecP" >{{i.name}}</option>
-            </select>				
-        </div><br>
-     </div>
-  </div> -->
-<!--<div class="glavni">
-<div class="okvir">  -->
-    <!--<div class="container-fluid ">
-      <div class="wrapper">
-        <table class="micko">
-            <tr id="groups">
-              <th class="rotate">&nbsp;</th>
-              <th class="rotate" *ngFor="let korisnici of this.NizKorisnici;" ><span class="intact">{{korisnici}}</span></th>
-            </tr>
-            <tr *ngFor="let obj of this.NizObjekataKorPr; let i = index;">
-              <th style="display:inline-block;width: 350px;">{{obj.Projekat}}</th>
-              <th *ngFor="let korisnici of this.NizKorisnici;" style="font-weight: lighter;font-style: normal;">{{obj[korisnici]}}</th>
-            </tr>
-        </table>
-     </div>
-    </div>    -->
-    <app-header></app-header> 
+  <app-header></app-header> 
 </div>
 
 

@@ -11,6 +11,9 @@ import { Godina} from './models/godina.model';
 import { ProjektiSTNICA } from './models/projektiSatnica.model';
 import { ListaProjekataModel } from './models/ListaProjekata.model';
 import { ListaKorisnikaModel } from './models/ListaKorisnika.model';
+import { prevodPodaciModel } from './models/prevodPodaci';
+import { snimiProjekatModel } from './models/snimiProjekat';
+import { prikazTabelaModel } from './models/prikazTabela';
 
 
 import { PocetnaComponent } from './pocetna/pocetna.component';
@@ -37,7 +40,29 @@ export class SService {
             err => console.log(err),
             () => console.log('Completed'));*/
         
-     }
+    }
+
+    projektiPrevodPodaci(userService: any,godina:number,mesec:any,nedelja:number):Observable<prevodPodaciModel>{
+
+        let token = JSON.parse(localStorage.getItem('Token'));
+        if(token == null){
+                this.router.navigate(['/login']);
+        }
+        let authHeader = new Headers(
+            {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + token
+            }
+        );
+
+        let body = JSON.stringify({});
+
+        let options = new RequestOptions({ headers: authHeader })
+
+        return this.http.get(''+this.apiEndpoint+'projekti-prevodi?ime='+userService+'&mesec='+mesec+'&nedelja='+nedelja+'&godina='+godina+'',options)
+            .map(data => data.json()) 
+
+    }
 
     vrednosti_baza(userService: any,mesecService: any,godinaService:any,nedeljaService:any):Observable<ProjektiSTNICA>{
         
@@ -61,36 +86,69 @@ export class SService {
                     data.json()) 
     }
 
-    SaljiSve(userService: any,mesecService: any,godinaService:any,nedeljaService:any,objekti:ProjektiSTNICA):Observable<any>{
+    SaljiSve(userService: any,mesecService: any,godinaService:any,nedeljaService:any,objekti:prikazTabelaModel[] = []):Observable<any>{
 
+        //objekti:ProjektiSTNICA
         /*console.log("Micko");
         console.log(objekti[0].Projekti);*/
         let cuvajNesto = objekti;
+        console.log(cuvajNesto);
+
+
+        let nizCuvaj = [];
+        //let k = {};
+        for(let i in cuvajNesto){
+            let k = {};
+            k['Projekti'] = cuvajNesto[i].Projekti
+            k['id_pr'] = cuvajNesto[i].id_pr
+            for(let z in cuvajNesto[i].Podaci){
+               k[cuvajNesto[i].Podaci[z].baza] = cuvajNesto[i].Podaci[z].satnica;
+            }
+            nizCuvaj.push(k);
+           
+        }
+        //nizCuvaj.push(k);
+
+        let objekatSlanje:ProjektiSTNICA [] = [];
+        objekatSlanje = nizCuvaj;
+
+        console.log(nizCuvaj)
 
         let token = JSON.parse(localStorage.getItem('Token'));
         if(token == null){
             this.router.navigate(['/login']);
         }
-        let authHeader = new Headers(
-        {
+        let authHeader = new Headers({
             'Content-Type': 'application/json',
             'Authorization': 'Bearer ' + token
-        }
-        );
+        });
 
-        let body = ({ Objekti : cuvajNesto });
+        let body = ({ Objekti : objekatSlanje });
 
         let options = new RequestOptions({ headers: authHeader })
+
+        /*return this.http.get(''+this.apiEndpoint+'projekti/satnica?nedelja=4&mesec=Maj',options)
+                .map(data =>  data )
+                .catch(this.handleError)*/
+
         return this.http.put(''+this.apiEndpoint+'tests-insert?ime='+userService+'&mesec='+mesecService+'&nedelja='+nedeljaService+'&godina='+godinaService+'', body, options )
-        //return this.http.put(''+this.apiEndpoint+'tests-insert', body)
             .map(data =>  data.json() )
             .catch(this.handleError)
     }
 
     //CuvajProjekat(userService: any,mesecService: any,godinaService:any,nedeljaService:any,idPr:any,razvoj:any,odrzavanje:any,dokumentacija:any,implementacija:any,reziski_poslovi:any):Observable<any>{
-    CuvajProjekat(userService: any,mesecService: any,godinaService:any,nedeljaService:any,niz:ProjektiSTNICA):Observable<ProjektiSTNICA>{
+    CuvajProjekat(userService: any,mesecService: any,godinaService:any,nedeljaService:any,niz:snimiProjekatModel[] = [],idProjekta:number):Observable<snimiProjekatModel>{
 
         let cuvajbreee = niz;
+        //console.log(cuvajbreee);
+
+        let nizCuvaj = [];
+        let k = {};
+        for(let z in cuvajbreee){
+            k[cuvajbreee[z].baza] = cuvajbreee[z].satnica;
+        }
+        nizCuvaj.push(k);
+        console.log(nizCuvaj)
 
         let token = JSON.parse(localStorage.getItem('Token'));
         if(token == null){
@@ -107,11 +165,15 @@ export class SService {
 
         let options = new RequestOptions({ headers: authHeader })
 
-        return this.http.put(''+this.apiEndpoint+'projekti?ime='+userService+'&projekat='+niz.id_pr+'&mesec='+mesecService+'&nedelja='+nedeljaService+'&godina='+godinaService+
-        '&razvoj='+niz.Razvoj+'&odrzavanje='+niz.odrzavanje+'&dokumentacija='+niz.dokumentacija+'&implementacija='+niz.implementacija+'&reziskiposlovi='+niz.rezijski_poslovi+'',body,options)
+        /*return this.http.get(''+this.apiEndpoint+'projekti/satnica?nedelja=4&mesec=Maj',options)
+                .map(data =>  data )
+                .catch(this.handleError)*/
+
+        return this.http.put(''+this.apiEndpoint+'projekti?ime='+userService+'&projekat='+idProjekta+'&mesec='+mesecService+'&nedelja='+nedeljaService+'&godina='+godinaService+
+        '&razvoj='+nizCuvaj[0].Razvoj+'&odrzavanje='+nizCuvaj[0].odrzavanje+'&dokumentacija='+nizCuvaj[0].dokumentacija+'&implementacija='+nizCuvaj[0].implementacija+'&reziskiposlovi='+nizCuvaj[0].rezijski_poslovi+'',body,options)
                 .map(data =>  data )
                 .catch(this.handleError)
-        
+    
     }
 
     ListaProjekata():Observable<ListaProjekataModel[]>{
@@ -222,8 +284,7 @@ export class SService {
         let options = new RequestOptions({ headers: authHeader })
         return this.http.get(''+this.apiEndpoint+'puni-ime-prezime?ime='+nadimak+'',options)
                 .toPromise()
-                .then(data => 
-                    data.json()[0].Ime_Prezime) 
+                .then(data => data.json()[0].Ime_Prezime) 
     }
 
     upisstanja(nadimak:any,projekat:any,sati:number,mesec:any,nedelja:any,godina:any):Promise<User[]>{
@@ -318,7 +379,9 @@ export class SService {
 
     }
 
-    slanjeMejla(projekat:any,email:Email):Promise<Email>{
+    slanjeMejla(projekat:any,email:any):Observable<Email>{
+
+       console.log("email" + email);
 
         let token = JSON.parse(localStorage.getItem('Token'));
         if(token == null){
@@ -333,10 +396,8 @@ export class SService {
         );
         let options = new RequestOptions({ headers: authHeader })
         return this.http.get(''+this.apiEndpoint+'email?projekat='+projekat+'&emailsend='+email+'',options)
-                .toPromise()
-                .then(data => 
-                    data.json())    
-
+            .map(data => data.json())    
+            .catch(this.handleError)
     }
 
     proveraTokena():Observable<any>{

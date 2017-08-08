@@ -4,6 +4,7 @@ import { FormsModule,ReactiveFormsModule } from '@angular/forms';
 import { HttpModule } from '@angular/http';
 import { RouterModule,Routes } from '@angular/router';
 import {Observable} from 'rxjs/Rx';
+import { OpaqueToken } from '@angular/core';
 
 import { AppComponent } from './app.component';
 import { MickoComponent } from './micko/micko.component';
@@ -24,6 +25,7 @@ import { InputTextModule } from 'primeng/primeng';
 import { AutoCompleteModule } from 'primeng/primeng';
 import { FooterComponent } from './footer/footer.component';
 import { TabelaComponent } from './tabela/tabela.component';
+
 import { FooterOstaloComponent } from './footer-ostalo/footer-ostalo.component';
 import { AdminComponent } from './admin/admin.component';
 import { AdminService } from './admin.service';
@@ -38,7 +40,10 @@ import { LocationStrategy,HashLocationStrategy} from '@angular/common';
 //import { environment } from './app/';
 import { environment } from '../environments/environment';
 
-
+//import { NgxDatatableModule } from '@swimlane/ngx-datatable';
+//import { NgxDatatableModule } from '@swimlane/ngx-datatable';
+//import { MdButtonModule, MdCheckboxModule } from '@angular/material';
+//import {NoopAnimationsModule} from '@angular/animations/@angular/animations';
 
 @NgModule({
   declarations: [
@@ -53,6 +58,7 @@ import { environment } from '../environments/environment';
     LozinkaComponent,
     RegistracijaComponent,
     HeaderComponent,
+    
   ],
   imports: [
     BrowserModule,ReactiveFormsModule,CustomFormsModule,
@@ -62,6 +68,9 @@ import { environment } from '../environments/environment';
     DialogModule,SpinnerModule,
     ConfirmDialogModule,CalendarModule,
     DataTableModule,SharedModule,
+    //NgxDatatableModule,
+    //MdButtonModule, MdCheckboxModule,
+    //NgxDatatableModule,
     RouterModule.forRoot([
       {
         path: 'login',
