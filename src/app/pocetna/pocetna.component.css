@@ -9,6 +9,7 @@ div.godina, div.mesec,div.probaM,div.prikazi-sakri-sve,div.Zahtev,div.snimi-sve 
 .obavestenje-text, .obavestenje-text-dani{
     display:inline-block;
     display: table-cell;
+    
 }
 
 .ui-dialog {
@@ -70,7 +71,8 @@ div.tabela-detalji-text, div.tabela-detalji-input, div.tabela-detalji-button{
 
 .tabela-detalji-text-sredjeno{
 
-    width:100px;
+    width:290px;
+    text-align:left;
 
 }
 
@@ -87,7 +89,7 @@ div.tabela-detalji-text, div.tabela-detalji-input, div.tabela-detalji-button{
 }
 
    
- .rotate1 {
+.rotate1 {
     width: 50px;
     height: 20px;
     background-color: yellow;
@@ -95,17 +97,18 @@ div.tabela-detalji-text, div.tabela-detalji-input, div.tabela-detalji-button{
     
     -webkit-transform: rotate(-90deg); /* Chrome, Safari, Opera */
     transform: rotate(-90deg);
- }
+}
 
- .sort-satnica , .up-down{
+.sort-satnica , .up-down{
     display:inline-block;    
- }
+}
 
 
 table micko {
 	margin-bottom: 20px;
 }
- tr#groups {
+
+tr#groups {
 	/*display:block;
 	margin-left:120px;
 	margin-top:120px;*/

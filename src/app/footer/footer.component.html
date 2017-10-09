@@ -7,9 +7,12 @@
       <div class="col-sm-2 col-sm-offset-8 col-md-2 col-md-offset-8 col-lg-2 col-lg-offset-8 col-xl-2 col-xl-offset-8" style="background-color:white; height: 100%;">
         <div class="border_pocetna-button">
           <div class="dropdown">
-              <button class="btn btn-danger dropbtn">Moj nalog</button>
-                <div class="dropdown-content" >
-                  <p>{{ fullname_baza }}</p>
+              <p class="btn btn-danger dropbtn" (click)="prikazDropDowna()"  >{{ fullname_baza }} 
+                <span *ngIf="flgDrop == false" class="glyphicon glyphicon-triangle-bottom"></span>
+                <span *ngIf="flgDrop == true" class="glyphicon glyphicon-triangle-top"></span>
+              </p>
+                <div *ngIf="flgDrop == true" class="dropdown-content" >
+                  <!--<p>{{ fullname_baza }}</p>-->
                   <p [hidden]="tokenAdmin == 'nije'"><a (click)="Admin()">Admin</a></p>
                   <p><a (click)="Lozinka()">Promeni lozinku</a></p>
                   <p><a (click)="Tabela()">Tabela</a></p>

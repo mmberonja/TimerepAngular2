@@ -36,15 +36,16 @@ h1 {
 .dropdown {
     position: relative;
     display: inline-block;
-    /*border: 10px solid black;*/
+    
+    
     float:right;
 }
 
 .dropdown-content {
-   display: none;
+   /*display: none;*/
    position: absolute;
    background-color: white;
-   min-width: 160px;
+   min-width: 180px;
    box-shadow: 0px 2px 16px 0px rgba(0,0,0,0.2);
    padding: 12px 16px;
    left:auto;
@@ -61,20 +62,15 @@ h1 {
     text-decoration: none;
     display: block;*/
 }
-/*.dropdown-content a:hover {background-color: gray}*/
 
-.dropdown:hover .dropdown-content {
+
+/*.dropdown:hover .dropdown-content {
     display: block;
-}
+}*/
 
 #loading-image-preuzmi {
     background-color: red;
-	/*background-repeat: no-repeat;
-	position: absolute;
-	margin-left: 140px;
-	background: url('/images/loading.gif');
-	width: 30%;
-	height: 30%;*/
+	
     
 }
 

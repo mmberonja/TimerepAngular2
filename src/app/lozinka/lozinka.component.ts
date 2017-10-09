@@ -50,27 +50,18 @@ export class LozinkaComponent implements OnInit,OnDestroy {
   ) { }
 
   ngOnDestroy(){
-
-    //console.log("ngOnDestroy")
     clearInterval(this.interval);
-
   }
 
   ngOnInit() {
-
-    //console.log("ngOnInit")
     this.interval = setInterval(() => { 
       console.log("Lozinka!!");
 
       this.currentUser_ne = JSON.parse(localStorage.getItem('currentUser'));
       this.tokenAdmin = this.ParsirajJWT(JSON.parse(localStorage.getItem('Token')));
-
       this.lozinkService.RefresujToken(this.currentUser_ne,this.tokenAdmin)
         .subscribe(
             pamtiToken => { this.pamtiToken = pamtiToken
-
-              
-
           },
         error => {                     
       });
@@ -78,127 +69,91 @@ export class LozinkaComponent implements OnInit,OnDestroy {
     
 
     this.RegForm = this.formBuilder.group({
-            starasifra   : ['', Validators.compose([Validators.required, Validators.minLength(0)])],
-            novasifra : ['', Validators.compose([Validators.required, Validators.minLength(0)])],
-            potvrdasifra : ['', Validators.compose([Validators.required, Validators.minLength(0)])],
+      starasifra   : ['', Validators.compose([Validators.required, Validators.minLength(0)])],
+      novasifra : ['', Validators.compose([Validators.required, Validators.minLength(0)])],
+      potvrdasifra : ['', Validators.compose([Validators.required, Validators.minLength(0)])],
     });
 
     this.currentUser_lozinka = JSON.parse(localStorage.getItem('currentUser'));
-    //console.log("this.currentUser_lozinka" + this.currentUser_lozinka);
-
     this.subcribeToFormChanges();  
 
     if(JSON.parse(localStorage.getItem('Token')) == null){
-
-        //console.log("Nemaaa nistaa");
-        this.router.navigate(['/login']);
-        return;
-
+      this.router.navigate(['/login']);
+      return;
     } 
-
     this.flgLoadingLozinka = true;
-
   }
 
   ParsirajJWT (token) {
 
-     
-      if(token == null){
-
-        console.log("split1");
-        //this.router.navigate(['/login']);
-        return;
-
-      } 
-      else{
-
-        //console.log("split2");
-        this.base64Url = token.split('.')[1];
-        this.base64 = this.base64Url.replace('-', '+').replace('_', '/');
-        this.ispisToken = JSON.parse(window.atob(this.base64));
-        
-        return this.ispisToken.admin;
-
-      }
-
+    if(token == null){
+      return;
+    } 
+    else{
+      this.base64Url = token.split('.')[1];
+      this.base64 = this.base64Url.replace('-', '+').replace('_', '/');
+      this.ispisToken = JSON.parse(window.atob(this.base64));
+      return this.ispisToken.admin;
+    }
   }
 
   save(model: any, isValid: boolean){
 
     if(JSON.parse(localStorage.getItem('Token')) == null){
-
-            console.log("Izlogovani ste!!");
-            this.router.navigate(['/login']);
-            return;
-
+      console.log("Izlogovani ste!!");
+      this.router.navigate(['/login']);
+      return;
     }
     else{
       this.submitted = true;
-
       console.log("starasifra" + this.model.starasifra);
       console.log("novasifra" + this.model.novasifra);
       console.log("potvrdasifra" + this.model.potvrdasifra);
 
-          if(isValid){
+      if(isValid){
 
-              if(this.model.starasifra == this.model.novasifra){
+        if(this.model.starasifra == this.model.novasifra){
+        
+          this.text = 'Nova i stara šifra su jednake!!';
+          this.text_izlaz_lozinka = 'Izlaz';
+          this.showDialog();
+          return;
+        }
+        if(this.model.novasifra != this.model.potvrdasifra){
+         
+          this.text = 'Šifre nisu jednake!!';
+          this.text_izlaz_lozinka = 'Izlaz';
+          this.showDialog();
+          return;
+        }
+        else{
 
-                console.log("Nova i stara sofra su iste!!");
-                this.text = 'Nova i stara šifra su jednake!!';
-                this.text_izlaz_lozinka = 'Izlaz';
-                this.showDialog();
-                return;
+          this.lozinkService.PromenaSifre( this.currentUser_lozinka,this.model.starasifra,this.model.novasifra)
+            .then(
+              odgovorLozinka => { this.odgovorLozinka = odgovorLozinka
 
-              }
+                console.log("this.odgovorLozinka" + this.odgovorLozinka);
 
+                if(this.odgovorLozinka == 'Nijeeeeeeee dobra sifraaa')
+                { 
+                  this.text = 'Nije dobra stara šifra!!';
+                  this.text_izlaz_lozinka = 'Izlaz';
+                  this.showDialog(); 
+                }
+                else{
 
-              if(this.model.novasifra != this.model.potvrdasifra){
-
-                console.log("Sifre nisu jednake!!");
-                this.text = 'Šifre nisu jednake!!';
-                this.text_izlaz_lozinka = 'Izlaz';
-                this.showDialog();
-                return;
-
-              }
-
-              else{
-
-              this.lozinkService.PromenaSifre( this.currentUser_lozinka,this.model.starasifra,this.model.novasifra)
-                  .then(
-                      odgovorLozinka => { this.odgovorLozinka = odgovorLozinka
-
-                              console.log("this.odgovorLozinka" + this.odgovorLozinka);
-
-                              if(this.odgovorLozinka == 'Nijeeeeeeee dobra sifraaa')
-                              { 
-
-                                this.text = 'Nije dobra stara šifra!!';
-                                this.text_izlaz_lozinka = 'Izlaz';
-                                this.showDialog(); 
-                              }
-                              else{
-
-                                console.log("Odicnoooooooo!!!");
-                                this.text = 'Uspešno promenjena šifra';
-                                this.text_izlaz_lozinka = 'Gotovo';
-                                this.showDialog(); 
-                                //this.router.navigate(['/firstpage']);
-
-                              }
-
-
-                      },error => {
-                            console.log("error");
-                            localStorage.clear();
-                            this.textError = 'Došlo je do greške na serveru!!'
-                            this.textErrorIzlaz = 'Gotovo';
-                            this.showDialogError();      
-                                
-              }); 
-            
-            }
-      
+                  this.text = 'Uspešno promenjena šifra';
+                  this.text_izlaz_lozinka = 'Gotovo';
+                  this.showDialog(); 
+                }
+            },
+            error => {
+              localStorage.clear();
+              this.textError = 'Došlo je do greške na serveru!!'
+              this.textErrorIzlaz = 'Gotovo';
+              this.showDialogError();              
+          }); 
+        }
       } 
     }
   }
@@ -206,17 +161,38 @@ export class LozinkaComponent implements OnInit,OnDestroy {
   FirstPage(){
 
     if(this.text_izlaz_lozinka == 'Gotovo'){
-
       this.router.navigate(['/firstpage']);
-
     }
     else{
-
       return;
-
     }    
-    
+  }
 
+  subcribeToFormChanges(){
+
+    const myFormStatusChanges$ = this.RegForm.statusChanges;
+    const myFormValueChanges$ = this.RegForm.valueChanges;
+   
+    myFormStatusChanges$.subscribe(x => this.events.push({ 
+      event: 'STATUS_CHANGED', object: x,
+      //nesto: console.log("x" + x) 
+    }));
+    myFormValueChanges$.subscribe(x => this.events.push({ event: 'VALUE_CHANGED', object: x, //nesto: console.log("x" + x)
+    }));
+  }
+
+  showDialog() {
+    this.display = true;
+  }
+
+  showDialogError() {
+    this.displayError = true;
+  }
+
+  Izlaz(){
+    if(this.textError == 'Došlo je do greške na serveru!!'){          
+      this.router.navigate(['/login']);
+    }
   }
 
   Sifre(){
@@ -230,42 +206,6 @@ export class LozinkaComponent implements OnInit,OnDestroy {
                      
                            
       });*/
-  }
-
-  subcribeToFormChanges(){
-
-        const myFormStatusChanges$ = this.RegForm.statusChanges;
-        const myFormValueChanges$ = this.RegForm.valueChanges;
-        /*console.log("myFormStatusChanges$" +  myFormStatusChanges$)
-        console.log("myFormValueChanges$" +  myFormValueChanges$)*/
-        
-        myFormStatusChanges$.subscribe(x => this.events.push({ 
-          event: 'STATUS_CHANGED', object: x,
-          //nesto: console.log("x" + x) 
-        }));
-        myFormValueChanges$.subscribe(x => this.events.push({ event: 'VALUE_CHANGED', object: x, //nesto: console.log("x" + x)
-       }));
-
-  }
-
-  showDialog() {
-        this.display = true;
-  }
-
-  showDialogError() {
-        console.log("Usaooo")
-        this.displayError = true;
-  }
-
-  Izlaz(){
-
-    if(this.textError == 'Došlo je do greške na serveru!!'){
-
-           console.log("Mickoasadasasa")            
-           this.router.navigate(['/login']);
-
-        }
-
   }
 
 }

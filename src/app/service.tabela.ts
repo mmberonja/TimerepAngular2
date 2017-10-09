@@ -40,23 +40,20 @@ export class ServiceTabela {
 
      projektiNaKojimaRadiKorisnik(imePrezime:any):Observable<ListaProjekataModel[]>{
 
-         let token = JSON.parse(localStorage.getItem('Token'));
-        //console.log("nadimak" + nadimak)
+        let token = JSON.parse(localStorage.getItem('Token'));
         if(token == null){
             this.router.navigate(['/login']);
         }
 
         let authHeader = new Headers(
-            {
-                'Content-Type': 'application/json',
-                'Authorization': 'Bearer ' + token
-            }
-        );
+        {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + token
+        });
         let options = new RequestOptions({ headers: authHeader })
-        return this.http.get(''+this.apiEndpoint+'projekti/lista/admin?ime='+imePrezime+'',options)
-              .map(data =>  data.json())
-               .catch(this.handleError) 
-       
+        return this.http.get(''+this.apiEndpoint+'tabela/projekti?ime='+imePrezime+'',options)
+            .map(data =>  data.json())
+            .catch(this.handleError) 
      }
 
      satnicaKorisnik(mesec:any,nadimak:any,godina:any):Observable<ListaBazaPodaciModel[]>{
@@ -74,13 +71,13 @@ export class ServiceTabela {
             }
         );
         let options = new RequestOptions({ headers: authHeader })
-        return this.http.get(''+this.apiEndpoint+'korisnici/tabela?nadimak='+nadimak+'&mesec='+mesec+'&godina='+godina+'',options)
+        return this.http.get(''+this.apiEndpoint+'tabela/korisnici?nadimak='+nadimak+'&mesec='+mesec+'&godina='+godina+'',options)
               .map(data =>  data.json())
                .catch(this.handleError) 
        
      }  
 
-    proveraTokena():Promise<any>{
+     proveraTokena():Promise<any>{
 
          let token = JSON.parse(localStorage.getItem('Token'));
          if(token == null){
@@ -106,9 +103,9 @@ export class ServiceTabela {
 
         }       
       
-    }
+     }
 
-    RefresujToken(ime:any,admin:any):Observable<any>{
+     RefresujToken(ime:any,admin:any):Observable<any>{
         let token = JSON.parse(localStorage.getItem('Token'));
         //console.log(JSON.parse(localStorage.getItem('Token')));
         if(token == null){
@@ -131,10 +128,16 @@ export class ServiceTabela {
             })
             .catch(this.handleError) 
 
+      }
+
+    
+
+     private handleError(error: any): Promise<any> {
+        console.error('An error occurred', error); // for demo purposes only
+        return Promise.reject(error.message || error);
      }
 
-     /*
-     tabela(nadimak:any,godina:number):Promise<User[]>{
+     /*tabela(nadimak:any,godina:number):Promise<User[]>{
 
          let token = JSON.parse(localStorage.getItem('Token'));
          //console.log("nadimaktabela" + nadimak)
@@ -154,12 +157,7 @@ export class ServiceTabela {
               .then(data => 
                     data.json()) 
 
-
-     } */
-
-     private handleError(error: any): Promise<any> {
-        console.error('An error occurred', error); // for demo purposes only
-        return Promise.reject(error.message || error);
-     }
+     }*/
+     
 
 }

@@ -73,20 +73,20 @@
       <div class="col-sm-5 col-md-5 col-lg-5">
         <div class="projekat-input" style="vertical-align: top; padding: 0;">
           <h4 class="first">Godina:</h4>
-          <input (click)="KlikGodinaProjekti()" class="form-control"  type="number" min="2017" max="2019" step="1" autocomplete='on' style="width:100px;" [(ngModel)]="selectedGodinaProjektiAdmin">
+          <input (click)="KlikGodinaProjekti(projektiDropDown,selectedProjektiAktivni)" class="form-control"  type="number" min="2017" max="2019" step="1" autocomplete='on' style="width:100px;" [(ngModel)]="selectedGodinaProjektiAdmin">
         </div> 
         
         &nbsp; &nbsp; &nbsp;
         <div class="text-dodaj-novi-projekat">    
           <h4 class="first">Mesec:</h4>
-            <select [(ngModel)]="ProjektiMesecAdmin" class="form-control" (ngModelChange)="MesecAdminProjekti()" name="mesec" id="mesec" list="mesec" style="width:150px; ">
+            <select [(ngModel)]="ProjektiMesecAdmin" class="form-control" (ngModelChange)="MesecAdminProjekti(projektiDropDown,selectedProjektiAktivni)" name="mesec" id="mesec" list="mesec" style="width:150px; ">
               <option *ngFor="let i of nizMesec">{{i.name}}</option>
             </select>				
         </div>
           &nbsp; &nbsp; &nbsp;
         <div class="projekat-button">
           <h4 class="first">Projekat:</h4>
-          <p-dropdown  [options]="projektiDropDown" [(ngModel)]="selectedProjektiAktivni" [style]="{'width':'250px', 'height':'34px'}" (ngModelChange)="KlikProjektiAdmin(this.selectedGodinaProjektiAdmin,this.ProjektiMesecAdmin,this.selectedProjektiAktivni)" filter="filter"></p-dropdown>
+          <p-dropdown  [options]="projektiDropDown" [(ngModel)]="selectedProjektiAktivni" [style]="{'width':'250px', 'height':'34px'}" (ngModelChange)="KlikProjektiAdmin(this.selectedGodinaProjektiAdmin,this.ProjektiMesecAdmin,selectedProjektiAktivni,projektiDropDown)" filter="filter"></p-dropdown>
         </div>
       </div> 
     </div>  
@@ -131,25 +131,6 @@
      </div>
   </div>
   <br>
-  <!-- <div class="container-fluid ">
-    <div class="row">
-      <div class="col-sm-12 col-md-12 col-lg-12">
-         <p id="Naslovi">Dodavanje novog projekta</p> 
-      </div> 
-      <div class="col-sm-12 col-md-12 col-lg-12">
-        <div class="text-dodaj-novi-projekat">
-          <p id="projekat-dodavanje-novog">Projekat:</p>
-        </div>
-        <div class="projekat-input">
-          <input  class="form-control" [(ngModel)]="DodavanjeNovogKorisnika" type="text" id="ProjekatNovi" value="" >
-        </div>
-        &nbsp;  &nbsp;
-        <div class="projekat-button">
-          <button type="button" (click)="DodajNoviProjekat()" class="btn btn-danger">Dodaj</button>
-        </div>
-      </div>
-    </div>
-  </div> -->
   <hr>
   <div class="container-fluid ">
     <div class="row">
@@ -217,10 +198,10 @@
   </div>
   <br>    
   <hr>
-   <div class="container-fluid ">
+  <div class="container-fluid ">
     <div class="row">
       <div class="col-sm-12 col-md-12 col-lg-12">
-        <p id="Naslovi">Uklanjanje korisnika sa projekata</p>
+        <p id="Naslovi">Uklanjanje korisnika sa projekta</p>
       </div>
       <div class="col-sm-12 col-md-12 col-lg-12">
         <div class="korisnik-dodavanje">
@@ -248,10 +229,67 @@
            Potrebno je uneti parametre!!
         </small>-->
       </div>
-     </div>
     </div>
-    <br>    
+  </div>
+  <br>    
   <hr>
+  <div class="container-fluid ">
+    <div class="row">
+      <div class="col-sm-6 col-md-6 col-lg-6" style="margin-top: -20px;margin-bottom: -20px;">
+        <div lass="col-sm-12 col-md-12 col-lg-12" style="margin-top: 20px;">
+          <p id="naslovi-pola">Postavljanje projekta na listu aktivnih</p>
+        </div>
+        <div class="col-sm-12 col-md-12 col-lg-12" style="height: 100px;margin-left: -15px;">
+          <div class="text-dodaj-novi-projekat">
+            <p id="projekat-dodavanje-novog" >Projekat:</p>
+          </div>
+          <div class="projekat-input" >
+            <input [(ngModel)]="readonlyInput.Projekti" (click)="prikaziDrop()" id ="input-slika" name="lokacija" class="rasiri sencenje-belo lokacija" readonly/>
+            <div *ngIf="flgDrop == true" style="position:absolute;z-index: 1; background-color:  white; max-height: 190px;border: 2px solid #DCDCDC;width: 250px;">
+              <div style="background-color: white;padding-left: 8px;padding-top:5px;"><input (click)="InputFunkcija();" (keyup)="PretragaInput();" [(ngModel)]="this.pretraga" style="width: 200px;" type="text"/>
+              </div>
+              <div style="background-color: white;margin-left: 8px;padding-top:5px;cursor:pointer;max-height: 155px;overflow: auto;padding-bottom: 10px;">
+                <div *ngFor="let z of this.projektiObjekat;let i = index;" (click)="vrednostDrop(z);"  (mouseover)="over(z)" class="vrednost-div" >
+                  <div *ngIf="this.nizNgForPrikaz[i] == 0">{{ z.Projekti }}<br /></div>
+                </div>
+              </div>
+            </div>
+          </div>
+          &nbsp; &nbsp;
+          <div class="button-dodavanje">
+            <button type="" (click)="AktiviranjeProjekta(readonlyInput)" class="btn btn-danger">Izvrši</button>
+          </div>
+        </div>
+      </div>
+      <div class="col-sm-6 col-md-6 col-lg-6" style="margin-top: -20px;margin-bottom: -20px;height: 175px; border-left: 1px solid black;">
+        <div class="col-sm-12 col-md-12 col-lg-12" style="margin-top: 20px;">
+          <p id="naslovi-pola">Postavljanje projekta na listu neaktivnih</p>
+        </div>
+        <div class="col-sm-12 col-md-12 col-lg-12" style="height: 100px;">
+          <div class="text-dodaj-novi-projekat">
+            <p id="projekat-dodavanje-novog" >Projekat:</p>
+          </div>
+          <div class="projekat-input" >
+            <input [(ngModel)]="readonlyInputNeaktivni.Projekti" (click)="prikaziDropNeaktivni()" id ="input-slika" name="lokacija" class="rasiri sencenje-belo lokacija" readonly/>
+            <div *ngIf="flgDropNeaktivni == true" style="position:absolute;z-index: 1; background-color:  white; max-height: 190px;border: 2px solid #DCDCDC;width: 250px;">
+              <div style="background-color: white;padding-left: 8px;padding-top:5px;"><input (click)="InputFunkcijaAktivni();" (keyup)="PretragaInputNeaktivni();" [(ngModel)]="this.pretragaAktivni" style="width: 200px;" type="text"/>
+              </div>
+              <div style="background-color: white;margin-left: 8px;padding-top:5px;cursor:pointer;max-height: 155px;overflow: auto;padding-bottom: 10px;">
+                <div *ngFor="let z of this.projektiObjekatNeaktivni;let i = index;" (click)="vrednostDropNeaktivni(z);"  (mouseover)="over(z)" class="vrednost-div" >
+                  <div *ngIf="this.nizNgForPrikazNeaktivni[i] == 0">{{ z.Projekti }}<br /></div>
+                </div>
+              </div>
+            </div>
+          </div>
+          &nbsp; &nbsp;
+          <div class="button-dodavanje">
+            <button type="" (click)="DekativiranjeProjekata(readonlyInputNeaktivni)" class="btn btn-danger">Izvrši</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <hr>  
   <div class="container-fluid ">
     <div class="row">
       <div class="col-sm-12 col-md-12 col-lg-12">
@@ -312,16 +350,16 @@
             </div>
         </p-footer>
       </p-dialog>
-      <p-dialog header="{{textUpozorenje}}" [ngStyle]="{'width': valueSize +'px'}"  [(visible)]="displayUkloni" modal="modal">
+      <p-dialog header="{{ textObavestenje }}" [ngStyle]="{'width': valueSize +'px'}"  [(visible)]="displayUkloni" modal="modal">
           {{ textUpozorenje  }}
           <p-footer>
             <div class="ui-dialog-buttonpane ui-widget-content ui-helper-clearfix" style="margin-top: 50px;">
-                <button type="button"   style="width:75px;" (click)="displayUkloni=false; IzlazNe();" >{{ textNe }}</button>
+                <!--<button type="button"   style="width:75px;" (click)="displayUkloni=false; IzlazNe();" >{{ textNe }}</button> -->
                 <button type="button"   style="width:75px;" (click)="displayUkloni=false; IzlazPotvrda();" >{{ textPotvrda }}</button>
             </div>
         </p-footer>
       </p-dialog>
-      <p-dialog header="{{textUpozorenje}}" [ngStyle]="{'width': valueSize +'px'}"  [(visible)]="displayUredu" modal="modal">
+      <p-dialog header="{{ textObavestenje }}" [ngStyle]="{'width': valueSize +'px'}"  [(visible)]="displayUredu" modal="modal">
           {{ textUpozorenje  }}
           <p-footer>
             <div class="ui-dialog-buttonpane ui-widget-content ui-helper-clearfix" style="margin-top: 50px;">
@@ -341,34 +379,5 @@
   </div>
   <br>    
   <hr>
-  <!--<div class="container-fluid ">
-    <div class="row">
-      <div class="col-sm-12 col-md-12 col-lg-12">
-        <p id="Naslovi">Slanje mejla</p>
-      </div>
-      <div>
-        <form>
-          <div class="form-group">
-            <label for="inputEmail" class="control-label">Email id</label>
-            <input type="text" class="form-control" id="inputEmail" name="inputEmail" placeholder="Email Id" [(ngModel)]="newUser.username">
-          </div>
-          <div class="form-group">
-            <label for="inputPassword" class="control-label">Password</label>
-            <input type="password" class="form-control" id="inputPassword" name="inputPassword" placeholder="password"  [(ngModel)]="newUser.password">
-          </div>       
-          <div class="form-group">
-            <button type="button" class="btn btn-danger" (click)="addUser()">Sign up</button>
-          </div>
-        </form>
-
-      </div>  
-   </div>
-  </div>     
-  <br>    
-  <hr>-->
- <!--<div class="body" id="body1">
-		<p></p>
-	</div>
-  <div id="footer"></div> -->
   <app-header></app-header>      
 </div>  

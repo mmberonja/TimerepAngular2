@@ -14,6 +14,7 @@ import { ProjektiSTNICA } from '../models/projektiSatnica.model';
 import { ListaProjekataModel } from '../models/ListaProjekata.model';
 import { ListaKorisnikaModel } from '../models/ListaKorisnika.model';
 import { ListaBazaPodaciModel } from '../models/ListaBazaPodaci.model';
+import { SelectItemProjekti } from '../models/dropdown.model';
 import { Directive, ElementRef, HostListener, Input,Renderer } from '@angular/core';
 import { User } from '../models/user';
 
@@ -21,7 +22,10 @@ import { User } from '../models/user';
 @Component({
   selector: 'app-admin',
   templateUrl: './admin.component.html',
-  styleUrls: ['./admin.component.css']
+  styleUrls: ['./admin.component.css'],
+  /*host: {
+    '(document:click)': 'onClick($event)',
+  },*/
 })
 export class AdminComponent implements OnInit,OnDestroy {
 
@@ -41,7 +45,7 @@ export class AdminComponent implements OnInit,OnDestroy {
   //spinner input
   selectedGodinaProjektiAdmin:any;
   //dropdown
-  projektiDropDown:SelectItem[];
+  projektiDropDown:SelectItemProjekti[];
   selectedProjektiAktivni:string;
   //tabela-vrednost za NgPrime tabelu
   vrednostTabelaProjekti:any;
@@ -145,6 +149,8 @@ export class AdminComponent implements OnInit,OnDestroy {
    neznamKakoDaNazovem:any[] = [];
    neznamKakoDaNazovemObject:any[] = [];
    pakovanjeDetalji:any[] = [];
+   probaMICKO:any[] = [];
+
    detaljiKorisniciObject:ListaKorisnikaModel[] = [];
    detaljiNizObjKorisnik:any[] = [];
 
@@ -191,6 +197,25 @@ export class AdminComponent implements OnInit,OnDestroy {
    //Style html
    boja:string;  
    stringPrazan:string = "";
+   godinaTrAdmin:number;
+
+   //readonlyInput:any;
+   readonlyInput = new ListaProjekataModel();
+   flgIf:boolean = false;
+   flgDrop:boolean = false;
+   nizNgFor:any = ['Miroslav Beronja','Stefan Beronja','Jasna Beronja','Miroslav Beronja','Mihajlo Beronja','Radivoje Mikic','Zelimir Mikic','Marko Vulic','Marko Beronja'];
+   nizNgForPrikaz:any[] = [];
+   brojacDrop:boolean = false;
+   probaBre:string = 'nije';
+   brojacKlik:number = 0;
+   pretraga:any;
+   projektiObjekat: ListaProjekataModel[] = [];
+
+   readonlyInputNeaktivni = new ListaProjekataModel();
+   flgDropNeaktivni:boolean = false;
+   nizNgForPrikazNeaktivni:any[] = [];
+   pretragaAktivni:any;
+   projektiObjekatNeaktivni: ListaProjekataModel[] = [];
 
   constructor(
     private route: ActivatedRoute,
@@ -205,7 +230,7 @@ export class AdminComponent implements OnInit,OnDestroy {
     ) 
   {   
     
-     
+      //this.readonlyInput.Projekti = 
       this.SumaNizVertikalno[0] = 0;
       this.SumaNizHorizontalno[0] = 0;
       this.uvecajNesto = 0;
@@ -218,8 +243,25 @@ export class AdminComponent implements OnInit,OnDestroy {
       this.KorisniciMesecAdmin = this.nizMesec[0].name;
       this.ProjektiMesecAdmin = this.nizMesec[0].name;
       this.KorisniciNedeljaAdmin = 1;
-      this.selectedProjektiAktivni = 'Eksterna obuka, kurs, seminar, …';
-     
+      this.selectedProjektiAktivni = 'INIT 10';
+      let tabelaIme = 'sve_jedna_tabela';
+      
+      this.adminservice.trenutni_godina()
+        .then(
+            gorinaAdTre => { this.godinaTrAdmin = gorinaAdTre
+
+              //console.log("Admin godina" + this.godinaTrAdmin);
+              let mesecAd;
+              mesecAd = 'Septembar';
+
+
+          },
+        error => { this.error = error
+          console.log("error");
+          this.Erorr("Nije moguce ocitati trenutnu godinu");
+
+      });
+
       this.adminservice.trenutni_godina()
         .then(
           gorinaTre => { this.selectedGodinakorisniciAdmin = gorinaTre
@@ -383,124 +425,129 @@ export class AdminComponent implements OnInit,OnDestroy {
         .then(
           gorinaTre => { this.selectedGodinaProjektiAdmin = gorinaTre
 
-            this.adminservice.projekatKorisnici(this.ProjektiMesecAdmin,this.selectedProjektiAktivni,this.selectedGodinaProjektiAdmin)
+            this.adminservice.projekatKorisnici(this.ProjektiMesecAdmin,this.selectedProjektiAktivni,this.selectedGodinaProjektiAdmin,tabelaIme)
               .subscribe(
                 projekatKorisnici => { this.projekatKorisnici = projekatKorisnici
 
-                  console.log(this.projekatKorisnici);
+                  //console.log(this.projekatKorisnici);
+                  let tabelaCuvaj;
 
-                  this.adminservice.ListaKorisnikaAdmin()
+                  this.adminservice.TabelaJson(tabelaIme)
                     .subscribe(
+                      tabelaCuvaj => { tabelaCuvaj = tabelaCuvaj
+                        
+                        //console.log(tabelaCuvaj);
 
-                      detaljiKorisniciObject => { this.detaljiKorisniciObject = detaljiKorisniciObject
-                                        
-                      let cuvajObject = this.detaljiKorisniciObject;                        
-                      this.projektiBrojNedeljaMesecAdmin();
-                      let brojacKor = 0;
+                        this.adminservice.ListaKorisnikaAdmin()
+                          .subscribe(
 
-                      for(let duzNed in this.projekatPamti_nedelje_Admin){ 
-                        //for(let brKor in this.korisniciObject){
-                        for(let brKor = 0;brKor<this.detaljiKorisniciObject.length + 1;brKor++){  
-                          let objectKor = {};
-                          brojacKor++;
-                          
-                          if(this.detaljiKorisniciObject.length + 1 == brojacKor){
-                            objectKor['ime'] = this.saberi + "." + 'Nedelja';
-                            objectKor['oznaka'] = 'Nedelja' + "" + this.saberi;
-                            objectKor['boja'] = 1;
-                            brojacKor = 0;
-                            this.boja = 'blue';
+                            detaljiKorisniciObject => { this.detaljiKorisniciObject = detaljiKorisniciObject
+                                              
+                            let cuvajObject = this.detaljiKorisniciObject;                        
+                            this.projektiBrojNedeljaMesecAdmin();
+                            let brojacKor = 0;
 
-                          }else if(brKor <= this.detaljiKorisniciObject.length){
+                            for(let duzNed in this.projekatPamti_nedelje_Admin){ 
+                              //for(let brKor in this.korisniciObject){
+                              for(let brKor = 0;brKor<this.detaljiKorisniciObject.length + 1;brKor++){  
+                                let objectKor = {};
+                                brojacKor++;
+                                
+                                if(this.detaljiKorisniciObject.length + 1 == brojacKor){
+                                  objectKor['ime'] = this.saberi + "." + 'Nedelja';
+                                  objectKor['oznaka'] = 'Nedelja' + "" + this.saberi;
+                                  objectKor['boja'] = 1;
+                                  brojacKor = 0;
+                                  this.boja = 'blue';
 
-                            this.saberi = Number(duzNed) + 1;
-                            objectKor['ime'] = this.detaljiKorisniciObject[brKor].Ime_Prezime
-                            objectKor['oznaka'] = this.detaljiKorisniciObject[brKor].Ime_Prezime + "" + this.saberi;
-                            objectKor['boja'] = 0;
-                            this.boja = 'white';
-                          }
-                          this.detaljiNizObjKorisnik.push(objectKor);      
-                        }                     
-                      }
-                      // console.log(this.detaljiNizObjKorisnik);
-                      for(let nz of this.neznamKakoDaNazovemObject){
+                                }else if(brKor <= this.detaljiKorisniciObject.length){
 
-                          let Kor = {};
-                          Kor['Projekat'] = nz.x.ime;
-                          for(let pr of this.detaljiNizObjKorisnik){
-
-                            Kor[pr.oznaka] = null;
-
-                          }
-                          this.pakovanjeDetalji.push(Kor);
-                      }
-                      
-
-                      for(let i in this.neznamKakoDaNazovemObject){
-                        //console.log(this.neznamKakoDaNazovemObject[i].x.ime);
-                      }
-
-                      for(let i in this.neznamKakoDaNazovemObject){//ovde prolazi 5 puta
-                      //for(let i = 0; i < 1 ; i++){   
-                        for(let nz in this.projekatKorisnici){//ovde prolazi onoliko puta koliko smo dobili podataka iz baze
-                          this.pakovanjeDetalji[i][this.projekatKorisnici[nz].Ime_Prezime + "" + this.projekatKorisnici[nz].nedelja] = this.projekatKorisnici[nz][this.neznamKakoDaNazovemObject[i].x.baza];
-                          if(this.pakovanjeDetalji[i][this.projekatKorisnici[nz].Ime_Prezime + "" + this.projekatKorisnici[nz].nedelja] == 0){
-                            this.pakovanjeDetalji[i][this.projekatKorisnici[nz].Ime_Prezime + "" + this.projekatKorisnici[nz].nedelja] = null;
-                          }
-                        }
-                      }
-                      //console.log(this.pakovanjeDetalji);
-                      //Sumiranje po nedeljama
-                      for(let pd in this.pakovanjeDetalji){
-                      //for(let pd = 0; pd < 1 ; pd++){  
-                        for(let duzNed in this.projekatPamti_nedelje_Admin){
-                          for(let kor in this.detaljiKorisniciObject){
-
-                              this.projekatRezDetalji = Number(duzNed) + 1;
-                              this.pakovanjeDetalji[pd]['Nedelja' + this.projekatRezDetalji] = Number(this.pakovanjeDetalji[pd][this.detaljiKorisniciObject[kor]['Ime_Prezime'] + "" + this.projekatRezDetalji]) +  this.pakovanjeDetalji[pd]['Nedelja' + this.projekatRezDetalji];
-                          }
-                        }
-                      }
-                      for(let pd in this.detaljiNizObjKorisnik){
-
-                          this.SumaPoKorisnikuProjekat[pd] = 0;
-                      }
-
-                      //Sumiranje po korisniku  
-                      for(let kor in this.detaljiNizObjKorisnik){         
-                        //for(let kor = 0; kor < 3 ; kor++){
-                            for(let pk in this.pakovanjeDetalji){
-
-                            let cuvajIme;
-                            cuvajIme = this.detaljiNizObjKorisnik[kor].oznaka 
-                            this.SumaPoKorisnikuProjekat[kor] = this.pakovanjeDetalji[pk][cuvajIme] + this.SumaPoKorisnikuProjekat[kor]; 
+                                  this.saberi = Number(duzNed) + 1;
+                                  objectKor['ime'] = this.detaljiKorisniciObject[brKor].Ime_Prezime
+                                  objectKor['oznaka'] = this.detaljiKorisniciObject[brKor].Ime_Prezime + "" + this.saberi;
+                                  objectKor['boja'] = 0;
+                                  this.boja = 'white';
+                                }
+                                this.detaljiNizObjKorisnik.push(objectKor);      
+                              }                     
+                            }
                             
-                        }  
-                      }
+                            for(let tb in tabelaCuvaj){
+                              //console.log(tb);
+                              let korA = {};
+                              korA['Projekat'] = tabelaCuvaj[tb].ime;
+                              for(let pr of this.detaljiNizObjKorisnik){
+                                korA[pr.oznaka] = null;
+                              }
+                              this.pakovanjeDetalji.push(korA);
+                            }
 
-                      for(let pd in this.pakovanjeDetalji){
+                            for(let i in tabelaCuvaj){//ovde prolazi 5 puta
+                            //for(let i = 0; i < 1 ; i++){
+                              //console.log(i);
+                              for(let nz in this.projekatKorisnici){
+                                this.pakovanjeDetalji[i][this.projekatKorisnici[nz].Ime_Prezime + "" + this.projekatKorisnici[nz].nedelja] = this.projekatKorisnici[nz][tabelaCuvaj[i].baza];
+                                if(this.pakovanjeDetalji[i][this.projekatKorisnici[nz].Ime_Prezime + "" + this.projekatKorisnici[nz].nedelja] == 0){
+                                  this.pakovanjeDetalji[i][this.projekatKorisnici[nz].Ime_Prezime + "" + this.projekatKorisnici[nz].nedelja] = null;
+                                }
+                              }
+                            }
+                        
+                            //Sumiranje po nedeljama
+                            for(let pd in this.pakovanjeDetalji){
+                            //for(let pd = 0; pd < 1 ; pd++){  
+                              for(let duzNed in this.projekatPamti_nedelje_Admin){
+                                for(let kor in this.detaljiKorisniciObject){
 
-                        this.SumaPoNedeljamaDetalji[pd] = 0;
+                                    this.projekatRezDetalji = Number(duzNed) + 1;
+                                    this.pakovanjeDetalji[pd]['Nedelja' + this.projekatRezDetalji] = Number(this.pakovanjeDetalji[pd][this.detaljiKorisniciObject[kor]['Ime_Prezime'] + "" + this.projekatRezDetalji]) +  this.pakovanjeDetalji[pd]['Nedelja' + this.projekatRezDetalji];
+                                }
+                              }
+                            }
+                            for(let pd in this.detaljiNizObjKorisnik){
 
-                      }
+                                this.SumaPoKorisnikuProjekat[pd] = 0;
+                            }
 
-                      for(let pd in this.pakovanjeDetalji){
-                        for(let duzNed in this.projekatPamti_nedelje_Admin){
+                            //Sumiranje po korisniku  
+                            for(let kor in this.detaljiNizObjKorisnik){         
+                              //for(let kor = 0; kor < 3 ; kor++){
+                                  for(let pk in this.pakovanjeDetalji){
 
-                          this.projekatKorDetalji = Number(duzNed) + 1;
-                          this.SumaPoNedeljamaDetalji[pd] = this.pakovanjeDetalji[pd]['Nedelja' + this.projekatKorDetalji] + this.SumaPoNedeljamaDetalji[pd];  
-                        }
-                      }
+                                  let cuvajIme;
+                                  cuvajIme = this.detaljiNizObjKorisnik[kor].oznaka 
+                                  this.SumaPoKorisnikuProjekat[kor] = this.pakovanjeDetalji[pk][cuvajIme] + this.SumaPoKorisnikuProjekat[kor]; 
+                                  
+                              }  
+                            }
 
-                      for(let sum in this.SumaPoNedeljamaDetalji){
-                        this.sumSvihProjekti = Number(this.SumaPoNedeljamaDetalji[sum]) + this.sumSvihProjekti;
-                      }
+                            for(let pd in this.pakovanjeDetalji){
 
-                      this.flgLoadingAdminTabela2 = true;
+                              this.SumaPoNedeljamaDetalji[pd] = 0;
+
+                            }
+
+                            for(let pd in this.pakovanjeDetalji){
+                              for(let duzNed in this.projekatPamti_nedelje_Admin){
+
+                                this.projekatKorDetalji = Number(duzNed) + 1;
+                                this.SumaPoNedeljamaDetalji[pd] = this.pakovanjeDetalji[pd]['Nedelja' + this.projekatKorDetalji] + this.SumaPoNedeljamaDetalji[pd];  
+                              }
+                            }
+
+                            for(let sum in this.SumaPoNedeljamaDetalji){
+                              this.sumSvihProjekti = Number(this.SumaPoNedeljamaDetalji[sum]) + this.sumSvihProjekti;
+                            }
+
+                            this.flgLoadingAdminTabela2 = true;
+                          },
+                          error => {
+                          this.Erorr('Nije moguce očitati korisnike');           
+                        });
                     },
-                    error => {
-                    this.Erorr('Nije moguce očitati korisnike');           
-                  });     
+                    error => { this.error = error
+                    this.Erorr(this.error._body);    
+                });       
               },
               error => { this.error = error
                 this.Erorr(this.error._body);    
@@ -512,89 +559,300 @@ export class AdminComponent implements OnInit,OnDestroy {
       });       
   }
 
+  
+  prikaziDrop(){
+    this.flgDropNeaktivni = false;
+    this.brojacKlik++;
+    if(this.flgDrop == false){
+      this.flgDrop = true;
+    }
+    else{
+      this.flgDrop = false;
+    }
+  }
+
+  prikaziDropNeaktivni(){
+    this.flgDrop = false;
+    this.brojacKlik++;
+    if(this.flgDropNeaktivni == false){
+      this.flgDropNeaktivni = true;
+    }
+    else{
+      this.flgDropNeaktivni = false;
+    }
+  }
+
+  InputFunkcija(){
+    this.brojacKlik++;
+  }
+
+  InputFunkcijaAktivni(){
+    this.brojacKlik++;
+  }
+
+  PretragaInput(){
+    for(let pr in this.projektiObjekat){
+      if(this.projektiObjekat[pr]['Projekti'].toLowerCase().indexOf(""+this.pretraga+"") > -1){
+        this.nizNgForPrikaz[pr] = 0;
+      }
+      else{
+        this.nizNgForPrikaz[pr] = 1;
+      }
+    }
+  }
+
+  PretragaInputNeaktivni(){
+    for(let pr in this.projektiObjekatNeaktivni){
+      if(this.projektiObjekatNeaktivni[pr]['Projekti'].toLowerCase().indexOf(""+this.pretragaAktivni+"") > -1){
+        this.nizNgForPrikazNeaktivni[pr] = 0;
+      }
+      else{
+        this.nizNgForPrikazNeaktivni[pr] = 1;
+      }
+    }
+  }
+
+  vrednostDrop(z:ListaProjekataModel){
+    this.readonlyInput.Projekti = z.Projekti;
+    this.readonlyInput.id_pr = z.id_pr;
+  }
+
+  vrednostDropNeaktivni(z:ListaProjekataModel){
+    this.readonlyInputNeaktivni.Projekti = z.Projekti;
+    this.readonlyInputNeaktivni.id_pr = z.id_pr;
+  }
+
+  over(z:any){
+    //console.log("Over: " + z);
+  }
+
+  AktiviranjeProjekta(projekat = new ListaProjekataModel()){
+    console.log(projekat);
+    let odgovorUp:string;
+    this.adminservice.AktivirajProjekat(projekat)
+      .subscribe(
+        odgovorUp => { odgovorUp = odgovorUp
+          this.Erorr(odgovorUp);
+          this.readonlyInput.Projekti = "";
+          this.readonlyInput.id_pr = null;
+          this.pretraga = "";
+
+          this.NeaktivniProjekti();
+          this.AktivniProjekti();
+          this.godinaMesecProjekat();
+          this.tabelaSviKorisniciSviProjekti();
+
+        }, 
+        error => {
+          console.log("error")
+          localStorage.clear();
+        },
+        () => {console.log('done')
+    });
+
+  }
+
+  DekativiranjeProjekata(projekat = new ListaProjekataModel()){
+
+    let odgovorUp:string;
+    this.adminservice.DeaktivirajProjekat(projekat)
+      .subscribe(
+        odgovorUp => { odgovorUp = odgovorUp
+          this.Erorr(odgovorUp);
+          this.readonlyInputNeaktivni.Projekti = "";
+          this.readonlyInputNeaktivni.id_pr = null;
+          this.pretragaAktivni = "";
+
+          this.NeaktivniProjekti();
+          this.AktivniProjekti();
+          this.godinaMesecProjekat();
+          this.tabelaSviKorisniciSviProjekti();
+
+        }, 
+        error => {
+          console.log("error")
+          localStorage.clear();
+        },
+        () => {console.log('done')
+    });
+
+  }
+
+  @HostListener('document:click', ['$event'])
+  public documentClick(event: Event,z:any): void {
+
+    this.brojacKlik++;
+    if(this.brojacKlik == 2){
+      this.brojacKlik = 0;
+    }
+    else if(this.brojacKlik == 1){
+      this.brojacKlik = 0;
+      this.flgDrop = false;
+      this.flgDropNeaktivni = false;
+    }
+  }
+
+  NeaktivniProjekti(){
+
+    this.adminservice.NeAktivniProjekti()
+      .subscribe(
+        projektiObjekat => { this.projektiObjekat = projektiObjekat
+          for(let t in this.projektiObjekat){
+            this.nizNgForPrikaz[t] = 0;
+          }
+
+        },  
+        error => {
+          console.log("error")
+          localStorage.clear();
+        },
+        () => {console.log('done')
+    });
+  }
+
+  AktivniProjekti(){
+    this.adminservice.AktivniProjekti()
+      .subscribe(
+        projektiObjekatNeaktivni => { this.projektiObjekatNeaktivni = projektiObjekatNeaktivni
+          //console.log(this.projektiObjekatNeaktivni)
+          for(let t in this.projektiObjekatNeaktivni){
+            this.nizNgForPrikazNeaktivni[t] = 0;
+          }
+
+        },  
+        error => {
+          console.log("error")
+          localStorage.clear();
+        },
+        () => {console.log('done')
+    });  
+  }
+
+  godinaMesecProjekat(){
+
+    this.adminservice.Projekti()
+      .subscribe(
+        projektiAktivni => { this.projektiAktivni = projektiAktivni
+          //ovde se popunjava dopwdpwn sa korisniciAktivni
+          //console.log(this.projektiAktivni);
+          this.popuniProjektiAdmin(this.projektiAktivni);
+
+          },
+          error => {
+          console.log("error")
+              localStorage.clear();
+              this.text = 'Došlo je do greške na serveru!!'
+              this.text_izlaz = 'Gotovo';
+              this.showDialog();
+          },
+          () => {console.log('done')
+    });
+
+
+  }
+
   ngOnDestroy(){
     clearInterval(this.interval);
   }
 
   ngOnInit() {
 
-        //console.log("ngOnInit")
-        this.interval = setInterval(() => { 
-            console.log("Admin!!");
+  
+    this.interval = setInterval(() => { 
+        console.log("Admin!!");
 
-            this.currentUser_ne = JSON.parse(localStorage.getItem('currentUser'));
-            this.tokenAdmin = this.ParsirajJWT(JSON.parse(localStorage.getItem('Token')));
-
-            this.adminservice.RefresujToken(this.currentUser_ne,this.tokenAdmin)
-              .subscribe(
-                  pamtiToken => { this.pamtiToken = pamtiToken
-                },
-                error => {                     
-            });
-        }, 1000 * 5 * 60 * 60 );
-        /*this.FormDodavanje = this.formBuilder.group({
-              korisnik   : ['', Validators.compose([Validators.required, Validators.minLength(5)])]
-        });*/
-        //this.MesecAdminNgInit();
-
-        this.flgDeaktivacija = 1;
-        this.flgAktivacija = 1;
-
-        //this.dodajuspesno = 1;
-        
-        this.myForm = this.formBuilder.group({
-              name   : ['', Validators.compose([Validators.required, Validators.minLength(5)])]
-        });
-        this.subcribeToFormChanges(); 
-
-        this.selectedGodinakorisniciAdmin = new Date().getFullYear();
-        this.selectedGodinaProjektiAdmin = new Date().getFullYear();
-        this.trenutnaGodinaDodavanje = new Date().getFullYear();
-
-        //Popunjavanje dropdown-a sa aktivnim korisnicima!!  
-        this.imePrezimeAktivniFunkcija();
-
-        this.ImePrezimeNeAktivniKorisniciFunkcija();
-      
-        this.adminservice.Projekti()
-              .subscribe(
-                  projektiAktivni => { this.projektiAktivni = projektiAktivni
-                    //ovde se popunjava dopwdpwn sa korisniciAktivni
-                    this.popuniProjektiAdmin(this.projektiAktivni);
-
-                  },
-                  error => {
-                      console.log("error")
-                      localStorage.clear();
-                      this.text = 'Došlo je do greške na serveru!!'
-                      this.text_izlaz = 'Gotovo';
-                      this.showDialog();
-                  },
-                  () => {console.log('done')}   
-                  
-        )
-
-        if(JSON.parse(localStorage.getItem('Token')) == null){
-
-          console.log("Izlogovani ste!!");
-          this.router.navigate(['/login']);
-          return;
-
-        }
-
+        this.currentUser_ne = JSON.parse(localStorage.getItem('currentUser'));
         this.tokenAdmin = this.ParsirajJWT(JSON.parse(localStorage.getItem('Token')));
-        //console.log("this.tokenAdmin" + this.tokenAdmin);
 
-        if(this.tokenAdmin == 'nije'){
-          
-          this.router.navigate(['/firstpage']);
+        this.adminservice.RefresujToken(this.currentUser_ne,this.tokenAdmin)
+          .subscribe(
+              pamtiToken => { this.pamtiToken = pamtiToken
+            },
+            error => {                     
+        });
+    }, 1000 * 5 * 60 * 60 );
+    /*this.FormDodavanje = this.formBuilder.group({
+          korisnik   : ['', Validators.compose([Validators.required, Validators.minLength(5)])]
+    });*/
+    //this.MesecAdminNgInit();
 
-        }
-        else{
+    this.flgDeaktivacija = 1;
+    this.flgAktivacija = 1;
+    this.myForm = this.formBuilder.group({
+          name   : ['', Validators.compose([Validators.required, Validators.minLength(5)])]
+    });
+    this.subcribeToFormChanges(); 
+    this.selectedGodinakorisniciAdmin = new Date().getFullYear();
+    this.selectedGodinaProjektiAdmin = new Date().getFullYear();
+    this.trenutnaGodinaDodavanje = new Date().getFullYear();
+    //Popunjavanje dropdown-a sa aktivnim korisnicima!!  
+    this.imePrezimeAktivniFunkcija();
+    this.ImePrezimeNeAktivniKorisniciFunkcija();
+    this.adminservice.Projekti()
+      .subscribe(
+        projektiAktivni => { this.projektiAktivni = projektiAktivni
+          //ovde se popunjava dopwdpwn sa korisniciAktivni
+          //console.log(this.projektiAktivni);
+          this.popuniProjektiAdmin(this.projektiAktivni);
 
-          return;
+          },
+          error => {
+          console.log("error")
+              localStorage.clear();
+              this.text = 'Došlo je do greške na serveru!!'
+              this.text_izlaz = 'Gotovo';
+              this.showDialog();
+          },
+          () => {console.log('done')
+    });
 
-        }
+    this.adminservice.NeAktivniProjekti()
+      .subscribe(
+        projektiObjekat => { this.projektiObjekat = projektiObjekat
+          //console.log(this.projektiObjekat)
+          for(let t in this.projektiObjekat){
+            this.nizNgForPrikaz[t] = 0;
+          }
+
+        },  
+        error => {
+          console.log("error")
+          localStorage.clear();
+        },
+        () => {console.log('done')
+    });
+
+    this.adminservice.AktivniProjekti()
+      .subscribe(
+        projektiObjekatNeaktivni => { this.projektiObjekatNeaktivni = projektiObjekatNeaktivni
+          //console.log(this.projektiObjekatNeaktivni)
+          for(let t in this.projektiObjekatNeaktivni){
+            this.nizNgForPrikazNeaktivni[t] = 0;
+          }
+
+        },  
+        error => {
+          console.log("error")
+          localStorage.clear();
+        },
+        () => {console.log('done')
+    });
+
+
+    if(JSON.parse(localStorage.getItem('Token')) == null){
+      console.log("Izlogovani ste!!");
+      this.router.navigate(['/login']);
+      return;
+    }
+
+    this.tokenAdmin = this.ParsirajJWT(JSON.parse(localStorage.getItem('Token')));
+
+    if(this.tokenAdmin == 'nije'){
+      this.router.navigate(['/firstpage']);
+    }
+    else{
+      return;
+    }
   }
 
   tabelaSviKorisniciSviProjekti(){
@@ -934,7 +1192,16 @@ export class AdminComponent implements OnInit,OnDestroy {
   }
   //
   //Druga tabela,goduna,mesec projekat!
-  KlikGodinaProjekti(){//input godine -projekti
+  KlikGodinaProjekti(dropdown:SelectItemProjekti[],projekat:any){//input godine -projekti
+
+    let OdabraniProjekat;
+
+    for(let pr in dropdown){
+      if(projekat == dropdown[pr].value){
+        OdabraniProjekat = dropdown[pr].tabela
+      }
+    }
+
     this.flgLoadingAdminTabela2 = false;
     if(JSON.parse(localStorage.getItem('Token')) == null){
 
@@ -986,14 +1253,22 @@ export class AdminComponent implements OnInit,OnDestroy {
               this.SumaPoNedeljamaDetalji.splice(index, this.SumaPoNedeljamaDetalji.length);
 
       }
-      this.adminservice.projekatKorisnici(this.ProjektiMesecAdmin,this.selectedProjektiAktivni,this.selectedGodinaProjektiAdmin)
-                .subscribe(
-                    projekatKorisnici => { this.projekatKorisnici = projekatKorisnici
+
+      this.adminservice.projekatKorisnici(this.ProjektiMesecAdmin,this.selectedProjektiAktivni,this.selectedGodinaProjektiAdmin,OdabraniProjekat)
+        .subscribe(
+            projekatKorisnici => { this.projekatKorisnici = projekatKorisnici
                       
                       //Provera za gresku!!
                       //console.log(this.projekatKorisnici);
+              let tabelaCuvaj;
 
-                        this.adminservice.ListaKorisnikaAdmin()
+              this.adminservice.TabelaJson(OdabraniProjekat)
+                .subscribe(
+                tabelaCuvaj => { tabelaCuvaj = tabelaCuvaj
+                        
+                console.log(tabelaCuvaj);
+
+                this.adminservice.ListaKorisnikaAdmin()
                           .subscribe(
 
                             detaljiKorisniciObject => { this.detaljiKorisniciObject = detaljiKorisniciObject
@@ -1029,28 +1304,26 @@ export class AdminComponent implements OnInit,OnDestroy {
                             
                             }
                             // console.log(this.detaljiNizObjKorisnik);
-                            for(let nz of this.neznamKakoDaNazovemObject){
-
-                                let Kor = {};
-                                Kor['Projekat'] = nz.x.ime;
-                                for(let pr of this.detaljiNizObjKorisnik){
-
-                                  Kor[pr.oznaka] = null;
-
-                                }
-                                this.pakovanjeDetalji.push(Kor);
+                            for(let tb in tabelaCuvaj){
+                              //console.log(tb);
+                              let korA = {};
+                              korA['Projekat'] = tabelaCuvaj[tb].ime;
+                              for(let pr of this.detaljiNizObjKorisnik){
+                                korA[pr.oznaka] = null;
+                              }
+                              this.pakovanjeDetalji.push(korA);
                             }
                             //console.log(this.pakovanjeDetalji);
-
                           
                             for(let i in this.neznamKakoDaNazovemObject){
                               //console.log(this.neznamKakoDaNazovemObject[i].x.ime);
                             }
 
-                            for(let i in this.neznamKakoDaNazovemObject){//ovde prolazi 5 puta
-                            //for(let i = 0; i < 1 ; i++){   
-                              for(let nz in this.projekatKorisnici){//ovde prolazi onoliko puta koliko smo dobili podataka iz baze
-                                this.pakovanjeDetalji[i][this.projekatKorisnici[nz].Ime_Prezime + "" + this.projekatKorisnici[nz].nedelja] = this.projekatKorisnici[nz][this.neznamKakoDaNazovemObject[i].x.baza];
+                            for(let i in tabelaCuvaj){//ovde prolazi 5 puta
+                            //for(let i = 0; i < 1 ; i++){
+                              //console.log(i);
+                              for(let nz in this.projekatKorisnici){
+                                this.pakovanjeDetalji[i][this.projekatKorisnici[nz].Ime_Prezime + "" + this.projekatKorisnici[nz].nedelja] = this.projekatKorisnici[nz][tabelaCuvaj[i].baza];
                                 if(this.pakovanjeDetalji[i][this.projekatKorisnici[nz].Ime_Prezime + "" + this.projekatKorisnici[nz].nedelja] == 0){
                                   this.pakovanjeDetalji[i][this.projekatKorisnici[nz].Ime_Prezime + "" + this.projekatKorisnici[nz].nedelja] = null;
                                 }
@@ -1106,66 +1379,85 @@ export class AdminComponent implements OnInit,OnDestroy {
 
                             this.flgLoadingAdminTabela2 = true;
 
-                        },
-                        error => {
-                          this.Erorr('Nije moguce očitati korisnike');           
-                    });     
                   },
-                error => { this.error = error
-                  this.Erorr(this.error._body);    
+                  error => {
+                  this.Erorr('Nije moguce očitati korisnike');           
+                });
+
+              },
+              error => { this.error = error
+              this.Erorr(this.error._body);    
+            });       
+          },
+          error => { this.error = error
+          this.Erorr(this.error._body);    
       });
     }
   }
 
-  MesecAdminProjekti(){
+  MesecAdminProjekti(dropdown:SelectItemProjekti[],projekat:any){
+
+    let OdabraniProjekat
+
+    for(let pr in dropdown){
+      if(projekat == dropdown[pr].value){
+        OdabraniProjekat = dropdown[pr].tabela
+      }
+    }
+
     this.flgLoadingAdminTabela2 = false;
-        this.brisanjeVrednostiSelecta();
-        this.projektiBrojNedeljaMesecAdmin();
-        if(JSON.parse(localStorage.getItem('Token')) == null){
+    this.brisanjeVrednostiSelecta();
+    this.projektiBrojNedeljaMesecAdmin();
+    if(JSON.parse(localStorage.getItem('Token')) == null){
 
-            console.log("Izlogovani ste!!");
-            this.router.navigate(['/login']);
-            return;
+        console.log("Izlogovani ste!!");
+        this.router.navigate(['/login']);
+        return;
 
-        }
-        else{
-          for(let ar in this.detaljiNizObjKorisnik){//Brisanje Niza-objekata!!!
+    }
+    else{
+      for(let ar in this.detaljiNizObjKorisnik){//Brisanje Niza-objekata!!!
 
-                  var index = this.detaljiNizObjKorisnik.indexOf(this.detaljiNizObjKorisnik[ar]);
-                  //console.log("NizObjectIndex" + index);
-                  this.detaljiNizObjKorisnik.splice(index, this.detaljiNizObjKorisnik.length);
+              var index = this.detaljiNizObjKorisnik.indexOf(this.detaljiNizObjKorisnik[ar]);
+              //console.log("NizObjectIndex" + index);
+              this.detaljiNizObjKorisnik.splice(index, this.detaljiNizObjKorisnik.length);
 
-          }
-          for(let ar in this.pakovanjeDetalji){//Brisanje Niza-objekata!!!
+      }
+      for(let ar in this.pakovanjeDetalji){//Brisanje Niza-objekata!!!
 
-                  var index = this.pakovanjeDetalji.indexOf(this.pakovanjeDetalji[ar]);
-                  //console.log("NizObjectIndex" + index);
-                  this.pakovanjeDetalji.splice(index, this.pakovanjeDetalji.length);
+              var index = this.pakovanjeDetalji.indexOf(this.pakovanjeDetalji[ar]);
+              //console.log("NizObjectIndex" + index);
+              this.pakovanjeDetalji.splice(index, this.pakovanjeDetalji.length);
 
-          }
-          for(let ar in this.SumaPoKorisnikuProjekat){//Brisanje Niza-objekata!!!
+      }
+      for(let ar in this.SumaPoKorisnikuProjekat){//Brisanje Niza-objekata!!!
 
-                  var index = this.SumaPoKorisnikuProjekat.indexOf(this.SumaPoKorisnikuProjekat[ar]);
-                  //console.log("NizObjectIndex" + index);
-                  this.SumaPoKorisnikuProjekat.splice(index, this.SumaPoKorisnikuProjekat.length);
+              var index = this.SumaPoKorisnikuProjekat.indexOf(this.SumaPoKorisnikuProjekat[ar]);
+              //console.log("NizObjectIndex" + index);
+              this.SumaPoKorisnikuProjekat.splice(index, this.SumaPoKorisnikuProjekat.length);
 
-          }
-          for(let ar in this.SumaPoNedeljamaDetalji){//Brisanje Niza-objekata!!!
+      }
+      for(let ar in this.SumaPoNedeljamaDetalji){//Brisanje Niza-objekata!!!
 
-                  var index = this.SumaPoNedeljamaDetalji.indexOf(this.SumaPoNedeljamaDetalji[ar]);
-                  //console.log("NizObjectIndex" + index);
-                  this.SumaPoNedeljamaDetalji.splice(index, this.SumaPoNedeljamaDetalji.length);
+              var index = this.SumaPoNedeljamaDetalji.indexOf(this.SumaPoNedeljamaDetalji[ar]);
+              //console.log("NizObjectIndex" + index);
+              this.SumaPoNedeljamaDetalji.splice(index, this.SumaPoNedeljamaDetalji.length);
 
-          }
+      }
 
-          this.adminservice.projekatKorisnici(this.ProjektiMesecAdmin,this.selectedProjektiAktivni,this.selectedGodinaProjektiAdmin)
-                .subscribe(
-                    projekatKorisnici => { this.projekatKorisnici = projekatKorisnici
+      this.adminservice.projekatKorisnici(this.ProjektiMesecAdmin,this.selectedProjektiAktivni,this.selectedGodinaProjektiAdmin,OdabraniProjekat)
+        .subscribe(
+            projekatKorisnici => { this.projekatKorisnici = projekatKorisnici
                       
-                      //Provera za gresku!!
-                      //console.log(this.projekatKorisnici);
+              //Provera za gresku!!
+              //console.log(this.projekatKorisnici);
+              let tabelaCuvaj;
 
-                        this.adminservice.ListaKorisnikaAdmin()
+              this.adminservice.TabelaJson(OdabraniProjekat)
+                .subscribe(
+                tabelaCuvaj => { tabelaCuvaj = tabelaCuvaj
+
+                this.adminservice.ListaKorisnikaAdmin()
                           .subscribe(
 
                             detaljiKorisniciObject => { this.detaljiKorisniciObject = detaljiKorisniciObject
@@ -1183,7 +1475,7 @@ export class AdminComponent implements OnInit,OnDestroy {
                                     if(this.detaljiKorisniciObject.length + 1 == brojacKor){
                                       objectKor['ime'] = this.saberi + "." + 'Nedelja';
                                       objectKor['oznaka'] = 'Nedelja' + "" + this.saberi;
-                                      objectKor['boja'] = 1;
+                                        objectKor['boja'] = 1;
                                       brojacKor = 0;
                                       this.boja = 'blue';
 
@@ -1201,16 +1493,14 @@ export class AdminComponent implements OnInit,OnDestroy {
                             
                             }
                             // console.log(this.detaljiNizObjKorisnik);
-                            for(let nz of this.neznamKakoDaNazovemObject){
-
-                                let Kor = {};
-                                Kor['Projekat'] = nz.x.ime;
-                                for(let pr of this.detaljiNizObjKorisnik){
-
-                                  Kor[pr.oznaka] = null;
-
-                                }
-                                this.pakovanjeDetalji.push(Kor);
+                            for(let tb in tabelaCuvaj){
+                              //console.log(tb);
+                              let korA = {};
+                              korA['Projekat'] = tabelaCuvaj[tb].ime;
+                              for(let pr of this.detaljiNizObjKorisnik){
+                                korA[pr.oznaka] = null;
+                              }
+                              this.pakovanjeDetalji.push(korA);
                             }
                             //console.log(this.pakovanjeDetalji);
 
@@ -1219,10 +1509,11 @@ export class AdminComponent implements OnInit,OnDestroy {
                               //console.log(this.neznamKakoDaNazovemObject[i].x.ime);
                             }
 
-                            for(let i in this.neznamKakoDaNazovemObject){//ovde prolazi 5 puta
-                            //for(let i = 0; i < 1 ; i++){   
-                              for(let nz in this.projekatKorisnici){//ovde prolazi onoliko puta koliko smo dobili podataka iz baze
-                                this.pakovanjeDetalji[i][this.projekatKorisnici[nz].Ime_Prezime + "" + this.projekatKorisnici[nz].nedelja] = this.projekatKorisnici[nz][this.neznamKakoDaNazovemObject[i].x.baza];
+                            for(let i in tabelaCuvaj){//ovde prolazi 5 puta
+                            //for(let i = 0; i < 1 ; i++){
+                              //console.log(i);
+                              for(let nz in this.projekatKorisnici){
+                                this.pakovanjeDetalji[i][this.projekatKorisnici[nz].Ime_Prezime + "" + this.projekatKorisnici[nz].nedelja] = this.projekatKorisnici[nz][tabelaCuvaj[i].baza];
                                 if(this.pakovanjeDetalji[i][this.projekatKorisnici[nz].Ime_Prezime + "" + this.projekatKorisnici[nz].nedelja] == 0){
                                   this.pakovanjeDetalji[i][this.projekatKorisnici[nz].Ime_Prezime + "" + this.projekatKorisnici[nz].nedelja] = null;
                                 }
@@ -1249,18 +1540,23 @@ export class AdminComponent implements OnInit,OnDestroy {
                             for(let kor in this.detaljiNizObjKorisnik){         
                               //for(let kor = 0; kor < 3 ; kor++){
                                   for(let pk in this.pakovanjeDetalji){
+
                                   let cuvajIme;
                                   cuvajIme = this.detaljiNizObjKorisnik[kor].oznaka 
                                   this.SumaPoKorisnikuProjekat[kor] = this.pakovanjeDetalji[pk][cuvajIme] + this.SumaPoKorisnikuProjekat[kor]; 
+                                  
                               }  
                             }
 
                             for(let pd in this.pakovanjeDetalji){
+
                               this.SumaPoNedeljamaDetalji[pd] = 0;
+
                             }
 
                             for(let pd in this.pakovanjeDetalji){
                               for(let duzNed in this.projekatPamti_nedelje_Admin){
+
                                 this.projekatKorDetalji = Number(duzNed) + 1;
                                 this.SumaPoNedeljamaDetalji[pd] = this.pakovanjeDetalji[pd]['Nedelja' + this.projekatKorDetalji] + this.SumaPoNedeljamaDetalji[pd];  
                               }
@@ -1268,22 +1564,37 @@ export class AdminComponent implements OnInit,OnDestroy {
 
                             this.sumSvihProjekti = 0;
                             for(let sum in this.SumaPoNedeljamaDetalji){
-                              this.sumSvihProjekti = Number(this.SumaPoNedeljamaDetalji[sum]) + this.sumSvihProjekti;
+                                this.sumSvihProjekti = Number(this.SumaPoNedeljamaDetalji[sum]) + this.sumSvihProjekti;
                             }
 
-                          this.flgLoadingAdminTabela2 = true;
-                        },
-                        error => {
-                          this.Erorr('Nije moguce očitati korisnike');           
-                    });     
+                            this.flgLoadingAdminTabela2 = true;
+
                   },
-                error => { this.error = error
-                  this.Erorr(this.error._body);    
-          });
-       }
+                  error => {
+                  this.Erorr('Nije moguce očitati korisnike');           
+                });
+
+              },
+              error => { this.error = error
+              this.Erorr(this.error._body);    
+            });       
+          },
+          error => { this.error = error
+          this.Erorr(this.error._body);    
+      });  
+    }
   }
 
-  KlikProjektiAdmin(godina:any,mesec:string,projekat:string){
+  KlikProjektiAdmin(godina:any,mesec:string,projekat:string,dropdown:SelectItemProjekti[]){
+
+    let OdabraniProjekat
+
+    for(let pr in dropdown){
+      if(projekat == dropdown[pr].value){
+        OdabraniProjekat = dropdown[pr].tabela
+      }
+    }
+
     this.flgLoadingAdminTabela2 = false;
     if(JSON.parse(localStorage.getItem('Token')) == null){
 
@@ -1293,25 +1604,163 @@ export class AdminComponent implements OnInit,OnDestroy {
 
     }
     else{
-        for(let ar in this.detaljiNizObjKorisnik){//Brisanje Niza-objekata!!!
-          var index = this.detaljiNizObjKorisnik.indexOf(this.detaljiNizObjKorisnik[ar]);
-          this.detaljiNizObjKorisnik.splice(index, this.detaljiNizObjKorisnik.length);
-        }
-        for(let ar in this.pakovanjeDetalji){//Brisanje Niza-objekata!!!
-          var index = this.pakovanjeDetalji.indexOf(this.pakovanjeDetalji[ar]);
-          this.pakovanjeDetalji.splice(index, this.pakovanjeDetalji.length);
-        }
-        for(let ar in this.SumaPoKorisnikuProjekat){//Brisanje Niza-objekata!!!
-          var index = this.SumaPoKorisnikuProjekat.indexOf(this.SumaPoKorisnikuProjekat[ar]);
-          this.SumaPoKorisnikuProjekat.splice(index, this.SumaPoKorisnikuProjekat.length);
-        }
-        for(let ar in this.SumaPoNedeljamaDetalji){//Brisanje Niza-objekata!!!
-          var index = this.SumaPoNedeljamaDetalji.indexOf(this.SumaPoNedeljamaDetalji[ar]);
-          this.SumaPoNedeljamaDetalji.splice(index, this.SumaPoNedeljamaDetalji.length);
-        }
+      for(let ar in this.detaljiNizObjKorisnik){//Brisanje Niza-objekata!!!
+        var index = this.detaljiNizObjKorisnik.indexOf(this.detaljiNizObjKorisnik[ar]);
+        this.detaljiNizObjKorisnik.splice(index, this.detaljiNizObjKorisnik.length);
+      }
+      for(let ar in this.pakovanjeDetalji){//Brisanje Niza-objekata!!!
+        var index = this.pakovanjeDetalji.indexOf(this.pakovanjeDetalji[ar]);
+        this.pakovanjeDetalji.splice(index, this.pakovanjeDetalji.length);
+      }
+      for(let ar in this.SumaPoKorisnikuProjekat){//Brisanje Niza-objekata!!!
+        var index = this.SumaPoKorisnikuProjekat.indexOf(this.SumaPoKorisnikuProjekat[ar]);
+        this.SumaPoKorisnikuProjekat.splice(index, this.SumaPoKorisnikuProjekat.length);
+      }
+      for(let ar in this.SumaPoNedeljamaDetalji){//Brisanje Niza-objekata!!!
+        var index = this.SumaPoNedeljamaDetalji.indexOf(this.SumaPoNedeljamaDetalji[ar]);
+        this.SumaPoNedeljamaDetalji.splice(index, this.SumaPoNedeljamaDetalji.length);
+      }
 
           //this.adminservice.projekatKorisnici(this.ProjektiMesecAdmin,this.selectedProjektiAktivni,this.selectedGodinaProjektiAdmin)
-          this.adminservice.projekatKorisnici(mesec,projekat,godina)
+
+      this.adminservice.projekatKorisnici(this.ProjektiMesecAdmin,this.selectedProjektiAktivni,this.selectedGodinaProjektiAdmin,OdabraniProjekat)
+        .subscribe(
+            projekatKorisnici => { this.projekatKorisnici = projekatKorisnici
+                      
+              //Provera za gresku!!
+              //console.log(this.projekatKorisnici);
+              let tabelaCuvaj;
+
+              this.adminservice.TabelaJson(OdabraniProjekat)
+                .subscribe(
+                  tabelaCuvaj => { tabelaCuvaj = tabelaCuvaj
+
+                  this.adminservice.ListaKorisnikaAdmin()
+                    .subscribe(
+                        detaljiKorisniciObject => { this.detaljiKorisniciObject = detaljiKorisniciObject
+                                          
+                            let cuvajObject = this.detaljiKorisniciObject;                        
+                            this.projektiBrojNedeljaMesecAdmin();
+                            let brojacKor = 0;
+
+                        for(let duzNed in this.projekatPamti_nedelje_Admin){ 
+                          //for(let brKor in this.korisniciObject){
+                            for(let brKor = 0;brKor<this.detaljiKorisniciObject.length + 1;brKor++){  
+                                let objectKor = {};
+                                brojacKor++;
+                                
+                                if(this.detaljiKorisniciObject.length + 1 == brojacKor){
+                                  objectKor['ime'] = this.saberi + "." + 'Nedelja';
+                                  objectKor['oznaka'] = 'Nedelja' + "" + this.saberi;
+                                    objectKor['boja'] = 1;
+                                  brojacKor = 0;
+                                  this.boja = 'blue';
+
+                                }else if(brKor <= this.detaljiKorisniciObject.length){
+
+                                  this.saberi = Number(duzNed) + 1;
+                                  objectKor['ime'] = this.detaljiKorisniciObject[brKor].Ime_Prezime
+                                  objectKor['oznaka'] = this.detaljiKorisniciObject[brKor].Ime_Prezime + "" + this.saberi;
+                                  objectKor['boja'] = 0;
+                                  this.boja = 'white';
+                                }
+
+                                this.detaljiNizObjKorisnik.push(objectKor);      
+                          }
+                        
+                        }
+                        // console.log(this.detaljiNizObjKorisnik);
+                        for(let tb in tabelaCuvaj){
+                          //console.log(tb);
+                          let korA = {};
+                          korA['Projekat'] = tabelaCuvaj[tb].ime;
+                          for(let pr of this.detaljiNizObjKorisnik){
+                            korA[pr.oznaka] = null;
+                          }
+                          this.pakovanjeDetalji.push(korA);
+                        }
+                        //console.log(this.pakovanjeDetalji);
+
+                      
+                        for(let i in this.neznamKakoDaNazovemObject){
+                          //console.log(this.neznamKakoDaNazovemObject[i].x.ime);
+                        }
+
+                        for(let i in tabelaCuvaj){//ovde prolazi 5 puta
+                        //for(let i = 0; i < 1 ; i++){
+                          //console.log(i);
+                          for(let nz in this.projekatKorisnici){
+                            this.pakovanjeDetalji[i][this.projekatKorisnici[nz].Ime_Prezime + "" + this.projekatKorisnici[nz].nedelja] = this.projekatKorisnici[nz][tabelaCuvaj[i].baza];
+                            if(this.pakovanjeDetalji[i][this.projekatKorisnici[nz].Ime_Prezime + "" + this.projekatKorisnici[nz].nedelja] == 0){
+                              this.pakovanjeDetalji[i][this.projekatKorisnici[nz].Ime_Prezime + "" + this.projekatKorisnici[nz].nedelja] = null;
+                            }
+                          }
+                        }
+
+                        //Sumiranje po nedeljama
+                        for(let pd in this.pakovanjeDetalji){
+                        //for(let pd = 0; pd < 1 ; pd++){  
+                          for(let duzNed in this.projekatPamti_nedelje_Admin){
+                            for(let kor in this.detaljiKorisniciObject){
+
+                                this.projekatRezDetalji = Number(duzNed) + 1;
+                                this.pakovanjeDetalji[pd]['Nedelja' + this.projekatRezDetalji] = Number(this.pakovanjeDetalji[pd][this.detaljiKorisniciObject[kor]['Ime_Prezime'] + "" + this.projekatRezDetalji]) +  this.pakovanjeDetalji[pd]['Nedelja' + this.projekatRezDetalji];
+                            }
+                          }
+                        }
+                        for(let pd in this.detaljiNizObjKorisnik){
+
+                            this.SumaPoKorisnikuProjekat[pd] = 0;
+                        }
+
+                        //Sumiranje po korisniku  
+                        for(let kor in this.detaljiNizObjKorisnik){         
+                          //for(let kor = 0; kor < 3 ; kor++){
+                              for(let pk in this.pakovanjeDetalji){
+
+                              let cuvajIme;
+                              cuvajIme = this.detaljiNizObjKorisnik[kor].oznaka 
+                              this.SumaPoKorisnikuProjekat[kor] = this.pakovanjeDetalji[pk][cuvajIme] + this.SumaPoKorisnikuProjekat[kor]; 
+                              
+                          }  
+                        }
+
+                        for(let pd in this.pakovanjeDetalji){
+
+                          this.SumaPoNedeljamaDetalji[pd] = 0;
+
+                        }
+
+                        for(let pd in this.pakovanjeDetalji){
+                          for(let duzNed in this.projekatPamti_nedelje_Admin){
+
+                            this.projekatKorDetalji = Number(duzNed) + 1;
+                            this.SumaPoNedeljamaDetalji[pd] = this.pakovanjeDetalji[pd]['Nedelja' + this.projekatKorDetalji] + this.SumaPoNedeljamaDetalji[pd];  
+                          }
+                        }
+
+                        this.sumSvihProjekti = 0;
+                        for(let sum in this.SumaPoNedeljamaDetalji){
+                            this.sumSvihProjekti = Number(this.SumaPoNedeljamaDetalji[sum]) + this.sumSvihProjekti;
+                        }
+
+                        this.flgLoadingAdminTabela2 = true;
+
+                  },
+                  error => {
+                  this.Erorr('Nije moguce očitati korisnike');           
+                });
+
+              },
+              error => { this.error = error
+              this.Erorr(this.error._body);    
+            });       
+          },
+          error => { this.error = error
+          this.Erorr(this.error._body);    
+      });   
+          /*
+          this.adminservice.projekatKorisnici(mesec,projekat,godina,OdabraniProjekat)
                 .subscribe(
                     projekatKorisnici => { this.projekatKorisnici = projekatKorisnici
                       
@@ -1437,7 +1886,7 @@ export class AdminComponent implements OnInit,OnDestroy {
                   },
                 error => { this.error = error
                   this.Erorr(this.error._body);    
-          }); 
+          }); */
     }
   }
   //
@@ -1606,57 +2055,52 @@ export class AdminComponent implements OnInit,OnDestroy {
         myFormValueChanges$.subscribe(x => this.events.push({ event: 'VALUE_CHANGED', object: x, /*nesto: console.log("sdas" + x)*/ }));
   }
 
+
+
   save(model: any, isValid: boolean) {
 
     if(JSON.parse(localStorage.getItem('Token')) == null){
-
-            console.log("Izlogovani ste!!");
-            this.router.navigate(['/login']);
-            return;
-
+      console.log("Izlogovani ste!!");
+      this.router.navigate(['/login']);
+      return;
     } 
     else{  
       this.submitted = true;
-      //console.log(model, isValid);
-      //console.log("this.filter" + this.filter)
       if(isValid){
 
-        //console.log("Moze da se upise")
-        //this.filter = "";
-         //this.filter = "";
         this.adminservice.DodavanjeNovogProjekta(model.name)
-            .subscribe(
-                odgovorInsert => { this.odgovorInsert = odgovorInsert
-                    console.log("Bravoo" + this.odgovorInsert)
-                    this.filter = "";
-                    //this.subcribeToFormChanges();
-                    //this.KlikProjektiAdmin();
-                    this.adminservice.Projekti()
-                      .subscribe(
-                          projektiAktivni => { this.projektiAktivni = projektiAktivni
-                            //ovde se popunjava dopwdpwn sa korisniciAktivni
-                            this.popuniProjektiAdmin(this.projektiAktivni);
-                            this.Erorr('Uspešno ste dodali novi projekat.');
+          .subscribe(
+            odgovorInsert => { this.odgovorInsert = odgovorInsert
+              this.filter = "";
+              //this.subcribeToFormChanges();
+              //this.KlikProjektiAdmin();
+              this.adminservice.Projekti()
+                .subscribe(
+                    projektiAktivni => { this.projektiAktivni = projektiAktivni
+                      //ovde se popunjava dopwdpwn sa korisniciAktivni
+                      this.popuniProjektiAdmin(this.projektiAktivni);
+                      this.Erorr('Uspešno ste dodali novi projekat.');
 
-                          },
-                          error => {
-                            console.log("error")
-                            localStorage.clear();
-                            this.text = 'Došlo je do greške na serveru!!'
-                            this.text_izlaz = 'Gotovo';
-                            this.showDialog();
-                    });
+                    },
+                    error => {
+                      console.log("error")
+                      localStorage.clear();
+                      this.text = 'Došlo je do greške na serveru!!'
+                      this.text_izlaz = 'Gotovo';
+                      this.showDialog();
+              });
 
-                    this.MesecAdminF();
+              this.MesecAdminF();
+              this.godinaMesecProjekat();
+              //this.NeaktivniProjekti();
+              this.AktivniProjekti();
+              //this.MesecAdminProjekti();
 
-                    this.MesecAdminProjekti();
-
-                  },
-                  error => {
-                    console.log("error")
-                    this.Erorr('Nije moguce upisati novi projekat');
-                  });         
-
+          },
+          error => {
+            console.log("error")
+            this.Erorr('Nije moguce upisati novi projekat');
+        });         
       }
       else{
 
@@ -1669,29 +2113,19 @@ export class AdminComponent implements OnInit,OnDestroy {
   ProverDropDownProjekti(){
 
     if(JSON.parse(localStorage.getItem('Token')) == null){
-
-            console.log("Izlogovani ste!!");
-            this.router.navigate(['/login']);
-            return;
-
+      console.log("Izlogovani ste!!");
+      this.router.navigate(['/login']);
+      return;
     }
     else{ 
 
       if(this.selectedDodavanjeKorisnikaNaProjekatKorisnik == '' || this.selectedDodavanjeKorisnikaNaProjekatProjekat == '' || this.selectedDodavanjeKorisnikaNaProjekatKorisnik == undefined || this.selectedDodavanjeKorisnikaNaProjekatProjekat == undefined)
       {
-          console.log("Projekat");
-          this.dodajProvera = false;
-          
-
+        this.dodajProvera = false;
       }
       else{
-
-          console.log("Popunjeno")!
-          this.dodajProvera = true;
-
+        this.dodajProvera = true;
       }
-
-
       //this.ZastitaDodavanjeKorisnikaNaProjekat();
     }  
   }
@@ -1712,20 +2146,11 @@ export class AdminComponent implements OnInit,OnDestroy {
       //console.log("Ulaziii!!")
       if(this.selectedDodavanjeKorisnikaNaProjekatKorisnik == '' || this.selectedDodavanjeKorisnikaNaProjekatProjekat == '' || this.selectedDodavanjeKorisnikaNaProjekatKorisnik == undefined || this.selectedDodavanjeKorisnikaNaProjekatProjekat == undefined)
       {
-          console.log("Projekat");
-          this.dodajProvera = false;
-          
-
+        this.dodajProvera = false;
       }
       else{
-
-          console.log("Popunjeno")!
-          this.dodajProvera = true;
-
+        this.dodajProvera = true;
       }
-
-      //this.ZastitaDodavanjeKorisnikaNaProjekat();
-
       //Kada se odabere Korisnik on popuni dropdown sa odgovarajucim projektima
       this.ProbaDropDownFunkcija();
     }  
@@ -1736,28 +2161,21 @@ export class AdminComponent implements OnInit,OnDestroy {
   ProbaDropDownFunkcija(){
 
     if(JSON.parse(localStorage.getItem('Token')) == null){
-
-            console.log("Izlogovani ste!!");
-            this.router.navigate(['/login']);
-            return;
-
+      console.log("Izlogovani ste!!");
+      this.router.navigate(['/login']);
+      return;
     } 
     else{
       this.adminservice.PopunjavanjeDropDownDodavanjeNaProjekat(this.selectedDodavanjeKorisnikaNaProjekatKorisnik)
-              .subscribe(
-                  projektiNaKojimaNeRadi => { this.projektiNaKojimaNeRadi = projektiNaKojimaNeRadi
+        .subscribe(
+          projektiNaKojimaNeRadi => { this.projektiNaKojimaNeRadi = projektiNaKojimaNeRadi
+            //ovde se popunjava dopwdpwn sa korisniciAktivni
+            this.popuniProjektiAdminDodavanjeNaProjekat(this.projektiNaKojimaNeRadi)
 
-                    //ovde se popunjava dopwdpwn sa korisniciAktivni
-                    this.popuniProjektiAdminDodavanjeNaProjekat(this.projektiNaKojimaNeRadi)
-
-                  },
-                  error => {
-                      console.log("error");
-                      this.Erorr('Za datog korisnika nije moguce ocitati projekte!!');
-                      /*localStorage.clear();
-                      this.text = 'Došlo je do greške na serveru!!'
-                      this.text_izlaz = 'Gotovo';
-                      this.showDialog();*/
+          },
+          error => {
+            console.log("error");
+            this.Erorr('Za datog korisnika nije moguce ocitati projekte!!');         
       });
     } 
 
@@ -1767,61 +2185,41 @@ export class AdminComponent implements OnInit,OnDestroy {
   Dodaj(){
 
     if(JSON.parse(localStorage.getItem('Token')) == null){
-
-            console.log("Izlogovani ste!!");
-            this.router.navigate(['/login']);
-            return;
-
+      console.log("Izlogovani ste!!");
+      this.router.navigate(['/login']);
+      return;
     }
     else{     
       if( this.selectedDodavanjeKorisnikaNaProjekatKorisnik == '' || this.selectedDodavanjeKorisnikaNaProjekatProjekat == '' || this.selectedDodavanjeKorisnikaNaProjekatKorisnik == undefined || this.selectedDodavanjeKorisnikaNaProjekatProjekat == undefined){
-
          this.dodajProvera = false;
          return;
-         //this.dodajuspesno = ;
-
       }
       else{
+        this.dodajProvera = true;
+        this.adminservice.DodavanjeKorisnikaNaProjekat(this.selectedDodavanjeKorisnikaNaProjekatKorisnik, this.selectedDodavanjeKorisnikaNaProjekatProjekat, this.trenutnaGodinaDodavanje)
+          .subscribe(
+            insert => { this.insert = insert
 
-          this.dodajProvera = true;
-         //Dodato da posle pritiska na button dodaj se izprazni dropdown
-         
-         //this.Erorr("Uspešno ste dodali novi projekat.");
-         
-          this.adminservice.DodavanjeKorisnikaNaProjekat(this.selectedDodavanjeKorisnikaNaProjekatKorisnik, this.selectedDodavanjeKorisnikaNaProjekatProjekat,this.trenutnaGodinaDodavanje)
-                .subscribe(
-                    insert => { this.insert = insert
+                //Poziva se funkcija koja refresuje tabelu Projekti kada se doda projekat za odradjenog korisnika!!
+              this.KlikProjektiAdmin(this.selectedGodinaProjektiAdmin,this.ProjektiMesecAdmin,this.selectedProjektiAktivni,this.projektiDropDown);
 
-                        console.log("Bravoo" + this.insert)
-                        //this.Erorr("Uspešno ste dodali novi projekat.");
-                        //Poziva se funkcija koja refresuje tabelu Korisnik kada se doda projekat za odradjenog korisnika!!
-                        //this.KlikKorisnikAdmin();
-                        //Poziva se funkcija koja refresuje tabelu Projekti kada se doda projekat za odradjenog korisnika!!
-                        this.KlikProjektiAdmin(this.selectedGodinaProjektiAdmin,this.ProjektiMesecAdmin,this.selectedProjektiAktivni);
-
-                        //this.dodajuspesno = 1; 
-                        this.validDodaj = 'jeste';
-                        this.selectedDodavanjeKorisnikaNaProjekatKorisnik = '';
-                        this.selectedDodavanjeKorisnikaNaProjekatProjekat = '';
-                        //this.selectedDodavanjeKorisnikaNaProjekatProjekat
-                        //Ponovno popunjavanje dropdown jer je projekat dodat za korisnika i potrebo je osveziti dropdown
-                        this.ProbaDropDownFunkcija();
-                        //Da bi se dropdown sa projektima na kojima korisnik radi dopunio sa dodatim projektom!!
-                        this.UklanjanjeDropDownFunkcija();
-                        //this.Erorr(this.error._body);
-                        this.displayUredu = true;
-                        this.textPotvrda = 'Uredu';
-                        this.textUpozorenje = 'Uspešno ste dodali projekat';
-                        this.textObavestenje = "Obaveštenje!!";
-                    },
-                    error => {
-                        console.log("error");
-                        this.Erorr(this.error._body);
-                        //localStorage.clear();
-                        //this.text = 'Došlo je do greške na serveru!!'
-                        //this.text_izlaz = 'Gotovo';
-                        //this.showDialog();
-          }); 
+              this.validDodaj = 'jeste';
+              this.selectedDodavanjeKorisnikaNaProjekatKorisnik = '';
+              this.selectedDodavanjeKorisnikaNaProjekatProjekat = '';
+              //Ponovno popunjavanje dropdown jer je projekat dodat za korisnika i potrebo je osveziti dropdown
+              this.ProbaDropDownFunkcija();
+              //Da bi se dropdown sa projektima na kojima korisnik radi dopunio sa dodatim projektom!!
+              this.UklanjanjeDropDownFunkcija();
+              //this.Erorr(this.error._body);
+              this.displayUredu = true;
+              this.textPotvrda = 'Uredu';
+              this.textUpozorenje = 'Uspešno ste dodali projekat';
+              this.textObavestenje = "Obaveštenje!!";
+              },
+            error => {
+              console.log("error");
+              this.Erorr("Neuspešno ste dodali korisnika na projekat!!");
+        }); 
       }
     }
 
@@ -1831,42 +2229,34 @@ export class AdminComponent implements OnInit,OnDestroy {
   //Uklanjanje korisnika sa projekta
   ProveraVrednostiProjekataUklanjanje(){
    if(JSON.parse(localStorage.getItem('Token')) == null){
-
-            console.log("Izlogovani ste!!");
-            this.router.navigate(['/login']);
-            return;
-
+      console.log("Izlogovani ste!!");
+      this.router.navigate(['/login']);
+      return;
     }
     else{
-
       if(this.selectedUklanjanjeKorisnikaSaProjektaKorisnik == '' || this.selectedUklanjanjeKorisnikaSaProjektaProjekat == '' || this.selectedUklanjanjeKorisnikaSaProjektaKorisnik == undefined || this.selectedUklanjanjeKorisnikaSaProjektaProjekat == undefined)
       {
-          
-          this.proveraUspesnosti = false;
+        this.proveraUspesnosti = false;
       }
       else{
-          this.proveraUspesnosti = true;
+        this.proveraUspesnosti = true;
       }
-
     }
-
   }
-
 
   UklanjanjeDropDown(){
     if(JSON.parse(localStorage.getItem('Token')) == null){
-
-            console.log("Izlogovani ste!!");
-            this.router.navigate(['/login']);
-            return;
+      console.log("Izlogovani ste!!");
+      this.router.navigate(['/login']);
+      return;
     }
     else{
 
       if(this.selectedUklanjanjeKorisnikaSaProjektaKorisnik == '' || this.selectedUklanjanjeKorisnikaSaProjektaProjekat == '' || this.selectedUklanjanjeKorisnikaSaProjektaKorisnik == undefined || this.selectedUklanjanjeKorisnikaSaProjektaProjekat == undefined){
-          this.proveraUspesnosti = false;
+        this.proveraUspesnosti = false;
       }
       else{
-          this.proveraUspesnosti = true;
+        this.proveraUspesnosti = true;
       }
       this.UklanjanjeDropDownFunkcija();
     }
@@ -1876,12 +2266,11 @@ export class AdminComponent implements OnInit,OnDestroy {
   //Popunjavanje dropdown-a
   UklanjanjeDropDownFunkcija(){
 
+    //console.log("this.selectedUklanjanjeKorisnikaSaProjektaKorisnik" + this.selectedUklanjanjeKorisnikaSaProjektaKorisnik)
+
     this.adminservice.PopunjavanjeDropDownUklanjanjeSaProjekta(this.selectedUklanjanjeKorisnikaSaProjektaKorisnik)
             .subscribe(
                 projektiNaKojimaRadi => { this.projektiNaKojimaRadi = projektiNaKojimaRadi
-
-                  //console.log("this.projektiNaKojimaRadi"+ this.projektiNaKojimaRadi)
-
                   //ovde se popunjava dopwdpwn sa korisniciAktivni
                   this.popuniProjektiAdminUklanjanjeSaProjekta(this.projektiNaKojimaRadi)
 
@@ -1889,11 +2278,7 @@ export class AdminComponent implements OnInit,OnDestroy {
                 error => {
                     console.log("error");
                     this.Erorr('Za datog korisnika nije moguce ocitati projekte!!');
-                    /*localStorage.clear();
-                    this.text = 'Došlo je do greške na serveru!!'
-                    this.text_izlaz = 'Gotovo';
-                    this.showDialog();*/
-     });
+    });
   }
 
   //***Uklanjanje korisnika sa projekta
@@ -1917,44 +2302,36 @@ export class AdminComponent implements OnInit,OnDestroy {
       }
       else{
 
-        this.proveraUspesnosti = true;  
-        this.displayUkloni = true;
-        this.textUpozorenje = 'Prilikom uklanjanja svi podaci će biti izbrisani!!';
-        this.textNe = 'Odustani';
-        this.textPotvrda = 'Potvrda';
-        this.textObavestenje = "Upozorenje!!"
-
+        
+        
         this.adminservice.BrisanjeKorisnikaSaProjekta(this.selectedUklanjanjeKorisnikaSaProjektaKorisnik,this.selectedUklanjanjeKorisnikaSaProjektaProjekat)
-                .subscribe(
-                    odgovorUklanjanje => { this.odgovorUklanjanje = odgovorUklanjanje
+          .subscribe(
+            odgovorUklanjanje => { this.odgovorUklanjanje = odgovorUklanjanje
 
-                      //console.log("this.projektiNaKojimaRadi"+ this.projektiNaKojimaRadi)
+              //Poziva se funkcija koja refresuje tabelu Projekti kada se doda projekat za odradjenog korisnika!!
+              //this.KlikProjektiAdmin();
+              this.KlikProjektiAdmin(this.selectedGodinaProjektiAdmin,this.ProjektiMesecAdmin,this.selectedProjektiAktivni,this.projektiDropDown);
+            
+              this.selectedUklanjanjeKorisnikaSaProjektaKorisnik = "";
+              this.selectedUklanjanjeKorisnikaSaProjektaProjekat = "";
+              
+              this.UklanjanjeDropDownFunkcija();
 
-                      //Poziva se funkcija koja refresuje tabelu Korisnik kada se doda projekat za odradjenog korisnika!!
-                      //this.KlikKorisnikAdmin();
-                      //Poziva se funkcija koja refresuje tabelu Projekti kada se doda projekat za odradjenog korisnika!!
-                      //this.KlikProjektiAdmin();
-                      this.KlikProjektiAdmin(this.selectedGodinaProjektiAdmin,this.ProjektiMesecAdmin,this.selectedProjektiAktivni);
+              //Prilikom uklanjanja projekta za odredjenog korisnika da ozvezi dropdown za Dodavanje korisnika na projekat!!!
+              this.ProbaDropDownFunkcija();
+              
+              this.proveraUspesnosti = true;  
+              this.displayUkloni = true;
+              this.textUpozorenje = 'Uspešno ste uklonili korisnika sa projekta!';
+              this.textNe = 'Odustani';
+              this.textPotvrda = 'Potvrda';
+              this.textObavestenje = "Obaveštenje"
 
-                      this.selectedUklanjanjeKorisnikaSaProjektaKorisnik = "";
-                      this.selectedUklanjanjeKorisnikaSaProjektaProjekat = "";
-                      //this.UklanjanjeDropDownFunkcija();
-                      //console.log("this.selectedUklanjanjeKorisnikaSaProjektaKorisnik" + this.selectedUklanjanjeKorisnikaSaProjektaKorisnik)
-                      //console.log("this.selectedUklanjanjeKorisnikaSaProjektaProjekat" + this.selectedUklanjanjeKorisnikaSaProjektaProjekat)
 
-                      this.UklanjanjeDropDownFunkcija();
-
-                      //Prilikom uklanjanja projekta za odredjenog korisnika da ozvezi dropdown za Dodavanje korisnika na projekat!!!
-                      this.ProbaDropDownFunkcija();
-                      
-                  },
-                  error => {
-                    console.log("error");
-                    this.Erorr('Korisnika nije moguce ukloniti sa projekata!!');
-                    /*localStorage.clear();
-                    this.text = 'Došlo je do greške na serveru!!'
-                    this.text_izlaz = 'Gotovo';
-                    this.showDialog();*/
+          },
+          error => {
+            console.log("error");
+            this.Erorr('Korisnika nije moguce ukloniti sa projekata!!');
         });
       }
     }
@@ -2004,13 +2381,13 @@ export class AdminComponent implements OnInit,OnDestroy {
 
                                     //Refresovanje tabele Projekat u zavisnosti od toga koji je korisnik aktivan!!
                                     //this.KlikProjektiAdmin();
-                                    this.KlikProjektiAdmin(this.selectedGodinaProjektiAdmin,this.ProjektiMesecAdmin,this.selectedProjektiAktivni);
+                                    this.KlikProjektiAdmin(this.selectedGodinaProjektiAdmin,this.ProjektiMesecAdmin,this.selectedProjektiAktivni,this.projektiDropDown);
                                     
                                 }
                                 else{
                                   console.log("Ne brisi dropdown")
                                   //this.KlikProjektiAdmin();
-                                  this.KlikProjektiAdmin(this.selectedGodinaProjektiAdmin,this.ProjektiMesecAdmin,this.selectedProjektiAktivni);
+                                  this.KlikProjektiAdmin(this.selectedGodinaProjektiAdmin,this.ProjektiMesecAdmin,this.selectedProjektiAktivni,this.projektiDropDown);
                                   this.Erorr('Uspesno ste deaktivirali korisnika!');
                                 }
 
@@ -2104,7 +2481,7 @@ export class AdminComponent implements OnInit,OnDestroy {
               this.imePrezimeAktivniFunkcija();
               this.ImePrezimeNeAktivniKorisniciFunkcija();
               //this.KlikProjektiAdmin();
-              this.KlikProjektiAdmin(this.selectedGodinaProjektiAdmin,this.ProjektiMesecAdmin,this.selectedProjektiAktivni);
+              this.KlikProjektiAdmin(this.selectedGodinaProjektiAdmin,this.ProjektiMesecAdmin,this.selectedProjektiAktivni,this.projektiDropDown);
               //Praznjenje dropdown-ova!!
               //Praznjenje dropdown-ova gde se nalaze Korisnici nije potrebno jer je poziva funkcija this.imePrezimeAktivniFunkcija(); koja postavlja dropdown-ove na pocetne vrednosti!!
               this.selectedUklanjanjeKorisnikaSaProjektaProjekat = "";
@@ -2199,18 +2576,23 @@ export class AdminComponent implements OnInit,OnDestroy {
       projekt.ProjektiAdmin = '----';
       projekt.ProjektiAdmin = "";
 
+
       this.projektiDropDown.unshift({
           label: '----',
-          value: projekt.ProjektiAdmin
+          value: projekt.ProjektiAdmin,
+          tabela: 'Micko',
       })
 
       for(var i = 0; i <= projekti.length - 1; i++){
           //console.log("i" + korisnici[i].Ime_Prezime)
           this.projektiDropDown.push({ 
             label: projekti[i].Projekti ? projekti[i].Projekti : projekti[i].Projekti,
+            //label: projekti[i].tabela_vrednosti,
+            tabela: projekti[i].tabela_vrednosti, 
             value: projekti[i].Projekti});
       }
       //korisnik.Nadimak_Klijent = "";
+      //console.log(this.projektiDropDown);
 
   }
 
@@ -2300,22 +2682,17 @@ export class AdminComponent implements OnInit,OnDestroy {
   ZastitaDodavanjeKorisnikaNaProjekat(){
 
     if( this.selectedDodavanjeKorisnikaNaProjekatKorisnik == undefined || this.selectedDodavanjeKorisnikaNaProjekatProjekat == undefined){
-
       console.log("undefined") 
       this.validDodaj = 'nije';
       this.dodajuspesno = 0;
-
     }
     else if(this.selectedDodavanjeKorisnikaNaProjekatKorisnik == "" || this.selectedDodavanjeKorisnikaNaProjekatProjekat == ""){
-
        console.log("Praznoo") 
        this.validDodaj = 'nije';
        this.dodajuspesno = 0;
     }
     else{
-
       this.validDodaj = 'jeste';
-
     }
 
   }
@@ -2370,7 +2747,7 @@ export class AdminComponent implements OnInit,OnDestroy {
                 //this.KlikKorisnikAdmin();
                 //Poziva se funkcija koja refresuje tabelu Projekti kada se doda projekat za odradjenog korisnika!!
                 //this.KlikProjektiAdmin();
-                this.KlikProjektiAdmin(this.selectedGodinaProjektiAdmin,this.ProjektiMesecAdmin,this.selectedProjektiAktivni);
+                this.KlikProjektiAdmin(this.selectedGodinaProjektiAdmin,this.ProjektiMesecAdmin,this.selectedProjektiAktivni,this.projektiDropDown);
 
                 this.selectedUklanjanjeKorisnikaSaProjektaKorisnik = "";
                 this.selectedUklanjanjeKorisnikaSaProjektaProjekat = "";

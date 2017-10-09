@@ -9,4 +9,7 @@ export class prikazTabelaModel {
     ]
     Projekti:string;
     id_pr:number;
+    tabela_vrednosti:string;
+    sumProjekata:number;
+    pretraga:number;
 }

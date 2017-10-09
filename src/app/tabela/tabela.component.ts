@@ -71,6 +71,7 @@ export class TabelaComponent implements OnInit,OnDestroy {
   ngXColumnObject:any[] = [];
   ngXsize:number = 0;
   rows:any[] = [];
+  monthT:string [] = [];
 
 
   columns1 = [
@@ -102,7 +103,7 @@ export class TabelaComponent implements OnInit,OnDestroy {
 
       
 
-    }
+  }
 
   ngOnDestroy(){
 
@@ -112,11 +113,6 @@ export class TabelaComponent implements OnInit,OnDestroy {
   }  
 
   ngOnInit() {
-
-
-    
-
-
 
     this.interval = setInterval(() => { 
           console.log("Tabela!!");
@@ -133,11 +129,22 @@ export class TabelaComponent implements OnInit,OnDestroy {
           });
     }, 1000 * 5 * 60 * 60 );//1000 * 5 * 60 * 60 = 5h
 
+    this.monthT[0] = "Januar";
+    this.monthT[1] = "Februar";
+    this.monthT[2] = "Mart";
+    this.monthT[3] = "April";
+    this.monthT[4] = "Maj";
+    this.monthT[5] = "Jun";
+    this.monthT[6] = "Jul";
+    this.monthT[7] = "Avgust";
+    this.monthT[8] = "Septembar";
+    this.monthT[9] = "Oktobar";
+    this.monthT[10] = "Novembar";
+    this.monthT[11] = "Decembar";
+
 
     this.ngXsize = 100;
-
     let cuvajMesecGodina = this.ngXBrojNedeljaZaDatiMesec('Jun',2017);
-
     this.ngXColumn = cuvajMesecGodina;
 
     let z = {};
@@ -160,120 +167,89 @@ export class TabelaComponent implements OnInit,OnDestroy {
     x['oznaka'] = 'Ukupno';
 
     this.ngXColumnObject.push(x);
-
-    console.log(this.ngXColumnObject);
-
     //this.rows = [{ Projekti:'Erviko', nedelja1:1, nedelja2:2, nedelja3:3, nedelja4:4, nedelja5:5, nedelja6:6, Ukupno: 15 }];  
-
 
     this.selectedMesecTabela = this.deviceObjects[0].name;
     this.broj_nedelja_za_dati_mesec();
-
     this.selectedGodinaTabelaKorisnik = new Date().getFullYear();
-    /*this.selectedGodina = this.currentYear_B;*/
+    let d = new Date();
+    let nowMonth = this.monthT[d.getMonth()];
+
 
     this.nadimak_tabela = JSON.parse(localStorage.getItem('currentUser'));
-    //console.log("this.nadimak" + this.nadimak_tabela)
+    
     this.serviceTabela.fullName(this.nadimak_tabela)
-        .then(
+      .then(
+        fullname_baza_tabela => { this.fullname_baza_tabela= fullname_baza_tabela
 
-          fullname_baza_tabela => { this.fullname_baza_tabela= fullname_baza_tabela
-
-           this.serviceTabela.projektiNaKojimaRadiKorisnik(this.nadimak_tabela)
-                    .subscribe(
-
+          this.serviceTabela.projektiNaKojimaRadiKorisnik(this.nadimak_tabela)
+            .subscribe(
               projekti => { this.projekti= projekti
 
-              //console.log(projekti);
-               
-              this.serviceTabela.satnicaKorisnik(this.selectedMesecTabela,this.nadimak_tabela,this.selectedGodinaTabelaKorisnik)
-                .subscribe(      
+                this.selectedMesecTabela = nowMonth;
+                this.serviceTabela.satnicaKorisnik(this.selectedMesecTabela,this.nadimak_tabela,this.selectedGodinaTabelaKorisnik)
+                  .subscribe(      
+                    satnica => { this.satnica= satnica 
 
-                satnica => { this.satnica= satnica
+                      this.broj_nedelja_za_dati_mesec();
+                      for(let ar in this.projektiObjekiNedelje){//Brisanje Niza-objekata!!!
+                        var index = this.projektiObjekiNedelje.indexOf(this.projektiObjekiNedelje[ar]);
+                        this.projektiObjekiNedelje.splice(index, this.projektiObjekiNedelje.length);
+                      }
 
-                //console.log(this.satnica);
+                      for (let pr of this.projekti) {
+                          let y = {};
+                          y['Projekti'] = pr.Projekti;
+                          for (let kor of this.NizObjekiNedelje) {
+                            y[kor.Oznaka] = null;
+                          }
+                          this.projektiObjekiNedelje.push(y);                        
+                      }
 
-                        this.broj_nedelja_za_dati_mesec();
-
-                        for(let ar in this.projektiObjekiNedelje){//Brisanje Niza-objekata!!!
-
-                            var index = this.projektiObjekiNedelje.indexOf(this.projektiObjekiNedelje[ar]);
-                            //console.log("NizObjectIndex" + index);
-                            this.projektiObjekiNedelje.splice(index, this.projektiObjekiNedelje.length);
-
-                        }
-
-                        for (let pr of this.projekti) {
-                            let y = {};
-                            y['Projekti'] = pr.Projekti;
-                            for (let kor of this.NizObjekiNedelje) {
-                              y[kor.Oznaka] = null;
+                      for(let pr in this.projektiObjekiNedelje){
+                      //for(let pr = 0; pr < 2 ; pr++){  
+                          for (let sat of this.satnica) {//kor.Oznaka                          
+                            if(this.projektiObjekiNedelje[pr]['Projekti'] == sat.Projekti){ 
+                              this.projektiObjekiNedelje[pr][sat.nedelja+".Nedelja"] = sat.sum;
                             }
-                            this.projektiObjekiNedelje.push(y);
-                          
                         }
-                        //console.log(this.projektiObjekiNedelje);
+                      }
 
+                      for(let ar in this.sumNedelja){//Brisanje Niza-objekata!!!
+                        var index = this.sumNedelja.indexOf(this.sumNedelja[ar]);
+                        this.sumNedelja.splice(index, this.sumNedelja.length);
+                      }
+                      
+                      for(let pr in this.NizObjekiNedelje){
+                        this.sumNedelja[pr] = 0;
+                      }
+
+                      for(let ned in this.NizObjekiNedelje){
                         for(let pr in this.projektiObjekiNedelje){
-                        //for(let pr = 0; pr < 2 ; pr++){  
-                            
-                            for (let sat of this.satnica) {//kor.Oznaka
-                              
-                              if(this.projektiObjekiNedelje[pr]['Projekti'] == sat.Projekti){ 
-                                this.projektiObjekiNedelje[pr][sat.nedelja+".Nedelja"] = sat.sum;
-                              }
-                          }
+                          this.sumNedelja[ned] = this.projektiObjekiNedelje[pr][this.NizObjekiNedelje[ned].Oznaka] +  this.sumNedelja[ned];
                         }
+                      }
 
-
-
-                        for(let ar in this.sumNedelja){//Brisanje Niza-objekata!!!
-
-                            var index = this.sumNedelja.indexOf(this.sumNedelja[ar]);
-                            //console.log("NizObjectIndex" + index);
-                            this.sumNedelja.splice(index, this.sumNedelja.length);
-
+                      //sumProjekti
+                      for(let pr in this.projektiObjekiNedelje){
+                      //for(let h=0;h<1;h++){  
+                        this.sumProjekti[pr] = 0;
+                        this.projektiObjekiNedelje[pr]['Ukupno'] = this.sumProjekti[pr];
+                        for(let i=0;i<this.NizObjekiNedelje.length - 1;i++){
+                          let z = 1;
+                          z = z + i;
+                          this.sumProjekti[pr] = this.projektiObjekiNedelje[pr][z+".Nedelja"] + this.sumProjekti[pr];
                         }
-                        
-                        for(let pr in this.NizObjekiNedelje){
-                            this.sumNedelja[pr] = 0;
-                        }
+                        this.projektiObjekiNedelje[pr]['Ukupno'] = this.sumProjekti[pr];
+                      }
+                      this.temp = this.projektiObjekiNedelje;
+                      console.log("this.NizObjekiNedelje" , this.projektiObjekiNedelje);
 
-                        for(let ned in this.NizObjekiNedelje){
-                        //for(let ned = 0; ned < 1 ; ned++){  
-                          //console.log("usaoo" + this.NizObjekiNedelje[ned].Oznaka);
-                          for(let pr in this.projektiObjekiNedelje){
-
-                            this.sumNedelja[ned] = this.projektiObjekiNedelje[pr][this.NizObjekiNedelje[ned].Oznaka] +  this.sumNedelja[ned];
-                            //console.log(this.projektiObjekiNedelje[pr]['1.Nedelja'])
-
-                          }
-                        }
-
-
-                        //sumProjekti
-                        for(let pr in this.projektiObjekiNedelje){
-                        //for(let h=0;h<1;h++){  
-                          //console.log("pr" + pr);
-                          this.sumProjekti[pr] = 0;
-                          this.projektiObjekiNedelje[pr]['Ukupno'] = this.sumProjekti[pr];
-                          for(let i=0;i<this.NizObjekiNedelje.length - 1;i++){
-                            //console.log("i" + i)
-                            let z = 1;
-                            z = z + i;
-                            this.sumProjekti[pr] = this.projektiObjekiNedelje[pr][z+".Nedelja"] + this.sumProjekti[pr];
-                          }
-                          this.projektiObjekiNedelje[pr]['Ukupno'] = this.sumProjekti[pr];
-                        }
-                        
-                        console.log(this.projektiObjekiNedelje);
-                        this.temp = this.projektiObjekiNedelje;
-                    },
-                    error => {
-                      console.log("error");
-                                  
-              });
-          },
+                  },
+                  error => {
+                    console.log("error");              
+                });
+            },
                 error => {
                   console.log("error");
                               
@@ -286,39 +262,6 @@ export class TabelaComponent implements OnInit,OnDestroy {
         this.textErrorIzlaz = 'Gotovo';
         this.showDialog();
     });     
-
-    /*this.serviceTabela.fullName(this.nadimak_tabela)
-            .then(
-                    fullname_baza_tabela => { this.fullname_baza_tabela= fullname_baza_tabela
-                    console.log(this.fullname_baza_tabela)
-
-                    this.serviceTabela.tabela(this.fullname_baza_tabela,this.selectedGodinaTabelaKorisnik)
-                          .then(
-                                podaci_tabela => { this.podaci_tabela= podaci_tabela
-                                console.log("this.podaci_tabela" + this.podaci_tabela)
-
-
-                    },
-                    error => {
-                        console.log("error")
-                         localStorage.clear();
-                         this.textError = 'Došlo je do greške na serveru!!'
-                         this.textErrorIzlaz = 'Gotovo';
-                         this.showDialog();
-                    });   
-
-
-
-                  },
-                  error => {
-                      console.log("error");
-                      localStorage.clear();
-                      this.textError = 'Došlo je do greške na serveru!!'
-                      this.textErrorIzlaz = 'Gotovo';
-                      this.showDialog();
-    });*/
-
-    
 
     //Zastita ako je odjavljen korisnik iz nekog drugog taba da ne moze da dalje radi u aplikaciji!!
     if(JSON.parse(localStorage.getItem('Token')) == null){
@@ -340,22 +283,6 @@ export class TabelaComponent implements OnInit,OnDestroy {
 		return this.ispisToken.admin;
 
 	}
-
-  /*updateFilter(event) {
-    const val = event.target.value.toLowerCase();
-    //console.log("val" + val);
-    // filter our data
-    const temp = this.temp.filter(function(d) {
-      return d.Projekti.toLowerCase().indexOf(val) !== -1 || !val;
-    });
-
-    //console.log("temp"+temp)
-    // update the rows
-    this.projektiObjekiNedelje = temp;
-    // Whenever the filter changes, always go back to the first page
-    //this.table.offset = 0;
-  }*/
-  
 
   broj_nedelja(month:number,year:any){
 
@@ -786,6 +713,21 @@ export class TabelaComponent implements OnInit,OnDestroy {
     }
 
   }
+
+  /*updateFilter(event) {
+    const val = event.target.value.toLowerCase();
+    //console.log("val" + val);
+    // filter our data
+    const temp = this.temp.filter(function(d) {
+      return d.Projekti.toLowerCase().indexOf(val) !== -1 || !val;
+    });
+
+    //console.log("temp"+temp)
+    // update the rows
+    this.projektiObjekiNedelje = temp;
+    // Whenever the filter changes, always go back to the first page
+    //this.table.offset = 0;
+  }*/
 
 
 }

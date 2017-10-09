@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, HostListener } from '@angular/core';
 import { ActivatedRoute, Params,Router }   from '@angular/router';
 import { SService } from '../s.service';
 @Component({
@@ -18,6 +18,8 @@ export class FooterComponent implements OnInit {
   ispisToken:any;
   tokenAdmin:string;
   fullImagePath: string;
+  flgDrop:boolean = false;
+  brKlik:number = 0;
 
   constructor(private router: Router,
               private sservice :SService            
@@ -54,6 +56,32 @@ export class FooterComponent implements OnInit {
                         console.log("error")
     }); 
   }
+
+  prikazDropDowna(){
+
+    this.brKlik++;
+    if(this.flgDrop == false){
+      this.flgDrop = true;
+    }
+    else{
+      this.flgDrop = false;
+    }
+
+  }
+
+  @HostListener('document:click', ['$event'])
+  public documentClick(event: Event): void {
+
+    this.brKlik++;
+    if(this.brKlik == 2){
+      this.brKlik = 0;
+    }
+    else if(this.brKlik == 1){
+      this.brKlik = 0;
+      this.flgDrop = false;
+    }
+  }
+
 
   ParsirajJWT (token) {
 

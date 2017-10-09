@@ -32,7 +32,7 @@ export class LozinkaService {
         let body = JSON.stringify({sifra: sifraStara});
 
         let options = new RequestOptions({ headers: authHeader })
-        return this.http.post(''+this.apiEndpoint+'promenasifre?imeSifra='+nadimak+'&sifra='+sifraStara+'', { sifra: novasifra } ,options)
+        return this.http.post(''+this.apiEndpoint+'sifra/promena-sifre?imeSifra='+nadimak+'&sifra='+sifraStara+'', { sifra: novasifra } ,options)
             .toPromise()
             .then(data =>  data.json())
             .catch(this.handleError)
@@ -56,14 +56,11 @@ export class LozinkaService {
         let options = new RequestOptions({ headers: authHeader })
         return this.http.get(''+this.apiEndpoint+'refresh/token?ime='+ime+'&admin='+admin+'',options)
             .map(data => { 
-               let user =  data.json();
-               //console.log("user" + user);
-               //localStorage.removeItem('Token')
-               localStorage.setItem('Token', JSON.stringify(user));
-        
+                let user =  data.json();
+                localStorage.setItem('Token', JSON.stringify(user));
             })
             .catch(this.handleError) 
-     }
+    }
 
    private handleError(error: any): Promise<any> {
       console.error('An error occurred', error); // for demo purposes only

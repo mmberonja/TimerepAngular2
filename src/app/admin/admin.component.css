@@ -15,11 +15,15 @@ hr {
 }
 
 #Naslovi{
-
     width: 500px;
     font-size: 25px;
-
 }
+
+#naslovi-pola{
+    margin-bottom: 20px;
+    font-size: 25px;
+}
+
 
 /*Postavljanje klasa da budu jedna pored druge!!*/
 div.projekat-input, div.projekat-button,div.text-dodaj-novi-projekat{
@@ -167,20 +171,51 @@ div.wrapper {
 }
 
 .ui-widget-header .ui-state-default, .ui-widget-content .ui-state-default, .ui-state-default {
-
     color:red;
-
 }
 
 
 .ui-dropdown-panel .ui-dropdown-filter {
-
     color:red;
-
 }
 
 .ui-widget-header .ui-inputtext, .ui-widget-content .ui-inputtext {
-
     color:red;
-
 }
+
+#input-slika{
+    width:250px;
+    border: 1px solid #DCDCDC;
+    padding: 5px 5px 5px 5px;
+    outline-color: red;
+    cursor:pointer;
+    background: url('images/arrow_dropdown.png') no-repeat right white;
+    background-size: 32px 32px;
+}
+
+div.vrednost-div:hover{
+    color:black;
+    background-color:red; 
+}
+
+
+
+#wrapper{
+    position: sticky;
+    background:gray;
+    width:300px;
+    height:100px;
+    
+}
+
+/*padding:3px;
+    min-width: 150px;
+    margin: 0px;
+    border:none;
+    outline:none;
+    -webkit-appearance:none;
+    -moz-appearance:none;
+    appearance:none;
+    cursor:pointer;
+    background: url('images/arrow_dropdown.png') no-repeat right #ddd;
+    background-size: 32px 32px;*/
