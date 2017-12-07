@@ -26,11 +26,11 @@ hr {
 
 
 /*Postavljanje klasa da budu jedna pored druge!!*/
-div.projekat-input, div.projekat-button,div.text-dodaj-novi-projekat{
+div.projekat-input, div.projekat-button,div.text-dodaj-novi-projekat,div.excel-button,div.exoprt{
 	display:inline-block;
 }
 
-div.korisnik-dodavanje, div.projekat-dodavanje,div.button-dodavanje{
+div.korisnik-dodavanje, div.projekat-dodavanje,div.button-dodavanje,div.odabrano{
     display:inline-block;
 }
 
@@ -197,6 +197,7 @@ div.vrednost-div:hover{
     color:black;
     background-color:red; 
 }
+
 
 
 

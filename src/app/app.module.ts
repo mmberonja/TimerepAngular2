@@ -3,7 +3,7 @@ import { NgModule } from '@angular/core';
 import { FormsModule,ReactiveFormsModule } from '@angular/forms';
 import { HttpModule } from '@angular/http';
 import { RouterModule,Routes } from '@angular/router';
-import {Observable} from 'rxjs/Rx';
+import { Observable } from 'rxjs/Rx';
 import { OpaqueToken } from '@angular/core';
 
 import { AppComponent } from './app.component';
@@ -36,14 +36,10 @@ import { RegistracijaService } from './registracija.service';
 import { HeaderComponent } from './header/header.component';
 import { LozinkaService } from './lozinka.service';
 import { LocationStrategy,HashLocationStrategy} from '@angular/common';
-//import { provide } from '@angular/platform-browser-dynamic';
-//import { environment } from './app/';
 import { environment } from '../environments/environment';
+//import { provide } from '@angular/platform-browser-dynamic';;
 
-//import { NgxDatatableModule } from '@swimlane/ngx-datatable';
-//import { NgxDatatableModule } from '@swimlane/ngx-datatable';
-//import { MdButtonModule, MdCheckboxModule } from '@angular/material';
-//import {NoopAnimationsModule} from '@angular/animations/@angular/animations';
+
 
 @NgModule({
   declarations: [
@@ -121,7 +117,7 @@ export class AppModule {
 
     ngOnInit() {
 
-      console.log("Micko")
+      //console.log("Micko")
         /*Observable
             .interval(5000)//u milisekundama,36000 milisekundi je 60minuta ili 1h!!
             .take(24).map((x) => x+1)

@@ -7,7 +7,6 @@
       <div class="godina">
         <p>Godina:</p>
         <input [(ngModel)]="selectedGodinaTabelaKorisnik" style="width: 100px;" class="form-control" (click)="proveraGodinaTabelaKorisnik();" type="number" min="2017" max="2019" step="1" size="12" autocomplete='on'>
-          <!--{{ selectedGodina_tabela_korisnik }}-->
       </div>
       &nbsp; &nbsp; &nbsp;
       <div class="mesec">    
@@ -22,13 +21,12 @@
     <div class="col-sm-7 col-sm-offset-1 col-md-7 col-md-offset-1 col-lg-7 col-lg-offset-1 col-xl-7 col-xl-offset-1"><br> 
       <table class="table table-bordered">
         <tr class="active">
-          <th style="width:350px;">Projekti</th>
-          <th *ngFor="let i of NizObjekiNedelje">{{i.Oznaka}}</th>
+          <th style="min-width:350px;">Projekti</th>
+          <th   *ngFor="let i of NizObjekiNedelje">{{i.Oznaka}}</th>
         </tr>
         <tr *ngFor="let i of projektiObjekiNedelje; let n = index;">
           <th >{{i.Projekti}}</th>
           <th *ngFor="let ned of NizObjekiNedelje" style="color:#A9A9A9">{{i[ned.Oznaka]}}</th>
-          <!--<td><button id="1{{ idNiz }}" style="width:75px;" class="btn btn-danger"  (click)="NizVidljivost(niz.Projekti,idNiz)">Prikazi</button></td>-->
         </tr>
         <tr>
           <th>Ukupnoo</th>

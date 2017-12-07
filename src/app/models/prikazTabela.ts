@@ -12,4 +12,5 @@ export class prikazTabelaModel {
     tabela_vrednosti:string;
     sumProjekata:number;
     pretraga:number;
+    sacuvano:string;
 }

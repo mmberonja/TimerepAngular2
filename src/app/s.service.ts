@@ -325,12 +325,9 @@ export class SService {
                 .toPromise()
                 .then(data => 
                     data.json())    
-
     }
 
     slanjeMejla(projekat:any,email:any):Observable<Email>{
-
-       console.log("email" + email);
 
         let token = JSON.parse(localStorage.getItem('Token'));
         if(token == null){

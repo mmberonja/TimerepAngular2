@@ -8,18 +8,25 @@
     </div>
   <div class="container-fluid razmak">
     <div class="row">
-      <div class="col-sm-5 col-md-5 col-lg-5">
+      <div class="col-sm-6 col-md-6 col-lg-6">
         <div class="projekat-input" style="vertical-align: top; padding: 0;">
           <h4 class="first">Godina:</h4>
-          <input (ngModelChange)="KlikGodinaKorisnik()"  class="form-control"  type="number" min="2017" max="2019" step="1" autocomplete='on'  [(ngModel)]="selectedGodinakorisniciAdmin">
-        </div>
-         &nbsp; &nbsp; &nbsp;
+          <input (ngModelChange)="KlikGodinaKorisnik()"  class="form-control"  type="number" min="2017" max="2019" step="1"  [(ngModel)]="this.selectedGodinakorisniciAdmin"/>
+        </div> &nbsp; 
         <div class="projekat-button">    
           <h4 class="first">Mesec:</h4>
             <select [(ngModel)]="KorisniciMesecAdmin" class="form-control" (ngModelChange)="MesecAdminF()" name="mesec" id="mesec" list="mesec" style="width:150px; ">
               <option *ngFor="let i of nizMesec"  >{{i.name}}</option>
             </select>				
-        </div>&nbsp; &nbsp; &nbsp;<br>
+        </div>&nbsp; 
+        <div class="text-dodaj-novi-projekat">    
+          <h4 class="first"></h4>
+            <button style="width: 80px;" (click)="ExportCsv()" class="btn btn-danger"> CSV </button>		
+        </div>&nbsp; 
+        <div class="excel-button">    
+          <h4 class="first"></h4>
+            <button style="width: 80px;" (click)="ExcelExoprt()" class="btn btn-danger"> Excel </button>		
+        </div>&nbsp; <br>
       </div>  
       <div class="col-sm-7 col-md-7 col-lg-7">
       </div>
@@ -27,7 +34,7 @@
   </div>
   <br>
   <div class="container-fluid">
-     <div *ngIf="flgLoadingAdmin" class="wrapper">
+     <div *ngIf="flgLoadingAdmin == true" class="wrapper">
         <table class="micko">
             <tr id="groups" >
               <th class="rotate">&nbsp;</th>
@@ -49,14 +56,14 @@
                     </div>
                   </div>  
                   
-                </th><!--[ngStyle]="{'background-color':boja}"-->
+                </th>
                 <th style="background-color: yellow">{{SumaPoProjektu[i]}}</th>
             </tr>
            
             <tr>
               <th>Ukupno</th>
               <th style="background-color: yellow" *ngFor="let sumHor of this.SumaPoKorisniku;" >{{sumHor}}</th>
-              <th style="background-color: yellow" > {{ sumSvih }} </th><!-- -->
+              <th style="background-color: yellow" > {{ sumSvih }} </th>
             </tr>  
         </table>
      </div>
@@ -74,20 +81,25 @@
         <div class="projekat-input" style="vertical-align: top; padding: 0;">
           <h4 class="first">Godina:</h4>
           <input (click)="KlikGodinaProjekti(projektiDropDown,selectedProjektiAktivni)" class="form-control"  type="number" min="2017" max="2019" step="1" autocomplete='on' style="width:100px;" [(ngModel)]="selectedGodinaProjektiAdmin">
-        </div> 
-        
-        &nbsp; &nbsp; &nbsp;
+        </div>&nbsp;
         <div class="text-dodaj-novi-projekat">    
           <h4 class="first">Mesec:</h4>
             <select [(ngModel)]="ProjektiMesecAdmin" class="form-control" (ngModelChange)="MesecAdminProjekti(projektiDropDown,selectedProjektiAktivni)" name="mesec" id="mesec" list="mesec" style="width:150px; ">
               <option *ngFor="let i of nizMesec">{{i.name}}</option>
             </select>				
-        </div>
-          &nbsp; &nbsp; &nbsp;
+        </div>&nbsp;
         <div class="projekat-button">
           <h4 class="first">Projekat:</h4>
           <p-dropdown  [options]="projektiDropDown" [(ngModel)]="selectedProjektiAktivni" [style]="{'width':'250px', 'height':'34px'}" (ngModelChange)="KlikProjektiAdmin(this.selectedGodinaProjektiAdmin,this.ProjektiMesecAdmin,selectedProjektiAktivni,projektiDropDown)" filter="filter"></p-dropdown>
-        </div>
+        </div>&nbsp;
+        <div class="exoprt">    
+          <h4 class="first"></h4>
+            <button style="width: 80px;" (click)="ExportCsvProjekat()" class="btn btn-danger"> CSV </button>		
+        </div>&nbsp; 
+        <div class="excel-button">    
+          <h4 class="first"></h4>
+            <button style="width: 80px;" (click)="ExcelExoprtProjekat()" class="btn btn-danger"> Excel </button>		
+        </div>&nbsp;<br>
       </div> 
     </div>  
   </div>
@@ -114,7 +126,7 @@
                     {{obj[korisnici.oznaka]}}
                   </div>
                 </div>  
-              </th> <!--[ngStyle]="{'background-color':boja}"-->
+              </th>
               <th style="background-color: yellow">{{SumaPoNedeljamaDetalji[i]}}</th>
             </tr>
             <tr>
@@ -154,7 +166,6 @@
      </form>
      <div>
        <small [hidden]="myForm.controls.name.valid || (myForm.controls.name.pristine && !submitted)" class="text-danger">
-          <!--Name is required (minimum 5 characters).-->
           Potrebno je minimum 5 karaktera
       </small>
      </div>
@@ -166,34 +177,85 @@
       <div class="col-sm-12 col-md-12 col-lg-12">
         <p id="Naslovi">Dodavanje korisnika na projekat</p>
       </div>
-      <div class="col-sm-12 col-md-12 col-lg-12">
-        <div class="korisnik-dodavanje">
+      <div *ngIf="Citanje == 'sacuvano'" class="col-sm-12 col-md-12 col-lg-12">
+        <div class="korisnik-dodavanje" style="vertical-align: top; padding: 0;">
           <p>Korisnik:</p>
-          <p-dropdown [options]="imePrezimeAktivni" (click)="ProverDropDown()" [(ngModel)]="selectedDodavanjeKorisnikaNaProjekatKorisnik" [style]="{'width':'200px'}"  filter="filter"></p-dropdown>
+          <!--<p-dropdown [(ngModel)]="selectedDodavanjeKorisnikaNaProjekatKorisnik" (ngModelChange)="ProverDropDown()" [options]="imePrezimeAktivni" [style]="{'width':'200px','height': '40px'}"  filter="filter"></p-dropdown>
+          -->
+          <input [(ngModel)]="selectedDodavanjeKorisnikaNaProjekatKorisnik.Ime_Prezime" (click)="DropDodavanjeKorisnika()" id ="input-slika" name="lokacija" style="width: 300px;" class="rasiri sencenje-belo lokacija" readonly/>
+          <div *ngIf="flgAdd == true" style="position:absolute;z-index: 1; background-color:  white; max-height: 190px;border: 1px solid #DCDCDC;width: 300px;">
+            <div style="background-color: white;padding-left: 8px;padding-top:5px;">
+              <input style="width: 250px;" (click)="InputFunkcijaDodavanjeProjekata()" (keyup)="PretragaDodavanjeProjekta()" [(ngModel)]="this.pretragaDodaj" type="text"/>
+            </div>
+            <div style="background-color: white;margin-left: 8px;padding-top:5px;cursor:pointer;max-height: 155px;overflow: auto;padding-bottom: 10px;">
+              <div *ngFor="let z of this.korisniciAktivni;let i = index;" (click)="vrednostDropDodavanjeKorisnika(z)" class="vrednost-div" >
+                <div *ngIf="this.nizNgForDodajProjekat[i] == 0">{{ z.Ime_Prezime }}<br /></div>
+              </div>
+            </div>
+          </div>
         </div>
         &nbsp; &nbsp;
-        <div class="projekat-dodavanje">
+        <div class="projekat-dodavanje" style="vertical-align: top; padding: 0;">
           <p>Projekat:</p>
-          <p-dropdown [options]="projektiDropDownDodajNaProjekat" (click)="ProverDropDownProjekti()" [(ngModel)]="selectedDodavanjeKorisnikaNaProjekatProjekat" [style]="{'width':'250px'}"  filter="filter"></p-dropdown>
+          <div style="height: 210px;width:300px; background-color: white;border: 1px solid #dddddd;">
+            <div style="padding: 3px;">
+              <input type="text" class="form-control" (keyup)="PretragaDodavanjeKorisnika()" [(ngModel)]="pretragaDodavanje" placeholder="Search"/>
+            </div>
+            <div style="margin: 3px;border: 1px solid #dddddd;max-height: 160px;height: 160px;overflow-y:scroll;cursor:pointer;">
+              <div *ngFor="let pr of this.vidljivostProjekta;let i = index;" class="vrednost-div">
+                <div *ngIf="pr.trazi == 1">
+                  <div *ngIf="pr.vidljivo == true">
+                    <div (click)="OdaberiProjekat(pr.Projekti)" >{{ pr.Projekti }}</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>&nbsp; &nbsp;
+        <div class="odabrano" style="vertical-align: top; padding: 0;">
+          <p>Odabrani projekati:</p>
+          <div style="height: 210px;width:300px; background-color: white;border: 1px solid #dddddd;">
+            <div style="padding: 3px;">
+                <input type="text" class="form-control" (keyup)="PretragaDodavanjeOdabranoKorisnika()" [(ngModel)]="pretragaDodavanjeOdabrano" placeholder="Search"/>
+            </div>
+            <div style="margin: 3px;border: 1px solid #dddddd;max-height: 160px;height: 160px;overflow-y:scroll;cursor:pointer;">
+              <div *ngFor="let pr of this.projektiOdabrani;let i = index;" class="vrednost-div">
+                <div *ngIf="pr.trazi == 1">
+                  <div (dblclick)="BrisanjeIzObjekta(pr.Projekti)">
+                    <div>
+                      {{ pr.Projekti }}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>&nbsp; &nbsp;
+        <div class="button-dodavanje" style="vertical-align: top; padding: 0;">
+          <div>
+            <button style="margin-top:30px;" (click)="Dodaj()" [disabled]="izvrsiDisable" class="btn btn-danger">Izvrši</button>
+          </div><br>
+          <div>
+            <p>Dodaj preostale projekte na listu: </p>
+            <button (click)="PreostaliProjekti()" [disabled]="flgKorisnik == false" class="btn btn-danger">Dodaj</button>
+            <p>Ukloni preostale projekte sa liste: </p>
+            <button (click)="UkloniPr()" [disabled]="flgKorisnik == false" class="btn btn-danger">Ukloni</button>
+          </div>
         </div>
-        &nbsp; &nbsp;
-        <div class="button-dodavanje">
-          <button type="" (click)="Dodaj()" class="btn btn-danger">Izvrši</button>
-          <!-- <button type="" class="btn btn-danger">Posalji zahtev</button> -->
-        </div>  
       </div>
-      <br>
-      <div class="col-sm-12 col-md-12 col-lg-12">
-        <br>
-        <div *ngIf="!dodajProvera">
-        <small class="text-danger">
-           Potrebno je uneti parametre!!
-        </small>
+      <div *ngIf="Citanje == 'snimanje'" class="col-sm-12 col-md-12 col-lg-12" style="height:240px;">
+        <button style="background-color:white;margin-top: 90px;margin-left: 100px;" class="btn btn-lg">
+          <span class="glyphicon glyphicon-refresh glyphicon-refresh-animate"></span> U toku je dodavanje projekata...
+        </button>
+      </div>
+      <div *ngIf="Citanje == 'gotovo'" class="col-sm-12 col-md-12 col-lg-12" style="height:240px;">
+        <div style="margin-top: 90px;margin-left: 380px;">
+          <p>Uspešno ste dodali projekte</p>
+          <button class="btn btn-danger" (click)="Gotovo()" style="margin-left: 50px;">
+            Gotovo
+          </button>
         </div>
-        <!--<small *ngIf="(selectedDodavanjeKorisnikaNaProjekatKorisnik == 'undefined' || selectedDodavanjeKorisnikaNaProjekatProjekat == 'undefined')" class="text-danger">
-           Potrebno je uneti parametre!!
-        </small>-->
-      </div>  
+      </div>
     </div>
   </div>
   <br>    
@@ -203,21 +265,83 @@
       <div class="col-sm-12 col-md-12 col-lg-12">
         <p id="Naslovi">Uklanjanje korisnika sa projekta</p>
       </div>
-      <div class="col-sm-12 col-md-12 col-lg-12">
-        <div class="korisnik-dodavanje">
+      <div *ngIf="CitanjeUkloni == 'sacuvano'" class="col-sm-12 col-md-12 col-lg-12">
+        <div class="korisnik-dodavanje" style="vertical-align: top; padding: 0;">
           <p>Korisnik:</p>
-          <p-dropdown [options]="imePrezimeAktivni" (click)="UklanjanjeDropDown()" [(ngModel)]="selectedUklanjanjeKorisnikaSaProjektaKorisnik" [style]="{'width':'200px'}"  filter="filter"></p-dropdown>
+          <!--<p-dropdown [options]="imePrezimeAktivni" (click)="UklanjanjeDropDown()" [(ngModel)]="selectedUklanjanjeKorisnikaSaProjektaKorisnik" [style]="{'width':'200px'}"  filter="filter"></p-dropdown>
+          -->
+          <input [(ngModel)]="selectedUklanjanjeKorisnikaSaProjektaKorisnik.Ime_Prezime" (click)="DropUklanjanjeKorisnika()" id ="input-slika" name="lokacija" style="width: 300px;" class="rasiri sencenje-belo lokacija" readonly/>
+          <div *ngIf="flgRemove == true" style="position:absolute;z-index: 1; background-color:  white; max-height: 190px;border: 1px solid #DCDCDC;width: 300px;">
+            <div style="background-color: white;padding-left: 8px;padding-top:5px;">
+              <input style="width: 250px;" (click)="InputFunkcijaUklanjanjeProjekata()" (keyup)="PretragaUkloniProjekta()" [(ngModel)]="this.pretragaUkloni" type="text"/>
+            </div>
+            <div style="background-color: white;margin-left: 8px;padding-top:5px;cursor:pointer;max-height: 155px;overflow: auto;padding-bottom: 10px;">
+              <div *ngFor="let z of this.korisniciAktivni;let i = index;" (click)="vrednostDropUklanjanjeKorisnika(z)" class="vrednost-div" >
+                <div *ngIf="this.nizNgForUkloniProjekat[i] == 0">{{ z.Ime_Prezime }}<br /></div>
+              </div>
+            </div>
+          </div>
         </div>
         &nbsp; &nbsp;
-        <div class="projekat-dodavanje">
+        <div class="projekat-dodavanje" style="vertical-align: top; padding: 0;">
           <p>Projekat:</p>
-          <p-dropdown [style]="{'width':'250px'}" [options]="projektiDropDownUklanjanjeSaProjekta" (click)="ProveraVrednostiProjekataUklanjanje()"  [(ngModel)]="selectedUklanjanjeKorisnikaSaProjektaProjekat" filter="filter"></p-dropdown>
+          <div style="height: 210px;width:300px; background-color: white;border: 1px solid #dddddd;">
+            <div style="padding: 3px;">
+              <input type="text" class="form-control" (keyup)="PretragaUkloniKorisnika()" [(ngModel)]="pretragU" placeholder="Search"/>
+            </div>
+            <div style="margin: 3px;border: 1px solid #dddddd;max-height: 160px;height: 160px;overflow-y:scroll;cursor:pointer;">  
+              <div *ngFor="let pr of this.naKojimaRadeHtml;let i = index;" class="vrednost-div">
+                <div *ngIf="pr.trazi == 1">
+                  <div *ngIf="pr.vidljivo == true">
+                    <div (click)="OdaberiZaUkloni(pr.Projekti,pr.id_pr)" >{{ pr.Projekti }}</div>
+                  </div>
+                </div>
+              </div>
+            </div> 
+          </div> 
+          <!--<p-dropdown [style]="{'width':'250px'}" [options]="projektiDropDownUklanjanjeSaProjekta" (click)="ProveraVrednostiProjekataUklanjanje()"  [(ngModel)]="selectedUklanjanjeKorisnikaSaProjektaProjekat" filter="filter"></p-dropdown>
+          -->
+
         </div>
         &nbsp; &nbsp;
-        <div class="button-dodavanje">
-            <button type="" (click)="UklanjanjeKorisnikaSaProjekta()" class="btn btn-danger">Izvrši</button>
+        <div class="odabrano" style="vertical-align: top; padding: 0;">
+          <p>Odabrani projekati:</p>
+          <div style="height: 210px;width:300px; background-color: white;border: 1px solid #dddddd;">
+            <div style="padding: 3px;">
+                <input type="text" class="form-control" (keyup)="PretragaUklanjanjeOdabranoKorisnika()" [(ngModel)]="pretragaUklanjanjeOdabrano" placeholder="Search"/>
+            </div>
+            <div style="margin: 3px;border: 1px solid #dddddd;max-height: 160px;height: 160px;overflow-y:scroll;cursor:pointer;">
+              <div *ngFor="let pr of this.projektiUkloniOdabrani;let i = index;" class="vrednost-div">
+                <div *ngIf="pr.trazi == 1">
+                  <div (dblclick)="BrisanjeIzObjektaUkloni(pr.Projekti)">
+                    <div>
+                      {{ pr.Projekti }}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>&nbsp; &nbsp;
+        <div class="button-dodavanje" style="vertical-align: top; padding: 0;">
+            <button style="margin-top:30px;" (click)="UklanjanjeKorisnikaSaProjekta()" [disabled]="izvrsiUkloni" class="btn btn-danger">Izvrši</button>
+        </div>
+
+      </div>
+      <div *ngIf="CitanjeUkloni == 'snimanje'" class="col-sm-12 col-md-12 col-lg-12" style="height:240px;">
+        <button style="background-color:white;margin-top: 90px;margin-left: 100px;" class="btn btn-lg">
+          <span class="glyphicon glyphicon-refresh glyphicon-refresh-animate"></span> U toku je uklanjanje projekata...
+        </button>
+      </div>
+      <div *ngIf="CitanjeUkloni == 'gotovo'" class="col-sm-12 col-md-12 col-lg-12" style="height:240px;">
+        <div style="margin-top: 90px;margin-left: 380px;">
+          <p>Uspešno ste uklonili projekte</p>
+          <button class="btn btn-danger" (click)="GotovoUkloni()" style="margin-left: 50px;">
+            Gotovo
+          </button>
         </div>
       </div>
+      <!--
       <div class="col-sm-12 col-md-12 col-lg-12">
         <br>
         <div *ngIf="!proveraUspesnosti">
@@ -225,10 +349,7 @@
            Potrebno je uneti parametre!!
         </small>
         </div>
-        <!--<small *ngIf="(selectedDodavanjeKorisnikaNaProjekatKorisnik == 'undefined' || selectedDodavanjeKorisnikaNaProjekatProjekat == 'undefined')" class="text-danger">
-           Potrebno je uneti parametre!!
-        </small>-->
-      </div>
+      </div>-->
     </div>
   </div>
   <br>    
@@ -354,7 +475,6 @@
           {{ textUpozorenje  }}
           <p-footer>
             <div class="ui-dialog-buttonpane ui-widget-content ui-helper-clearfix" style="margin-top: 50px;">
-                <!--<button type="button"   style="width:75px;" (click)="displayUkloni=false; IzlazNe();" >{{ textNe }}</button> -->
                 <button type="button"   style="width:75px;" (click)="displayUkloni=false; IzlazPotvrda();" >{{ textPotvrda }}</button>
             </div>
         </p-footer>
@@ -381,3 +501,24 @@
   <hr>
   <app-header></app-header>      
 </div>  
+
+<!--
+    <div class="projekat-dodavanje">
+      <p>Projekat:</p>
+      <p-dropdown [options]="projektiDropDownDodajNaProjekat" (click)="ProverDropDownProjekti()" [(ngModel)]="selectedDodavanjeKorisnikaNaProjekatProjekat" [style]="{'width':'250px'}"  filter="filter"></p-dropdown>
+    </div>
+    &nbsp; &nbsp;-->
+    <!--<div class="button-dodavanje">
+      <button type="" (click)="Dodaj()" class="btn btn-danger">Izvrši</button>
+    </div>  
+  </div>
+  <br>
+  <div class="col-sm-12 col-md-12 col-lg-12">
+    <br>
+    <div *ngIf="!dodajProvera">
+    <small class="text-danger">
+      Potrebno je uneti parametre!!
+    </small>
+    </div>
+  </div>  
+-->

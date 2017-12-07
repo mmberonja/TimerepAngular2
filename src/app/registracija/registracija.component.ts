@@ -48,7 +48,7 @@ export class RegistracijaComponent implements OnInit {
                 });  */
 
 
-               }
+  }
 
   ngOnInit() {
 
@@ -66,10 +66,6 @@ export class RegistracijaComponent implements OnInit {
     this.subcribeToFormChanges();   
 
   }
-
-  doSomething($event,value:any){
-
-  } 
 
   showDialog() {
         this.display = true;
@@ -121,41 +117,38 @@ export class RegistracijaComponent implements OnInit {
          console.log("Moze");
 
          this.registracijaService.Registracija(model.name, model.korisnk,model.prezime, model.emaill, model.sifra)
-            .subscribe(
-                odgovor => { this.odgovor = odgovor
+          .subscribe(
+            odgovor => { this.odgovor = odgovor
                   
-                  console.log("odgovor" + this.odgovor)
+              console.log("odgovor" + this.odgovor)
 
-                  if(this.odgovor == 'postoji'){
+              if(this.odgovor == 'postoji'){
 
-                      this.text = "Postoji korisnik sa tim korisničkim imenom!! Pokušaj ponovo."
-                      this.widthD = 500;
-                      this.showDialog();
-                      this.model.name = "";
-                      this.model.korisnk = "";
-                      this.model.prezime = "";
-                      this.model.emaill = "";
-                      this.model.sifra = "";
-                      this.model.sifraPotvrda = "";
-                     // model = {};
-                     return;
-                  }
-                  else{
-
-                       this.text = "Uspešna registacija";
-                       this.widthD = 200;
-                       this.showDialog();
-                       //this.router.navigate(['/login']);
-
-                  }
-                  
-                },
-                error => {
-                    console.log("error");
-                    localStorage.clear();
-                    this.textError = 'Došlo je do greške na serveru!!'
-                    this.textErrorIzlaz = 'Gotovo';
-                    this.showDialogError();
+                this.text = "Postoji korisnik sa tim korisničkim imenom!! Pokušaj ponovo."
+                this.widthD = 500;
+                this.showDialog();
+                this.model.name = "";
+                this.model.korisnk = "";
+                this.model.prezime = "";
+                this.model.emaill = "";
+                this.model.sifra = "";
+                this.model.sifraPotvrda = "";
+                // model = {};
+                  return;
+              }
+              else{
+                this.text = "Uspešna registacija";
+                this.widthD = 200;
+                this.showDialog();
+              }
+              
+            },
+            error => {
+                console.log("error");
+                localStorage.clear();
+                this.textError = 'Došlo je do greške na serveru!!'
+                this.textErrorIzlaz = 'Gotovo';
+                this.showDialogError();
 
       });
         
@@ -213,5 +206,9 @@ export class RegistracijaComponent implements OnInit {
 
         }
   } 
+
+  doSomething($event,value:any){
+  }   
+ 
 
 }

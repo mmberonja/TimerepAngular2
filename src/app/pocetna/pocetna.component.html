@@ -1,3 +1,5 @@
+
+
 <div>
     <app-footer></app-footer><br>
 </div>
@@ -7,51 +9,48 @@
   <div class="row">
     <div class="col-sm-8 col-sm-offset-2 col-md-8 col-md-offset-2 col-lg-8 col-lg-offset-2 col-xl-8 col-xl-offset-2" style="background-color:white;">
       <!-- <div *ngIf="flgLoading"> -->
-      <div >
+      <div *ngIf="flgReload">
         <div class="godina" style="vertical-align: top; padding: 0;">
             <p>Godina:</p>
-            <input  class="form-control" style="width:100px;"  (click)="klikGodina(this.GodinaJ.godina,this.MesecJ,this.NedeljaJ.nedelja);" type="number" min="2017" max="2019" step="1"  autocomplete='on' 
+            <input [disabled]="flgDisable" class="form-control" style="width:100px;"  (click)="klikGodina(this.GodinaJ.godina,this.MesecJ,this.NedeljaJ.nedelja);" type="number" min="2017" max="2019" step="1"  autocomplete='on' 
             [(ngModel)]="this.GodinaJ.godina">
         </div>
         &nbsp; &nbsp;
         <div class="mesec">    
             <p>Mesec:</p>
-          <select [(ngModel)]="this.MesecJ" class="form-control" (keyup)="onUp()"  (ngModelChange)="onChangeMesec(this.GodinaJ.godina,this.MesecJ,this.NedeljaJ.nedelja)" name="mesec" id="mesec" list="mesec" style="width:150px; ">
+          <select [(ngModel)]="this.MesecJ" [disabled]="flgDisable" class="form-control" (keyup)="onUp()"  (ngModelChange)="onChangeMesec(this.GodinaJ.godina,this.MesecJ,this.NedeljaJ.nedelja)" name="mesec" id="mesec" list="mesec" style="width:150px;" >
               <option *ngFor="let i of deviceObjects"  [selected]="i?.name == this.MesecJ" >{{i?.name}}</option>
           </select>				
         </div>
         &nbsp; &nbsp;
         <div class="probaM">
           <p>Nedelja:</p>
-          <select [(ngModel)]="this.NedeljaJ.nedelja" class="form-control" (ngModelChange)="onChangeNedelja(this.GodinaJ.godina,this.MesecJ,this.NedeljaJ.nedelja)" name="nedeljaA" id="nedeljaA" list="nedeljaA" style="width:150px; ">
+          <select [(ngModel)]="this.NedeljaJ.nedelja" [disabled]="flgDisable" class="form-control" (ngModelChange)="onChangeNedelja(this.GodinaJ.godina,this.MesecJ,this.NedeljaJ.nedelja)" name="nedeljaA" id="nedeljaA" list="nedeljaA" style="width:150px; ">
             <option *ngFor="let i of objekatBrojNedelja" [selected]="i?.id == this.NedeljaJ.nedelja" >{{i?.id}}</option>
           </select>	
         </div>
-        <!--&nbsp; &nbsp;
-        <div class="prikazi-sakri-sve" style="text-align:center;">
-          <p></p>
-          <button style="width:90px;" class="btn btn-danger" (click)="prikazSve(prikazProjekti);">{{prikazProjekti}}</button>
-        </div>-->
         &nbsp; &nbsp; 
         <div class="Zahtev" style="text-align:center;">
           <p></p>
-          <button  class="btn btn-danger" (click)="Zahtev();">Zahtev za novi projekat</button>
+          <button  class="btn btn-danger" (click)="Zahtev();">Zahtev za novim projektom</button>
         </div>
          &nbsp; &nbsp;
       </div>
     </div>
   </div><br>
   <div class="row">
-    <div class="col-sm-8 col-sm-offset-2 col-md-8 col-md-offset-2 col-lg-8 col-lg-offset-2 col-xl-8 col-xl-offset-2" style="background-color:white;">
-      <div class="obavestenje-text"><p style="font-size: 20px;">Obavestenje:</p></div>
-      <div class="obavestenje-text-dani">
-        <div>
-          <p style="padding-left:10px;">{{textObavestenjaMesecPrvi}}</p>
-        </div>        
-        <div>
-          <p style="padding-left:10px;">{{textObavestenjaMesecPoslednji}}</p>
-        </div>
-      </div>   
+    <div *ngIf="flgReload">
+      <div class="col-sm-8 col-sm-offset-2 col-md-8 col-md-offset-2 col-lg-8 col-lg-offset-2 col-xl-8 col-xl-offset-2" style="background-color:white;">
+        <div class="obavestenje-text"><p style="font-size: 20px;">Obavestenje:</p></div>
+        <div class="obavestenje-text-dani">
+          <div>
+            <p style="padding-left:10px;">{{textObavestenjaMesecPrvi}}</p>
+          </div>        
+          <div>
+            <p style="padding-left:10px;">{{textObavestenjaMesecPoslednji}}</p>
+          </div>
+        </div>   
+      </div>
     </div>
   </div>
   <div class="row">
@@ -76,269 +75,199 @@
       </p-dialog>
     </div>
   <div class="snimi-ukuno-zahtev">
-    <div class="col-sm-3 col-sm-offset-9 col-md-3 col-md-offset-9 col-lg-3 col-lg-offset-9 col-xl-3 col-xl-offset-9 zahtev" 
-      *ngIf="flgZahtev == true" style="width:280px;height:300px;background-color: #F5F5F5;margin-top:180px; position: fixed; right: 5;z-index: 0;" >
-
-      <div>
-        <p style="display:inline-block;margin-top:5px; ">Novi projekat:</p>
-        <span class="glyphicon glyphicon-remove izlaz" style="display:inline-block;cursor: pointer;font-size:1.5em;" (click)="zahtevIzlaz()"></span>
-      </div>
-      <div>
-        <p>Naziv:</p>
-      </div>
-      <div>
-          <input [(ngModel)]="textEmail" class="form-control" maxlength="40" style="width:250px;">     
-      </div><br>
-      <div>
-          <button  class="btn btn-danger" (click)="posaljiEmail()">Pošalji zahtev</button>
-      </div>            
-    </div>
-      <div>
-        <div class="col-sm-3 col-sm-offset-9 col-md-3 col-md-offset-9 col-lg-3 col-lg-offset-9 col-xl-3 col-xl-offset-9 zahtev" 
-          style="width:280px;background-color: white;margin-top:40px; position: fixed; right: 5;z-index: 0;" >
-          <div class="snimi-sve" >
-            <p></p>
-            <button  class="btn btn-danger" (click)="sacuvajSveProjekate();">Snimi sve</button><br><br>
-            <p>Ukupna suma:</p>
-            <input style="width: 167px;vertical-align:top;" class="form-control" value="{{mumuSum}}" disabled/>
+    <div *ngIf="flgReload">
+      <div *ngIf="flgChange">
+        <div *ngIf="flgSaveAll == 'sacuvano'">  
+          <div class="col-sm-3 col-sm-offset-9 col-md-3 col-md-offset-9 col-lg-3 col-lg-offset-9 col-xl-3 col-xl-offset-9 zahtev" 
+            *ngIf="flgZahtev == true" style="width:280px;height:300px;background-color: #F5F5F5;margin-top:180px; position: fixed; right: 5;z-index: 0;" >
+            <div>
+              <p style="display:inline-block;margin-top:5px; ">Novi projekat:</p>
+              <span class="glyphicon glyphicon-remove izlaz" style="display:inline-block;cursor: pointer;font-size:1.5em;" (click)="zahtevIzlaz()"></span>
+            </div>
+            <div>
+              <p>Naziv:</p>
+            </div>
+            <div>
+                <input [(ngModel)]="textEmail" class="form-control" maxlength="40" style="width:250px;">     
+            </div><br>
+            <div>
+                <button  class="btn btn-danger" (click)="posaljiEmail()">Pošalji zahtev</button>
+            </div>            
           </div>
-        </div> 
-      </div>
-  </div>
-    <!--<div class="row"> 
-      <div *ngIf="flgLoading" class="col-sm-7 col-sm-offset-2 col-md-7 col-md-offset-2 col-lg-7 col-lg-offset-2 col-xl-7 col-xl-offset-2" >
-        <table class="table table-bordered">
-          <tr class="active" [ngStyle]="{'height' : '80px'}">
-            <th class="text-center"> Projekti <input type="text"   class="form-control search-input" (keyup)="Pretraga(this.textInput)" [(ngModel)]="this.textInput" /></th>
-            <th class="text-center"> <div class="up-down" style="cursor: pointer;" (click)="ViditiSort();" >Satnice</div> 
-              <div *ngIf="this.sort == true;" class="sort-satnica">
-                <div *ngIf="this.flgFiltar == false" class="up">
-                  <button type="button" class="btn btn-default btn-sm" (click)="probaHtmlL = true;Filtriraj();">
-                    <span class="glyphicon glyphicon-chevron-up"></span>
-                  </button>
-                </div>
-                <div *ngIf="this.flgFiltar == true" class="down">
-                  <button [disabled]="disableSort == false" type="button" class="btn btn-default btn-sm" (click)="probaHtmlL = false;Filtriraj();">
-                    <span class="glyphicon glyphicon-chevron-down"></span>
-                  </button>
-                </div>
+          <div>
+            <div class="col-sm-3 col-sm-offset-9 col-md-3 col-md-offset-9 col-lg-3 col-lg-offset-9 col-xl-3 col-xl-offset-9 zahtev" 
+              style="width:280px;background-color: white;margin-top:40px; position: fixed; right: 5;z-index: 0;" >
+              <div class="snimi-sve" >
+                <p></p>
+                <button  class="btn btn-danger" (click)="sacuvajSveProjekate();">Snimi sve</button><br><br>
+                <p>Ukupna suma:</p>
+                <input style="width: 167px;vertical-align:top;" class="form-control" value="{{mumuSum}}" disabled/>
               </div>
-            </th> 
-          </tr>
-          <tbody *ngFor="let niz of projekti_lista; let idNiz = index; trackBy: trackByNiz">
-            <tr *ngIf="hideElement == mickoTrue[idNiz]">
-              <td>{{ niz.Projekti }} </td>
-              <td style="width:210px;"><button id="12345{{ idNiz }}" style="width:75px;" class="btn btn-danger pored-prvi" (click)="NizVidljivost(niz.Projekti,idNiz)">{{ objektPrikazi[idNiz]['text'] }}</button>&nbsp; &nbsp;<div style="width:100px;" class="pored-drugi"><input style="width:80px;"  class="form-control"  [(ngModel)]="mumu[idNiz]" value="{{mumu[idNiz]}}" disabled></div></td>
-            </tr>
-              <tr *ngIf="hideElement == objektPrikazi[idNiz]['search']">  
-                <div  style="margin-left:10px;"  *ngIf="hideObavestenja == objektPrikazi[idNiz]['prikaz']" id="{{ idNiz }}">
-                  <div class="tabela-detalji-text">
-                    <div class="tabela-detalji-text-sredjeno" >
-                      <p>Razvoj:</p>
-                    </div>
-                  </div>
-                  <div class="tabela-detalji-input" style="vertical-align: top;">
-                    <input #box type="number" min="0" max="40" step="1" class="form-control" name="Micko" [(ngModel)]="niz.Razvoj" value="{{ niz.razvoj }}" style="width:200px;" 
-                    (keyup)="Racunaj_proba(niz.Razvoj,niz.odrzavanje,niz.dokumentacija,niz.implementacija,niz.rezijski_poslovi,idNiz);Racunaj_Ukupno();" 
-                    (click)="Racunaj_proba(niz.Razvoj,niz.odrzavanje,niz.dokumentacija,niz.implementacija,niz.rezijski_poslovi,idNiz);Racunaj_Ukupno();"/>
-                  </div><br>
-                  <div class="tabela-detalji-text">
-                    <div class="tabela-detalji-text-sredjeno">
-                      <p>Održavanje:</p>
-                    </div>
-                  </div>
-                  <div class="tabela-detalji-input" style="vertical-align: top;">
-                    <input #box1 type="number" min="0" max="40" step="1" class="form-control" [(ngModel)]="niz.odrzavanje" value="{{ niz.odrzavanje }}" style="width:200px;"
-                    (keyup)="Racunaj_proba(niz.Razvoj,niz.odrzavanje,niz.dokumentacija,niz.implementacija,niz.rezijski_poslovi,idNiz);Racunaj_Ukupno();"
-                    (click)="Racunaj_proba(niz.Razvoj,niz.odrzavanje,niz.dokumentacija,niz.implementacija,niz.rezijski_poslovi,idNiz);Racunaj_Ukupno();"/>   
-                  </div><br>
-                  <div class="tabela-detalji-text">
-                    <div class="tabela-detalji-text-sredjeno">
-                      <p>Dokumentacija:</p>
-                    </div>
-                  </div>
-                  <div class="tabela-detalji-input"  style="vertical-align: top;">
-                    <input #box2 type="number" min="0" max="40" step="1" class="form-control" [(ngModel)]="niz.dokumentacija" value="{{ niz.dokumentacija }}" style="width:200px;"
-                    (keyup)="Racunaj_proba(niz.Razvoj,niz.odrzavanje,niz.dokumentacija,niz.implementacija,niz.rezijski_poslovi,idNiz);Racunaj_Ukupno();"
-                    (click)="Racunaj_proba(niz.Razvoj,niz.odrzavanje,niz.dokumentacija,niz.implementacija,niz.rezijski_poslovi,idNiz);Racunaj_Ukupno();"/>         
-                  </div><br>
-                  <div class="tabela-detalji-text">
-                    <div class="tabela-detalji-text-sredjeno">
-                      <p>Implementacija:</p>
-                    </div>
-                  </div>
-                  <div class="tabela-detalji-input"  style="vertical-align: top;">
-                    <input #box3 type="number" min="0" max="40" step="1" class="form-control" [(ngModel)]="niz.implementacija"  value="{{ niz.implementacija }}" style="width:200px;"
-                    (keyup)="Racunaj_proba(niz.Razvoj,niz.odrzavanje,niz.dokumentacija,niz.implementacija,niz.rezijski_poslovi,idNiz);Racunaj_Ukupno();"
-                    (click)="Racunaj_proba(niz.Razvoj,niz.odrzavanje,niz.dokumentacija,niz.implementacija,niz.rezijski_poslovi,idNiz);Racunaj_Ukupno();"/>         
-                  </div><br>
-                  <div class="tabela-detalji-text">
-                    <div class="tabela-detalji-text-sredjeno">
-                      <p>Režijski poslovi:</p>
-                    </div>
-                  </div>
-                  <div class="tabela-detalji-input"  style="vertical-align: top;">
-                    <input #box4 type="number" min="0" max="40" step="1" class="form-control" [(ngModel)]="niz.rezijski_poslovi" value="{{ niz.reziski_poslovi }}" style="width:200px;"
-                    (keyup)="Racunaj_proba(niz.Razvoj,niz.odrzavanje,niz.dokumentacija,niz.implementacija,niz.rezijski_poslovi,idNiz);Racunaj_Ukupno();"
-                    (click)="Racunaj_proba(niz.Razvoj,niz.odrzavanje,niz.dokumentacija,niz.implementacija,niz.rezijski_poslovi,idNiz);Racunaj_Ukupno();"/>         
-                  </div>
-                  <br>
-                  <div class="tabela-detalji-text">
-                    <div class="tabela-detalji-text-sredjeno">    
-                        <p>Ukupno:<p>
-                    </div>
-                  </div>
-                  <div class="tabela-detalji-input"  style="vertical-align: top;">     
-                    <p><input style="width:200px;"  class="form-control"  [(ngModel)]="mumu[idNiz]" value="{{mumu[idNiz]}}" disabled><p>   
-                  </div>&nbsp; &nbsp;
-                  <div class="tabela-detalji-button">     
-                    <button class="btn btn-danger" style="width:100px;" (click)="SnimiNiz(niz.Projekti,niz.id_projekat_D,niz.Razvoj,niz.odrzavanje,niz.dokumentacija,niz.implementacija,niz.rezijski_poslovi,niz)">Sačuvaj</button>  
-                  </div>
+            </div> 
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="row">
+    <div *ngIf="flgReload" class="col-sm-7 col-sm-offset-2 col-md-7 col-md-offset-2 col-lg-7 col-lg-offset-2 col-xl-7 col-xl-offset-2" >
+      <div *ngIf="flgChange">
+        <div *ngIf="flgSaveAll == 'sacuvano'">
+          <table class="table table-bordered">
+            <tr class="active" >
+              <th class="text-center"><div class="pored-prvi">Projekti</div>&nbsp;
+                <div *ngIf="iconFlg == true" class="pored-drugi" style="cursor: pointer;" (click)="iconfunction('icon','Projekti','gore',this.tabelaPrikaz,this.opcijeTabelaMicko,'click');">
+                  <span class="glyphicon glyphicon-chevron-up"></span>
                 </div>
-              </tr>   
-          </tbody>
+                <div *ngIf="iconFlg == false" class="pored-drugi" style="cursor: pointer;" (click)="iconfunction('icon','Projekti','dole',this.tabelaPrikaz,this.opcijeTabelaMicko,'click');">
+                  <span class="glyphicon glyphicon-chevron-down"></span>
+                </div>
+                <input type="text" style="margin-top:5px; "  class="form-control search-input" (keyup)="Pretraga(this.textInput)" [(ngModel)]="this.textInput" placeholder="Search" />
+              </th>
+              <th style="width: 100px;" class="text-center"> Satnice 
+                <div *ngIf="iconFlgBtn == true" style="margin-top:5px;">
+                  <button type="button" class="btn btn-default btn-sm" (click)="iconfunction('btn','sumProjekata','gore',this.tabelaPrikaz,this.opcijeTabelaMicko,'click');">
+                    <span class="glyphicon glyphicon-chevron-up"></span> 
+                  </button>
+                </div>
+                <div *ngIf="iconFlgBtn == false" style="margin-top:5px;" (click)="iconfunction('btn','sumProjekata','dole',this.tabelaPrikaz,this.opcijeTabelaMicko,'click');">
+                  <button type="button" class="btn btn-default btn-sm">
+                    <span class="glyphicon glyphicon-chevron-down"></span> 
+                  </button>
+                </div>
+              </th>
+            </tr>
+            
+            <tbody  *ngFor="let prM of this.tabelaPrikaz;let id = index">
+              <!--<tr  *ngIf="hideElement == opcijeTabelaMicko[id]['pretraga']">-->
+              <tr  *ngIf="hideElement == prM['pretraga']">    
+                <td>
+                  <div *ngIf="this.opcijeTabelaMicko[id]['prikaz'] != prikazInformacija">
+                    <span style="cursor: pointer;" (click)="prikazPr(id,this.opcijeTabelaMicko)" class="glyphicon glyphicon-triangle-right"></span>
+                    <span style="cursor: pointer;" (click)="prikazPr(id,this.opcijeTabelaMicko)"> &nbsp; {{ prM.Projekti }} </span>
+                  </div>
+                  <div *ngIf="this.opcijeTabelaMicko[id]['prikaz'] == prikazInformacija">
+                    <span style="cursor: pointer;" (click)="prikazPr(id,this.opcijeTabelaMicko)" class="glyphicon glyphicon-triangle-bottom"></span>
+                    <span style="cursor: pointer;" (click)="prikazPr(id,this.opcijeTabelaMicko)" > &nbsp; {{ prM.Projekti }} </span>
+                  </div>
+                </td>
+                <td >
+                  <!--<input  [(ngModel)]=" this.rez[id]" value="{{ this.rez[id] }}" class="form-control"  disabled />-->
+                  <input  [(ngModel)]="prM.sumProjekata" value="{{ prM.sumProjekata }}" class="form-control"  disabled />
+                </td>
+              </tr>
+              <!--<tr  *ngIf="hideElement == opcijeTabelaMicko[id]['pretraga'] && borderFlg == true" [ngStyle]="{'border': this.opcijeTabelaMicko[id]['border'] }"  >-->
+              <tr  *ngIf="hideElement == prM['pretraga'] && borderFlg == true" [ngStyle]="{'border': this.opcijeTabelaMicko[id]['border'] }"  >  
+                <td style="border-right: 0px solid;border-bottom: 0px solid;border-top: 0px solid;" *ngIf="prikazInformacija == this.opcijeTabelaMicko[id]['prikaz']">
+                  <div *ngIf="flgSave == prM['sacuvano']">
+                    <div class="prvi-div" *ngFor="let pd of this.tabelaPrikaz[id].Podaci;">
+                      <div class="tabela-detalji-text" >
+                        <div class="tabela-detalji-text-sredjeno"  >
+                          <p style="margin-left: 10px;width:100%;margin-top: 10px;">{{ pd.ime }}:</p>
+                        </div>
+                      </div> &nbsp; &nbsp;
+                      <div class="tabela-detalji-input" style="vertical-align: middle;background-color: yellow;"> 
+                        <input #box1 type="number" min="0" max="40" step="1" class="form-control" [(ngModel)]="pd.satnica" value="{{  pd.satnica }}" style="width:200px;"
+                          (keyup)="racunanjeUzivo(pd.satnica,pd.ime,prM.id_pr,prM.Projekti,pd);"
+                          (click)="racunanjeUzivo(pd.satnica,pd.ime,prM.id_pr,prM.Projekti,pd);"    
+                        >
+                      </div><br>
+                    </div>
+                    <div class="drugi-div" style="margin-top:5px;">
+                      <td style="border-right: 0px solid;border-top: 0px solid;border-bottom: 0px solid;border-left: 0px solid;" *ngIf="prikazInformacija == this.opcijeTabelaMicko[id]['prikaz']">
+                        <div class="tabela-detalji-text" >
+                          <div class="tabela-detalji-text-sredjeno">    
+                            <p style="margin-left: 10px;width:100%;margin-top: 0px;">Ukupno:<p>
+                          </div>
+                        </div> &nbsp; &nbsp;
+                        <div class="tabela-detalji-input" style="vertical-align: middle;">
+                          <!--<input style="width:200px;" [(ngModel)]="this.rez[id]" value="{{ this.rez[id] }}" class="form-control"  disabled>-->
+                          <input style="width:200px;" [(ngModel)]="prM.sumProjekata" value="{{ prM.sumProjekata }}" class="form-control"  disabled />
+                        </div>
+                      </td>
+                    </div>
+                    <div class="treci-div" style="margin-top:5px;">
+                      <td style="border-right: 0px solid;border-top: 0px solid;border-bottom: 0px solid;border-left: 0px solid;" *ngIf="prikazInformacija == this.opcijeTabelaMicko[id]['prikaz']">
+                        <div class="tabela-detalji-text" >
+                          <div class="tabela-detalji-text-sredjeno">    
+                            <p style="margin-left: 10px;width:100%;margin-top: 0px;"><p>
+                          </div>
+                        </div> &nbsp; &nbsp;
+                        <div class="tabela-detalji-input" style="vertical-align: middle;">
+                          <button class="btn btn-danger" style="width:200px;margin-bottom: 5px;"
+                            (click)="sacuvajProjekat(id,this.tabelaPrikaz[id].Podaci,this.tabelaPrikaz[id].id_pr,this.tabelaPrikaz[id].tabela_vrednosti,this.GodinaJ.godina,this.MesecJ,this.NedeljaJ.nedelja);" >Sačuvaj
+                          </button>
+                        </div>
+                      </td>
+                    </div>
+                  </div>
+                  <div *ngIf="prM['sacuvano'] == 'nije'" class="col-sm-12 col-md-12 col-lg-12 col-xl-12" style="height:285px;">
+                    <div class="col-sm-12 col-sm-offset-4 col-md-12 col-md-offset-4 col-lg-12 col-lg-offset-4 col-xl-12 col-xl-offset-4">
+                      <button style="background-color:white;margin-top: 125px;margin-left: 0px;" class="btn btn-lg">
+                          <span class="glyphicon glyphicon-refresh glyphicon-refresh-animate"></span> U toku je snimanje satnica...
+                      </button>
+                    </div>
+                  </div>
+                  <div *ngIf="prM['sacuvano'] == 'snimanje'" class="col-sm-12 col-md-12 col-lg-12 col-xl-12" 
+                    style="height:285px;align-items: center;justify-content: center;">
+                      <div class="col-sm-12 col-sm-offset-6 col-md-12 col-md-offset-6 col-lg-12 col-lg-offset-6 col-xl-12 col-xl-offset-6">
+                        <button (click)="ureduFunkcija(id);" class="btn btn-danger" style="margin-top: 135px;" >
+                          Gotovo
+                        </button>
+                      </div>
+                  </div>
+                </td>
+                <td style="border-left: 0px solid;border-bottom: 0px solid;" *ngIf="prikazInformacija == this.opcijeTabelaMicko[id]['prikaz']">
+                </td>
+              </tr> 
+            </tbody>
             <tr class="active">
               <td>
-              <div class="tabela-detalji-text">
-                <div class="tabela-detalji-text-sredjeno">
-                  <p>Ukupna suma:</p>
+                <div class="tabela-detalji-text">
+                  <div class="tabela-detalji-text-sredjeno">
+                    <p>Ukupna suma:</p>
+                  </div>
                 </div>
-              </div>
-              <div class="tabela-detalji-input" style="vertical-align: top;">
-                  
-              </div><br>
+                <div class="tabela-detalji-input" style="vertical-align: top;">
+                </div><br>
               </td>
               <td>
-                <input style="width: 167px;vertical-align:top;" class="form-control" value="{{mumuSum}}" disabled/>
-              </td>  
+                <input  [(ngModel)]="mumuSum"  value="{{mumuSum}}" class="form-control"  disabled />
+              </td>
             </tr>  
-        </table>
+          </table>
+        </div>
       </div>
-    </div>-->
-    <!--<button id="12345{{ id }}" style="width:75px;" class="btn btn-danger pored-prvi" (click)="prikazPr(id,this.opcijeTabelaMicko)" >{{ this.opcijeTabelaMicko[id]['text'] }}
-    </button>&nbsp; &nbsp;--><!--<div style="width:100px;" class="pored-drugi">--> 
-    <!--</div>-->
-  <div class="row">
-    <div *ngIf="flgLoading" class="col-sm-7 col-sm-offset-2 col-md-7 col-md-offset-2 col-lg-7 col-lg-offset-2 col-xl-7 col-xl-offset-2" >
-      <table class="table table-bordered">
-        <tr class="active" >
-          <th class="text-center"><div class="pored-prvi">Projekti</div>&nbsp;
-            <div *ngIf="iconFlg == true" class="pored-drugi" style="cursor: pointer;" (click)="iconfunction('icon','Projekti','gore',this.tabelaPrikaz,this.opcijeTabelaMicko);">
-              <span class="glyphicon glyphicon-chevron-up"></span>
-            </div>
-            <div *ngIf="iconFlg == false" class="pored-drugi" style="cursor: pointer;" (click)="iconfunction('icon','Projekti','dole',this.tabelaPrikaz,this.opcijeTabelaMicko);">
-              <span class="glyphicon glyphicon-chevron-down"></span>
-            </div>
-            <input type="text" style="margin-top:5px; "  class="form-control search-input" (keyup)="Pretraga(this.textInput)" [(ngModel)]="this.textInput" placeholder="Search" />
-          </th>
-          <th style="width: 100px;" class="text-center"> Satnice 
-            <div *ngIf="iconFlgBtn == true" style="margin-top:5px;">
-              <button type="button" class="btn btn-default btn-sm" (click)="iconfunction('btn','sumProjekata','gore',this.tabelaPrikaz,this.opcijeTabelaMicko);">
-                <span class="glyphicon glyphicon-chevron-up"></span> 
-              </button>
-            </div>
-            <div *ngIf="iconFlgBtn == false" style="margin-top:5px;" (click)="iconfunction('btn','sumProjekata','dole',this.tabelaPrikaz,this.opcijeTabelaMicko);">
-              <button type="button" class="btn btn-default btn-sm">
-                <span class="glyphicon glyphicon-chevron-down"></span> 
-              </button>
-            </div>
-          </th>
-        </tr>
-        
-        <tbody  *ngFor="let prM of this.tabelaPrikaz;let id = index">
-          <!--<tr  *ngIf="hideElement == opcijeTabelaMicko[id]['pretraga']">-->
-          <tr  *ngIf="hideElement == prM['pretraga']">    
-            <td>
-              <div *ngIf="this.opcijeTabelaMicko[id]['prikaz'] != prikazInformacija">
-                <span style="cursor: pointer;" (click)="prikazPr(id,this.opcijeTabelaMicko)" class="glyphicon glyphicon-triangle-right"></span>
-                <span style="cursor: pointer;" (click)="prikazPr(id,this.opcijeTabelaMicko)"> &nbsp; {{ prM.Projekti }} </span>
-              </div>
-              <div *ngIf="this.opcijeTabelaMicko[id]['prikaz'] == prikazInformacija">
-                <span style="cursor: pointer;" (click)="prikazPr(id,this.opcijeTabelaMicko)" class="glyphicon glyphicon-triangle-bottom"></span>
-                <span style="cursor: pointer;" (click)="prikazPr(id,this.opcijeTabelaMicko)" > &nbsp; {{ prM.Projekti }} </span>
-              </div>
-            </td>
-            <td >
-              <!--<input  [(ngModel)]=" this.rez[id]" value="{{ this.rez[id] }}" class="form-control"  disabled />-->
-              <input  [(ngModel)]="prM.sumProjekata" value="{{ prM.sumProjekata }}" class="form-control"  disabled />
-            </td>
-          </tr>
-          <!--<tr  *ngIf="hideElement == opcijeTabelaMicko[id]['pretraga'] && borderFlg == true" [ngStyle]="{'border': this.opcijeTabelaMicko[id]['border'] }"  >-->
-          <tr  *ngIf="hideElement == prM['pretraga'] && borderFlg == true" [ngStyle]="{'border': this.opcijeTabelaMicko[id]['border'] }"  >  
-            <td style="border-right: 0px solid;border-bottom: 0px solid;border-top: 0px solid;" *ngIf="prikazInformacija == this.opcijeTabelaMicko[id]['prikaz']">
-              <div class="prvi-div" *ngFor="let pd of this.tabelaPrikaz[id].Podaci;">
-                <div class="tabela-detalji-text" >
-                  <div class="tabela-detalji-text-sredjeno"  >
-                    <p style="margin-left: 10px;width:100%;margin-top: 10px;">{{ pd.ime }}:</p>
-                  </div>
-                </div> &nbsp; &nbsp;
-                <div class="tabela-detalji-input" style="vertical-align: middle;background-color: yellow;"> 
-                  <input #box1 type="number" min="0" max="40" step="1" class="form-control" [(ngModel)]="pd.satnica" value="{{  pd.satnica }}" style="width:200px;"
-                    (keyup)="racunanjeUzivo(pd.satnica,pd.ime,prM.id_pr,prM.Projekti,pd);"
-                    (click)="racunanjeUzivo(pd.satnica,pd.ime,prM.id_pr,prM.Projekti,pd);"    
-                  >
-                </div><br>
-              </div>
-              <div class="drugi-div" style="margin-top:5px;">
-                <td style="border-right: 0px solid;border-top: 0px solid;border-bottom: 0px solid;border-left: 0px solid;" *ngIf="prikazInformacija == this.opcijeTabelaMicko[id]['prikaz']">
-                  <div class="tabela-detalji-text" >
-                    <div class="tabela-detalji-text-sredjeno">    
-                      <p style="margin-left: 10px;width:100%;margin-top: 0px;">Ukupno:<p>
-                    </div>
-                  </div> &nbsp; &nbsp;
-                  <div class="tabela-detalji-input" style="vertical-align: middle;">
-                    <!--<input style="width:200px;" [(ngModel)]="this.rez[id]" value="{{ this.rez[id] }}" class="form-control"  disabled>-->
-                    <input  [(ngModel)]="prM.sumProjekata" value="{{ prM.sumProjekata }}" class="form-control"  disabled />
-                  </div>
-                </td>
-              </div>
-              <div class="treci-div" style="margin-top:5px;">
-                <td style="border-right: 0px solid;border-top: 0px solid;border-bottom: 0px solid;border-left: 0px solid;" *ngIf="prikazInformacija == this.opcijeTabelaMicko[id]['prikaz']">
-                  <div class="tabela-detalji-text" >
-                    <div class="tabela-detalji-text-sredjeno">    
-                      <p style="margin-left: 10px;width:100%;margin-top: 0px;"><p>
-                    </div>
-                  </div> &nbsp; &nbsp;
-                  <div class="tabela-detalji-input" style="vertical-align: middle;">
-                    <button class="btn btn-danger" style="width:200px;margin-bottom: 5px; "
-                      (click)="sacuvajProjekat(this.tabelaPrikaz[id].Podaci,this.tabelaPrikaz[id].id_pr,this.tabelaPrikaz[id].tabela_vrednosti,this.GodinaJ.godina,this.MesecJ,this.NedeljaJ.nedelja);" >Sačuvaj
-                    </button>
-                  </div>
-                </td>
-              </div>
-            </td>
-            <td style="border-left: 0px solid;border-bottom: 0px solid;" *ngIf="prikazInformacija == this.opcijeTabelaMicko[id]['prikaz']">
-            </td>
-          </tr> 
-        </tbody>
-        <tr class="active">
-          <td>
-            <div class="tabela-detalji-text">
-              <div class="tabela-detalji-text-sredjeno">
-                <p>Ukupna suma:</p>
-              </div>
-            </div>
-            <div class="tabela-detalji-input" style="vertical-align: top;">
-            </div><br>
-          </td>
-          <td>
-            <input  [(ngModel)]="mumuSum"  value="{{mumuSum}}" class="form-control"  disabled />
-          </td>
-          <!--<td>
-            <input style="width: 120px;vertical-align:top;" class="form-control" [(ngModel)]="mumuSum" value="{{mumuSum}}" disabled/>
-          </td>-->  
-        </tr>  
-      </table>
     </div> 
+  </div>
   <div class="row">
-    <div *ngIf="flgLoading == false">
+    <div *ngIf="flgReload == false">
       <div class="col-sm-5 col-sm-offset-5 col-md-5 col-md-offset-5 col-lg-5 col-lg-offset-5 col-xl-5 col-xl-offset-5" style="background-color:white;">
-        <button style="background-color:white" class="btn btn-lg"><span class="glyphicon glyphicon-refresh glyphicon-refresh-animate"></span> Loading...</button>
+        <button style="background-color:white" class="btn btn-lg"><span class="glyphicon glyphicon-refresh glyphicon-refresh-animate"></span> Ucitavanje...</button>
+      </div> 
+    </div>
+    <div *ngIf="flgChange == false">
+      <div class="col-sm-5 col-sm-offset-5 col-md-5 col-md-offset-5 col-lg-5 col-lg-offset-5 col-xl-5 col-xl-offset-5" style="background-color:white;">
+        <button style="background-color:white" class="btn btn-lg"><span class="glyphicon glyphicon-refresh glyphicon-refresh-animate"></span> Ucitavanje...</button>
+      </div> 
+    </div>
+    <div *ngIf="flgSaveAll == 'snimanje'" style="margin-top: 150px;">
+      <div class="col-sm-5 col-sm-offset-5 col-md-5 col-md-offset-5 col-lg-5 col-lg-offset-5 col-xl-5 col-xl-offset-5" style="background-color:white;">
+        <button style="background-color:white" class="btn btn-lg"><span class="glyphicon glyphicon-refresh glyphicon-refresh-animate"></span> U toku je snimanje satnica...</button>
+      </div> 
+    </div>
+    <div *ngIf="flgSaveAll == 'gotovo'" style="margin-top: 150px">
+      <div class="col-sm-5 col-sm-offset-5 col-md-5 col-md-offset-5 col-lg-5 col-lg-offset-5 col-xl-5 col-xl-offset-5" style="background-color:white;">
+        <p style="font-size: 18px;">Uspešno ste sačuvali satnice</p>
+        <button style="margin-left: 85px;" (click)="GotovoSveSatnice()" class="btn btn-danger">Gotovo</button>
       </div> 
     </div>
   </div>
   <app-header></app-header> 
 </div>
+
+
+
  <!--
            <tr  *ngIf="hideElement == opcijeTabelaMicko[id]['pretraga']">
              <td style="border-right: 0px solid;border-top: 0px solid;border-bottom: 0px solid;" *ngIf="prikazInformacija == this.opcijeTabelaMicko[id]['prikaz']">
@@ -479,4 +408,119 @@
     </div> 
 -->
 
+<!--
+    <div class="row"> 
+      <div *ngIf="flgLoading" class="col-sm-7 col-sm-offset-2 col-md-7 col-md-offset-2 col-lg-7 col-lg-offset-2 col-xl-7 col-xl-offset-2" >
+        <table class="table table-bordered">
+          <tr class="active" [ngStyle]="{'height' : '80px'}">
+            <th class="text-center"> Projekti <input type="text"   class="form-control search-input" (keyup)="Pretraga(this.textInput)" [(ngModel)]="this.textInput" /></th>
+            <th class="text-center"> <div class="up-down" style="cursor: pointer;" (click)="ViditiSort();" >Satnice</div> 
+              <div *ngIf="this.sort == true;" class="sort-satnica">
+                <div *ngIf="this.flgFiltar == false" class="up">
+                  <button type="button" class="btn btn-default btn-sm" (click)="probaHtmlL = true;Filtriraj();">
+                    <span class="glyphicon glyphicon-chevron-up"></span>
+                  </button>
+                </div>
+                <div *ngIf="this.flgFiltar == true" class="down">
+                  <button [disabled]="disableSort == false" type="button" class="btn btn-default btn-sm" (click)="probaHtmlL = false;Filtriraj();">
+                    <span class="glyphicon glyphicon-chevron-down"></span>
+                  </button>
+                </div>
+              </div>
+            </th> 
+          </tr>
+          <tbody *ngFor="let niz of projekti_lista; let idNiz = index; trackBy: trackByNiz">
+            <tr *ngIf="hideElement == mickoTrue[idNiz]">
+              <td>{{ niz.Projekti }} </td>
+              <td style="width:210px;"><button id="12345{{ idNiz }}" style="width:75px;" class="btn btn-danger pored-prvi" (click)="NizVidljivost(niz.Projekti,idNiz)">{{ objektPrikazi[idNiz]['text'] }}</button>&nbsp; &nbsp;<div style="width:100px;" class="pored-drugi"><input style="width:80px;"  class="form-control"  [(ngModel)]="mumu[idNiz]" value="{{mumu[idNiz]}}" disabled></div></td>
+            </tr>
+              <tr *ngIf="hideElement == objektPrikazi[idNiz]['search']">  
+                <div  style="margin-left:10px;"  *ngIf="hideObavestenja == objektPrikazi[idNiz]['prikaz']" id="{{ idNiz }}">
+                  <div class="tabela-detalji-text">
+                    <div class="tabela-detalji-text-sredjeno" >
+                      <p>Razvoj:</p>
+                    </div>
+                  </div>
+                  <div class="tabela-detalji-input" style="vertical-align: top;">
+                    <input #box type="number" min="0" max="40" step="1" class="form-control" name="Micko" [(ngModel)]="niz.Razvoj" value="{{ niz.razvoj }}" style="width:200px;" 
+                    (keyup)="Racunaj_proba(niz.Razvoj,niz.odrzavanje,niz.dokumentacija,niz.implementacija,niz.rezijski_poslovi,idNiz);Racunaj_Ukupno();" 
+                    (click)="Racunaj_proba(niz.Razvoj,niz.odrzavanje,niz.dokumentacija,niz.implementacija,niz.rezijski_poslovi,idNiz);Racunaj_Ukupno();"/>
+                  </div><br>
+                  <div class="tabela-detalji-text">
+                    <div class="tabela-detalji-text-sredjeno">
+                      <p>Održavanje:</p>
+                    </div>
+                  </div>
+                  <div class="tabela-detalji-input" style="vertical-align: top;">
+                    <input #box1 type="number" min="0" max="40" step="1" class="form-control" [(ngModel)]="niz.odrzavanje" value="{{ niz.odrzavanje }}" style="width:200px;"
+                    (keyup)="Racunaj_proba(niz.Razvoj,niz.odrzavanje,niz.dokumentacija,niz.implementacija,niz.rezijski_poslovi,idNiz);Racunaj_Ukupno();"
+                    (click)="Racunaj_proba(niz.Razvoj,niz.odrzavanje,niz.dokumentacija,niz.implementacija,niz.rezijski_poslovi,idNiz);Racunaj_Ukupno();"/>   
+                  </div><br>
+                  <div class="tabela-detalji-text">
+                    <div class="tabela-detalji-text-sredjeno">
+                      <p>Dokumentacija:</p>
+                    </div>
+                  </div>
+                  <div class="tabela-detalji-input"  style="vertical-align: top;">
+                    <input #box2 type="number" min="0" max="40" step="1" class="form-control" [(ngModel)]="niz.dokumentacija" value="{{ niz.dokumentacija }}" style="width:200px;"
+                    (keyup)="Racunaj_proba(niz.Razvoj,niz.odrzavanje,niz.dokumentacija,niz.implementacija,niz.rezijski_poslovi,idNiz);Racunaj_Ukupno();"
+                    (click)="Racunaj_proba(niz.Razvoj,niz.odrzavanje,niz.dokumentacija,niz.implementacija,niz.rezijski_poslovi,idNiz);Racunaj_Ukupno();"/>         
+                  </div><br>
+                  <div class="tabela-detalji-text">
+                    <div class="tabela-detalji-text-sredjeno">
+                      <p>Implementacija:</p>
+                    </div>
+                  </div>
+                  <div class="tabela-detalji-input"  style="vertical-align: top;">
+                    <input #box3 type="number" min="0" max="40" step="1" class="form-control" [(ngModel)]="niz.implementacija"  value="{{ niz.implementacija }}" style="width:200px;"
+                    (keyup)="Racunaj_proba(niz.Razvoj,niz.odrzavanje,niz.dokumentacija,niz.implementacija,niz.rezijski_poslovi,idNiz);Racunaj_Ukupno();"
+                    (click)="Racunaj_proba(niz.Razvoj,niz.odrzavanje,niz.dokumentacija,niz.implementacija,niz.rezijski_poslovi,idNiz);Racunaj_Ukupno();"/>         
+                  </div><br>
+                  <div class="tabela-detalji-text">
+                    <div class="tabela-detalji-text-sredjeno">
+                      <p>Režijski poslovi:</p>
+                    </div>
+                  </div>
+                  <div class="tabela-detalji-input"  style="vertical-align: top;">
+                    <input #box4 type="number" min="0" max="40" step="1" class="form-control" [(ngModel)]="niz.rezijski_poslovi" value="{{ niz.reziski_poslovi }}" style="width:200px;"
+                    (keyup)="Racunaj_proba(niz.Razvoj,niz.odrzavanje,niz.dokumentacija,niz.implementacija,niz.rezijski_poslovi,idNiz);Racunaj_Ukupno();"
+                    (click)="Racunaj_proba(niz.Razvoj,niz.odrzavanje,niz.dokumentacija,niz.implementacija,niz.rezijski_poslovi,idNiz);Racunaj_Ukupno();"/>         
+                  </div>
+                  <br>
+                  <div class="tabela-detalji-text">
+                    <div class="tabela-detalji-text-sredjeno">    
+                        <p>Ukupno:<p>
+                    </div>
+                  </div>
+                  <div class="tabela-detalji-input"  style="vertical-align: top;">     
+                    <p><input style="width:200px;"  class="form-control"  [(ngModel)]="mumu[idNiz]" value="{{mumu[idNiz]}}" disabled><p>   
+                  </div>&nbsp; &nbsp;
+                  <div class="tabela-detalji-button">     
+                    <button class="btn btn-danger" style="width:100px;" (click)="SnimiNiz(niz.Projekti,niz.id_projekat_D,niz.Razvoj,niz.odrzavanje,niz.dokumentacija,niz.implementacija,niz.rezijski_poslovi,niz)">Sačuvaj</button>  
+                  </div>
+                </div>
+              </tr>   
+          </tbody>
+            <tr class="active">
+              <td>
+              <div class="tabela-detalji-text">
+                <div class="tabela-detalji-text-sredjeno">
+                  <p>Ukupna suma:</p>
+                </div>
+              </div>
+              <div class="tabela-detalji-input" style="vertical-align: top;">
+                  
+              </div><br>
+              </td>
+              <td>
+                <input style="width: 167px;vertical-align:top;" class="form-control" value="{{mumuSum}}" disabled/>
+              </td>  
+            </tr>  
+        </table>
+      </div>
+    </div>
+    <button id="12345{{ id }}" style="width:75px;" class="btn btn-danger pored-prvi" (click)="prikazPr(id,this.opcijeTabelaMicko)" >{{ this.opcijeTabelaMicko[id]['text'] }}
+    </button>&nbsp; &nbsp;--><!--<div style="width:100px;" class="pored-drugi">
+    </div>
+-->
 

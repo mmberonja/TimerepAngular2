@@ -66,7 +66,6 @@ export class TabelaComponent implements OnInit,OnDestroy {
   tokenAdmin:string;
   currentUser_ne:User[] = [];
 
-
   ngXColumn:any[] = [];
   ngXColumnObject:any[] = [];
   ngXsize:number = 0;
@@ -96,20 +95,13 @@ export class TabelaComponent implements OnInit,OnDestroy {
               public renderer: Renderer) 
     { 
 
-
-      this.NizObject = [{ 
-            Project:'Erviko',nedelja1:1,nedelja2:2,nedelja3:3,nedelja4:4,nedelja5:5,nedelja6:6
-      }]
-
-      
-
+    this.NizObject = [{ 
+          Project:'Erviko',nedelja1:1,nedelja2:2,nedelja3:3,nedelja4:4,nedelja5:5,nedelja6:6
+    }]
   }
 
   ngOnDestroy(){
-
-        console.log("ngOnDestroy")
-        clearInterval(this.interval);
-
+    clearInterval(this.interval);
   }  
 
   ngOnInit() {
@@ -175,9 +167,7 @@ export class TabelaComponent implements OnInit,OnDestroy {
     let d = new Date();
     let nowMonth = this.monthT[d.getMonth()];
 
-
     this.nadimak_tabela = JSON.parse(localStorage.getItem('currentUser'));
-    
     this.serviceTabela.fullName(this.nadimak_tabela)
       .then(
         fullname_baza_tabela => { this.fullname_baza_tabela= fullname_baza_tabela
@@ -243,8 +233,6 @@ export class TabelaComponent implements OnInit,OnDestroy {
                         this.projektiObjekiNedelje[pr]['Ukupno'] = this.sumProjekti[pr];
                       }
                       this.temp = this.projektiObjekiNedelje;
-                      console.log("this.NizObjekiNedelje" , this.projektiObjekiNedelje);
-
                   },
                   error => {
                     console.log("error");              
@@ -431,10 +419,6 @@ export class TabelaComponent implements OnInit,OnDestroy {
      for(var i = 0; this.lista_broja_nedelja >= i ; i++){
         this.objekti_nedelje.splice(this.objekti_nedelje.indexOf(i), 1);
      }
-     /*for(var i = 0; this.lista_broja_nedelja_ngModel >= i ; i++){
-        this.objekti_nedelje_ngModel.splice(this.objekti_nedelje_ngModel.indexOf(i), 1);
-     }*/
-
      
   }
 
@@ -444,97 +428,80 @@ export class TabelaComponent implements OnInit,OnDestroy {
     this.broj_nedelja_za_dati_mesec();
 
     this.serviceTabela.fullName(this.nadimak_tabela)
-        .then(
+      .then(
 
-          fullname_baza_tabela => { this.fullname_baza_tabela= fullname_baza_tabela
+        fullname_baza_tabela => { this.fullname_baza_tabela= fullname_baza_tabela
 
-           this.serviceTabela.projektiNaKojimaRadiKorisnik(this.nadimak_tabela)
-                    .subscribe(
+        this.serviceTabela.projektiNaKojimaRadiKorisnik(this.nadimak_tabela)
+          .subscribe(
+            projekti => { this.projekti= projekti
+              
+            this.serviceTabela.satnicaKorisnik(this.selectedMesecTabela,this.nadimak_tabela,this.selectedGodinaTabelaKorisnik)
+              .subscribe(      
+                satnica => { this.satnica= satnica
 
-                //console.log(this.satnica);
-                projekti => { this.projekti= projekti
-               
-                 this.serviceTabela.satnicaKorisnik(this.selectedMesecTabela,this.nadimak_tabela,this.selectedGodinaTabelaKorisnik)
-                    .subscribe(      
+                this.broj_nedelja_za_dati_mesec();
 
-                        satnica => { this.satnica= satnica
+                for(let ar in this.projektiObjekiNedelje){//Brisanje Niza-objekata!!!
+                  var index = this.projektiObjekiNedelje.indexOf(this.projektiObjekiNedelje[ar]);
+                  this.projektiObjekiNedelje.splice(index, this.projektiObjekiNedelje.length);
+                }
 
-                        //console.log(this.projekti);
-                        this.broj_nedelja_za_dati_mesec();
+                for (let pr of this.projekti) {
+                  let y = {};
+                  y['Projekti'] = pr.Projekti;
+                  for (let kor of this.NizObjekiNedelje) {
+                    y[kor.Oznaka] = null;
+                  }
+                  this.projektiObjekiNedelje.push(y);                  
+                }                       
 
-                        for(let ar in this.projektiObjekiNedelje){//Brisanje Niza-objekata!!!
+                for(let pr in this.projektiObjekiNedelje){
+                //for(let pr = 0; pr < 2 ; pr++){  
+                  for (let sat of this.satnica) {//kor.Oznaka                            
+                    if(this.projektiObjekiNedelje[pr]['Projekti'] == sat.Projekti){ 
+                      this.projektiObjekiNedelje[pr][sat.nedelja+".Nedelja"] = sat.sum;
+                    }
+                  }
+                }
 
-                            var index = this.projektiObjekiNedelje.indexOf(this.projektiObjekiNedelje[ar]);
-                            //console.log("NizObjectIndex" + index);
-                            this.projektiObjekiNedelje.splice(index, this.projektiObjekiNedelje.length);
+                for(let ar in this.sumNedelja){//Brisanje Niza-objekata!!!
+                  var index = this.sumNedelja.indexOf(this.sumNedelja[ar]);
+                  this.sumNedelja.splice(index, this.sumNedelja.length);
+                }
 
-                        }
+                for(let pr in this.NizObjekiNedelje){
+                  this.sumNedelja[pr] = 0;
+                }
 
-                        for (let pr of this.projekti) {
-                            let y = {};
-                            y['Projekti'] = pr.Projekti;
-                            for (let kor of this.NizObjekiNedelje) {
-                              y[kor.Oznaka] = null;
-                            }
-                            this.projektiObjekiNedelje.push(y);
-                          
-                        }
-                        //console.log(this.projektiObjekiNedelje);
+                for(let ned in this.NizObjekiNedelje){
+                //for(let ned = 0; ned < 1 ; ned++){  
+                  for(let pr in this.projektiObjekiNedelje){
+                    this.sumNedelja[ned] = this.projektiObjekiNedelje[pr][this.NizObjekiNedelje[ned].Oznaka] +  this.sumNedelja[ned];
+                  }
+                }
 
-                        for(let pr in this.projektiObjekiNedelje){
-                        //for(let pr = 0; pr < 2 ; pr++){  
-                            for (let sat of this.satnica) {//kor.Oznaka
-                              
-                              if(this.projektiObjekiNedelje[pr]['Projekti'] == sat.Projekti){ 
-                                this.projektiObjekiNedelje[pr][sat.nedelja+".Nedelja"] = sat.sum;
-                              }
-                          }
-                        }
+                for(let pr in this.projektiObjekiNedelje){
+                //for(let h=0;h<1;h++){                           
+                  this.sumProjekti[pr] = 0;
+                  this.projektiObjekiNedelje[pr]['Ukupno'] = this.sumProjekti[pr];
+                  for(let i=0;i<this.NizObjekiNedelje.length - 1;i++){             
+                    let z = 1;
+                    z = z + i;
+                    this.sumProjekti[pr] = this.projektiObjekiNedelje[pr][z+".Nedelja"] + this.sumProjekti[pr];
+                  }
+                  this.projektiObjekiNedelje[pr]['Ukupno'] = this.sumProjekti[pr];
+                }
 
-                        for(let ar in this.sumNedelja){//Brisanje Niza-objekata!!!
-
-                            var index = this.sumNedelja.indexOf(this.sumNedelja[ar]);
-                            //console.log("NizObjectIndex" + index);
-                            this.sumNedelja.splice(index, this.sumNedelja.length);
-
-                        }
-
-                        for(let pr in this.NizObjekiNedelje){
-
-                            this.sumNedelja[pr] = 0;
-
-                        }
-
-                        for(let ned in this.NizObjekiNedelje){
-                        //for(let ned = 0; ned < 1 ; ned++){  
-                          for(let pr in this.projektiObjekiNedelje){
-                            this.sumNedelja[ned] = this.projektiObjekiNedelje[pr][this.NizObjekiNedelje[ned].Oznaka] +  this.sumNedelja[ned];
-                          }
-
-                        }
-
-                        for(let pr in this.projektiObjekiNedelje){
-                        //for(let h=0;h<1;h++){                           
-                          this.sumProjekti[pr] = 0;
-                          this.projektiObjekiNedelje[pr]['Ukupno'] = this.sumProjekti[pr];
-                          for(let i=0;i<this.NizObjekiNedelje.length - 1;i++){             
-                            let z = 1;
-                            z = z + i;
-                            this.sumProjekti[pr] = this.projektiObjekiNedelje[pr][z+".Nedelja"] + this.sumProjekti[pr];
-                          }
-                          this.projektiObjekiNedelje[pr]['Ukupno'] = this.sumProjekti[pr];
-                        }
-
-                    },
-                    error => {
-                      console.log("error");
-                                  
-              });
-          },
-                error => {
-                  console.log("error");
-                              
-          });
+                  },
+                  error => {
+                    console.log("error");
+                                
+            });
+        },
+        error => {
+          console.log("error");
+        });
       },
       error => {
         console.log("error");

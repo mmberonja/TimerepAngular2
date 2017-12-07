@@ -16,27 +16,45 @@ import { ListaBazaPodaciModel } from './models/ListaBazaPodaci.model';
 @Injectable()
 export class AdminService {
 
-  /*private headers = new Headers({ 'Content-Type': 'application/json' });
-  private options = new RequestOptions({ headers: this.headers });*/
-  obj:any;
+    /*private headers = new Headers({ 'Content-Type': 'application/json' });
+    private options = new RequestOptions({ headers: this.headers });*/
+    obj:any;
 
-  constructor(private router:Router,private http: Http,@Inject('ApiEndpoint') private apiEndpoint: any) { 
+    constructor(private router:Router,private http: Http,@Inject('ApiEndpoint') private apiEndpoint: any) { 
 
 
-      /* this.getJSON().subscribe(data => {
-        this.obj=data.konfiguracija.konekcija.web;
-                  //console.log("obj" + this.obj);
-        }, 
-        error => console.log(error));*/
+        /*this.getJSON().subscribe(data => {
+            this.obj=data.konfiguracija.konekcija.web;
+                    //console.log("obj" + this.obj);
+            }, 
+            error => console.log(error));*/
 
-  }
+    }
   
-
     getJSON():Observable<any>{
 
-                return this.http.get('src/config.json')
-                            .map(data => data.json())
-                            .catch(this.handleError);
+        return this.http.get('src/config.json')
+            .map(data => data.json())
+            .catch(this.handleError);
+
+    }
+
+    Sifra(projekti:any):Observable<any>{
+
+        let token = JSON.parse(localStorage.getItem('Token'));
+        if(token == null){
+            this.router.navigate(['/login']);
+        }
+        let authHeader = new Headers(
+            {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + token
+            }
+        );
+        let options = new RequestOptions({ headers: authHeader })
+        return this.http.put(''+this.apiEndpoint+'admin/Excel',{ Projekti : projekti },options)
+            .map(data =>  data.json())
+            .catch(this.handleError)
 
     }
 
@@ -258,7 +276,7 @@ export class AdminService {
             .catch(this.handleError)
                 
     }
-    
+
     Projekti():Observable<Admin>{
 
         let token = JSON.parse(localStorage.getItem('Token'));
@@ -280,7 +298,7 @@ export class AdminService {
             .catch(this.handleError)
                 
     }
-    
+
     DodavanjeNovogProjekta(projekat:any):Observable<any>{
 
         let token = JSON.parse(localStorage.getItem('Token'));
@@ -323,7 +341,7 @@ export class AdminService {
             .catch(this.handleError)
     }
 
-    DodavanjeKorisnikaNaProjekat(Nadimak:any,Projekat:string,godina:number):Observable<Admin>{
+    DodavanjeKorisnikaNaProjekat(Nadimak:any,Projekat:any[] = [],godina:number):Observable<Admin>{
         
         let token = JSON.parse(localStorage.getItem('Token'));
         if(token == null){
@@ -363,7 +381,7 @@ export class AdminService {
             .catch(this.handleError)
     }
 
-    BrisanjeKorisnikaSaProjekta(Nadimak:any,Projekat:string):Observable<Admin>{
+    BrisanjeKorisnikaSaProjekta(Nadimak:any,projekti:any[] = []):Observable<Admin>{
         
         let token = JSON.parse(localStorage.getItem('Token'));
         //console.log("token" + token)
@@ -379,7 +397,7 @@ export class AdminService {
         );
 
         let options = new RequestOptions({ headers: authHeader })
-        let body = JSON.stringify({Nadimak: Nadimak,Projekat: Projekat});
+        let body = JSON.stringify({Nadimak: Nadimak,Projekat: projekti});
 
         //return this.http.put(''+this.apiEndpoint+'projekat/admin?NadimakBrisanje='+Nadimak+'&ProjekatBRisanje='+Projekat+'' ,options)
         return this.http.put(''+this.apiEndpoint+'admin/ukloni-korisnika-sa-projekata',body,options)
@@ -474,9 +492,9 @@ export class AdminService {
         let options = new RequestOptions({ headers: authHeader })
         return this.http.get(''+this.apiEndpoint+'refresh/token?ime='+ime+'&admin='+admin+'',options)
             .map(data => { 
-               let user =  data.json();
-               //localStorage.removeItem('Token')
-               localStorage.setItem('Token', JSON.stringify(user));
+                let user =  data.json();
+                //localStorage.removeItem('Token')
+                localStorage.setItem('Token', JSON.stringify(user));
             })
             .catch(this.handleError) 
     }
